@@ -1,6 +1,7 @@
 {
-  "buildCommand": "vite build --outDir dist",
-  "outputDirectory": "dist",
+  "buildCommand": "cd frontend && vite build",
+  "outputDirectory": "frontend/dist",
+  "installCommand": "npm install",
   "rewrites": [
     {
       "source": "/api/v1/(.*)",
