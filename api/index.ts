@@ -15,14 +15,14 @@ export default async function handler(req: any, res: any) {
     
     // CORS configuration for your frontend
     nestApp.enableCors({
-      origin: [
+    origin: [
         process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000',
-        'https://royal-health.vercel.app',
+        'https://royal-health-testing.vercel.app', // ← Add your actual domain
         'http://localhost:3000'
-      ],
-      credentials: true,
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     });
     
     // Set API prefix (same as your current setup)
