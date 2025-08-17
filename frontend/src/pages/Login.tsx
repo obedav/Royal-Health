@@ -1,4 +1,4 @@
-// src/pages/Login.tsx - Updated with proper navigation
+// src/pages/Login.tsx - Updated with Supabase authentication
 import { useState } from 'react';
 import {
   Box,
@@ -24,6 +24,7 @@ import {
 } from '@chakra-ui/react';
 import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../hooks/useAuth';
 
 const Login = () => {
@@ -37,23 +38,71 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
+  const toast = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
-    const success = await login(email, password);
-    
-    if (success) {
-      // Get intended destination or default to dashboard
-      const from = location.state?.from?.pathname || '/dashboard';
-      navigate(from, { replace: true });
-    } else {
-      setError('Login failed. Please check your credentials.');
+    try {
+      // Sign in with Supabase Auth
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (error) {
+        setError(error.message);
+        toast({
+          title: 'Login Failed',
+          description: error.message,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // If Supabase login is successful, call your custom login hook
+      const success = await login(email, password);
+      
+      if (success) {
+        toast({
+          title: 'Login Successful',
+          description: 'Welcome back!',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+
+        // Get intended destination or default to dashboard
+        const from = location.state?.from?.pathname || '/dashboard';
+        navigate(from, { replace: true });
+      } else {
+        setError('Login failed. Please check your credentials.');
+        toast({
+          title: 'Login Failed',
+          description: 'Please check your credentials and try again.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('Network error. Please check your connection and try again.');
+      toast({
+        title: 'Connection Error',
+        description: 'Unable to connect to the server. Please try again.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   const togglePasswordVisibility = () => {
@@ -237,6 +286,25 @@ const Login = () => {
                         Privacy Policy
                       </Link>
                     </Text>
+
+                    {/* Demo Credentials Info */}
+                    <Box 
+                      bg="blue.50" 
+                      p={4} 
+                      borderRadius="lg" 
+                      textAlign="center"
+                      w="full"
+                    >
+                      <Text fontSize="xs" fontWeight="bold" color="blue.700" mb={1}>
+                        Demo Test Account
+                      </Text>
+                      <Text fontSize="xs" color="blue.600">
+                        Email: john.doe@royalhealth.ng
+                      </Text>
+                      <Text fontSize="xs" color="blue.600">
+                        Password: SecurePassword123!
+                      </Text>
+                    </Box>
                   </VStack>
                 </VStack>
               </form>

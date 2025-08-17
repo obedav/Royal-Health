@@ -33,6 +33,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
+import { supabase } from '../lib/supabaseClient'
 import { 
   FaUser, 
   FaLock, 
@@ -113,26 +114,45 @@ const Register: React.FC = () => {
     return 'green'
   }
 
-  const onSubmit = async (data: RegisterFormSchema) => {
+  const onSubmit = async (formData: RegisterFormSchema) => {
     setIsSubmitting(true)
     setError('')
 
     try {
-      // Call the API directly
+      // Sign up with Supabase Auth
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+      })
+
+      if (error) {
+        setError(error.message)
+        toast({
+          title: 'Registration Failed',
+          description: error.message,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
+        return
+      }
+
+      // If Supabase signup is successful, call your backend API
       const response = await fetch('http://localhost:3001/api/v1/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: data.email,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          phone: data.phone,
-          password: data.password,
-          confirmPassword: data.confirmPassword,
-          role: data.role,
-          preferredLanguage: 'en'
+          email: formData.email,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: formData.phone,
+          password: formData.password,
+          confirmPassword: formData.confirmPassword,
+          role: formData.role,
+          preferredLanguage: 'en',
+          supabaseUserId: data.user?.id // Include Supabase user ID
         }),
       })
 
