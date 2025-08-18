@@ -34,22 +34,25 @@ import { Booking } from './modules/bookings/entities/booking.entity';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const isProduction = configService.get('NODE_ENV') === 'production';
-        const databaseUrl = configService.get<string>('DATABASE_URL');
+        const directUrl = configService.get<string>('DATABASE_URL_DIRECT');
+        const poolerUrl = configService.get<string>('DATABASE_URL_POOLER');
+        const fallbackUrl = configService.get<string>('DATABASE_URL'); // optional legacy
 
-        if (isProduction && databaseUrl) {
-          console.log('🔗 Connecting to Supabase/Render Database (Production)...');
+        if (isProduction) {
+          // Prefer Direct, fallback to Pooler, then legacy DATABASE_URL
+          const databaseUrl = directUrl || poolerUrl || fallbackUrl;
+          if (!databaseUrl) {
+            throw new Error('❌ No production DATABASE_URL found');
+          }
+
+          console.log(`🔗 Connecting to Supabase Database (${directUrl ? 'Direct' : poolerUrl ? 'Pooler' : 'Default'})...`);
           return {
             type: 'postgres',
-            url: databaseUrl, // Pooler URI from Supabase
+            url: databaseUrl,
             entities: [User, Booking],
-            synchronize: false, // Never sync in production
+            synchronize: false, // Never in prod
             logging: false,
-            ssl: {
-              rejectUnauthorized: false,
-            },
-            extra: {
-              ssl: true,
-            },
+            ssl: { rejectUnauthorized: false },
           };
         }
 
@@ -58,13 +61,13 @@ import { Booking } from './modules/bookings/entities/booking.entity';
           type: 'postgres',
           host: configService.get('DB_HOST', 'localhost'),
           port: parseInt(configService.get('DB_PORT', '5432')),
-          username: configService.get('DB_USERNAME'),
-          password: String(configService.get('DB_PASSWORD')),
-          database: configService.get('DB_NAME'),
+          username: configService.get('DB_USERNAME', 'postgres'),
+          password: String(configService.get('DB_PASSWORD', 'postgres')),
+          database: configService.get('DB_NAME', 'postgres'),
           entities: [User, Booking],
-          synchronize: true, // OK for dev
+          synchronize: true, // Safe for dev
           logging: true,
-          ssl: false,
+          ssl: { rejectUnauthorized: false },
         };
       },
     }),
