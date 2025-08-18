@@ -5,8 +5,8 @@
   "main": "dist/main.js",
   "scripts": {
     "build": "npm run prebuild && npm run compile",
-  "prebuild": "rm -rf dist",  
-  "compile": "tsc -p tsconfig.build.json",
+    "prebuild": "rm -rf dist",
+    "compile": "tsc -p tsconfig.build.json",
     "start": "node dist/main",
     "start:prod": "node dist/main",
     "start:dev": "nest start --watch",
@@ -18,7 +18,7 @@
   "keywords": [
     "healthcare",
     "api",
-    "nodejs", 
+    "nodejs",
     "nestjs",
     "supabase",
     "nigeria",
