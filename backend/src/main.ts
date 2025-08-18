@@ -1,47 +1,55 @@
-// backend/src/main.ts
+// src/main.ts
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe, Logger } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { NestExpressApplication } from '@nestjs/platform-express';
+import helmet from 'helmet';
 import * as compression from 'compression';
-import helmet from 'helmet'; // Changed to default import
 
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
-  const logger = new Logger('Bootstrap');
 
-  // Global prefix
-  const apiPrefix = configService.get('API_PREFIX', 'api/v1');
-  app.setGlobalPrefix(apiPrefix);
-
-  // Security
-  app.use(helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        scriptSrc: ["'self'"],
-        imgSrc: ["'self'", "data:", "https:"],
-      },
-    },
-  }));
+  // Security middleware
+  app.use(helmet());
   app.use(compression());
 
-  // CORS configuration
-  const corsOrigin = configService.get('CORS_ORIGIN');
-  if (!corsOrigin) {
-    logger.warn('CORS_ORIGIN not set, using default localhost:3000');
-  }
-  
+  // CORS configuration - UPDATED to include Vercel domains
+  const corsOrigins = configService.get('CORS_ORIGIN')?.split(',') || [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'https://royal-health-testing-r2we00vpm-david-m-gs-projects.vercel.app',
+    'https://*.vercel.app', // Allow all Vercel preview domains
+    'https://your-frontend-domain.com' // Add your custom domain when you have one
+  ];
+
   app.enableCors({
-    origin: corsOrigin || 'http://localhost:3000',
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, Postman, etc.)
+      if (!origin) return callback(null, true);
+      
+      // Check if origin matches any allowed pattern
+      const isAllowed = corsOrigins.some(allowedOrigin => {
+        if (allowedOrigin.includes('*')) {
+          // Handle wildcard patterns like *.vercel.app
+          const pattern = allowedOrigin.replace(/\*/g, '.*');
+          return new RegExp('^' + pattern + '$').test(origin);
+        }
+        return allowedOrigin === origin;
+      });
+      
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        console.log('❌ CORS blocked origin:', origin);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   });
 
   // Global validation pipe
@@ -56,71 +64,58 @@ async function bootstrap() {
     }),
   );
 
+  // API prefix
+  app.setGlobalPrefix('api/v1', {
+    exclude: ['/', '/health'],
+  });
+
   // Swagger documentation
-  const nodeEnv = configService.get('NODE_ENV');
-  if (nodeEnv !== 'production') {
+  if (configService.get('NODE_ENV') !== 'production') {
     const config = new DocumentBuilder()
-      .setTitle('Royal Health Consult API')
-      .setDescription('API documentation for Royal Health Consult - Nigerian Healthcare Platform')
+      .setTitle('Royal Health API')
+      .setDescription('Healthcare services platform API')
       .setVersion('1.0')
-      .addBearerAuth(
-        {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-          name: 'JWT',
-          description: 'Enter JWT token',
-          in: 'header',
-        },
-        'JWT-auth',
-      )
-      .addTag('Authentication', 'User authentication endpoints')
-      .addTag('Users', 'User management endpoints')
-      .addTag('Bookings', 'Appointment booking endpoints')
-      .addTag('Nurses', 'Nurse management endpoints')
-      .addTag('Payments', 'Payment processing endpoints')
-      .addTag('Notifications', 'SMS and email notifications')
+      .addBearerAuth()
+      .addTag('Authentication')
+      .addTag('Users')
+      .addTag('Bookings')
       .build();
 
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup(`${apiPrefix}/docs`, app, document, {
-      swaggerOptions: {
-        persistAuthorization: true,
-      },
+    SwaggerModule.setup('api/docs', app, document);
+  }
+
+  // Health check endpoint
+  app.getHttpAdapter().get('/health', (req, res) => {
+    res.status(200).json({
+      status: 'OK',
+      message: 'Royal Health API is running',
+      timestamp: new Date().toISOString(),
+      environment: configService.get('NODE_ENV') || 'development',
     });
+  });
 
-    const port = configService.get('PORT', 3001);
-    logger.log(`📚 API Documentation available at: http://localhost:${port}/${apiPrefix}/docs`);
-  }
-
-  // Trust proxy for production
-  if (nodeEnv === 'production') {
-    app.set('trust proxy', 1);
-  }
+  // Root endpoint
+  app.getHttpAdapter().get('/', (req, res) => {
+    res.status(200).json({
+      message: 'Welcome to Royal Health API',
+      version: '1.0.0',
+      documentation: '/api/docs',
+      health: '/health',
+    });
+  });
 
   const port = configService.get('PORT', 3001);
+  await app.listen(port, '0.0.0.0'); // Listen on all interfaces
+
+  console.log(`🚀 Royal Health API server running on port ${port}`);
+  console.log(`🏥 Environment: ${configService.get('NODE_ENV') || 'development'}`);
+  console.log(`🔗 Health check: http://localhost:${port}/health`);
   
-  // Graceful shutdown
-  process.on('SIGTERM', async () => {
-    logger.log('SIGTERM received, shutting down gracefully');
-    await app.close();
-    process.exit(0);
-  });
-
-  process.on('SIGINT', async () => {
-    logger.log('SIGINT received, shutting down gracefully');
-    await app.close();
-    process.exit(0);
-  });
-
-  await app.listen(port);
-
-  logger.log(`🚀 Royal Health Consult API running on: http://localhost:${port}/${apiPrefix}`);
-  logger.log(`🏥 Nigerian Healthcare Platform Backend Started Successfully`);
-  logger.log(`🌍 Environment: ${nodeEnv || 'development'}`);
+  if (configService.get('NODE_ENV') !== 'production') {
+    console.log(`📱 Local API: http://localhost:${port}/api/v1`);
+    console.log(`📚 API Docs: http://localhost:${port}/api/docs`);
+  }
 }
 
-bootstrap().catch((error) => {
-  Logger.error('❌ Error starting server', error, 'Bootstrap');
-  process.exit(1);
-});
+bootstrap();
