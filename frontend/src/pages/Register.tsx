@@ -114,94 +114,70 @@ const Register: React.FC = () => {
     return 'green'
   }
 
-  const onSubmit = async (formData: RegisterFormSchema) => {
-    setIsSubmitting(true)
-    setError('')
+const onSubmit = async (formData: RegisterFormSchema) => {
+  setIsSubmitting(true)
+  setError('')
 
-    try {
-      // Sign up with Supabase Auth
-      const { data, error } = await supabase.auth.signUp({
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         email: formData.email,
+        phone: formData.phone,
         password: formData.password,
-      })
+        confirmPassword: formData.confirmPassword,
+        role: formData.role,
+        preferredLanguage: 'en',
+      }),
+    })
 
-      if (error) {
-        setError(error.message)
-        toast({
-          title: 'Registration Failed',
-          description: error.message,
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        })
-        return
-      }
+    const data = await response.json()
 
-      // If Supabase signup is successful, call your backend API
-      const response = await fetch('http://localhost:3001/api/v1/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          phone: formData.phone,
-          password: formData.password,
-          confirmPassword: formData.confirmPassword,
-          role: formData.role,
-          preferredLanguage: 'en',
-          supabaseUserId: data.user?.id // Include Supabase user ID
-        }),
-      })
-
-      const responseData = await response.json()
-
-      if (response.ok) {
-        // Registration successful - API returns { accessToken, refreshToken, user, expiresIn }
-        toast({
-          title: 'Registration Successful!',
-          description: `Welcome to Royal Health, ${responseData.user.firstName}!`,
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-        })
-
-        // Store the tokens
-        localStorage.setItem('accessToken', responseData.accessToken)
-        localStorage.setItem('refreshToken', responseData.refreshToken)
-        localStorage.setItem('user', JSON.stringify(responseData.user))
-
-        // Navigate to dashboard
-        navigate('/dashboard')
-      } else {
-        // Registration failed - API returns { message, error, statusCode }
-        setError(responseData.message || 'Registration failed. Please try again.')
-        
-        toast({
-          title: 'Registration Failed',
-          description: responseData.message || 'Please check your information and try again.',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        })
-      }
-    } catch (error) {
-      console.error('Registration error:', error)
-      setError('Network error. Please check your connection and try again.')
-      
+    if (response.ok) {
+      // Registration successful
       toast({
-        title: 'Connection Error',
-        description: 'Unable to connect to the server. Please try again.',
+        title: 'Registration Successful!',
+        description: `Welcome to Royal Health, ${data.user.firstName}!`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      })
+
+      // Store tokens
+      localStorage.setItem('accessToken', data.accessToken)
+      localStorage.setItem('refreshToken', data.refreshToken)
+      localStorage.setItem('user', JSON.stringify(data.user))
+
+      navigate('/dashboard')
+    } else {
+      // Registration failed
+      setError(data.message || 'Registration failed. Please try again.')
+      toast({
+        title: 'Registration Failed',
+        description: data.message || 'Please check your information and try again.',
         status: 'error',
         duration: 5000,
         isClosable: true,
       })
-    } finally {
-      setIsSubmitting(false)
     }
+  } catch (err: any) {
+    console.error('Registration error:', err)
+    setError('Network error. Please check your connection and try again.')
+    toast({
+      title: 'Connection Error',
+      description: 'Unable to connect to the server. Please try again.',
+      status: 'error',
+      duration: 5000,
+      isClosable: true,
+    })
+  } finally {
+    setIsSubmitting(false)
   }
+}
+
 
   return (
     <div style={{

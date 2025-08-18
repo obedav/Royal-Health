@@ -41,69 +41,57 @@ const Login = () => {
   const toast = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
+  e.preventDefault();
+  setIsLoading(true);
+  setError('');
 
-    try {
-      // Sign in with Supabase Auth
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
-      });
+  try {
+    // Call your backend login endpoint
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, rememberMe }),
+    });
 
-      if (error) {
-        setError(error.message);
-        toast({
-          title: 'Login Failed',
-          description: error.message,
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      // If Supabase login is successful, call your custom login hook
-      const success = await login(email, password);
-      
-      if (success) {
-        toast({
-          title: 'Login Successful',
-          description: 'Welcome back!',
-          status: 'success',
-          duration: 3000,
-          isClosable: true,
-        });
-
-        // Get intended destination or default to dashboard
-        const from = location.state?.from?.pathname || '/dashboard';
-        navigate(from, { replace: true });
-      } else {
-        setError('Login failed. Please check your credentials.');
-        toast({
-          title: 'Login Failed',
-          description: 'Please check your credentials and try again.',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        });
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      setError('Network error. Please check your connection and try again.');
-      toast({
-        title: 'Connection Error',
-        description: 'Unable to connect to the server. Please try again.',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
-    } finally {
-      setIsLoading(false);
+    if (!response.ok) {
+      const errData = await response.json();
+      throw new Error(errData.message || 'Login failed');
     }
-  };
+
+    const data = await response.json();
+
+    // Save tokens in localStorage/sessionStorage
+    localStorage.setItem('accessToken', data.accessToken);
+    localStorage.setItem('refreshToken', data.refreshToken);
+    // Optionally save user info
+    localStorage.setItem('user', JSON.stringify(data.user));
+
+    toast({
+      title: 'Login Successful',
+      description: 'Welcome back!',
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+    });
+
+    const from = location.state?.from?.pathname || '/dashboard';
+    navigate(from, { replace: true });
+
+  } catch (err: any) {
+    console.error('Login error:', err);
+    setError(err.message || 'Network error. Please try again.');
+    toast({
+      title: 'Login Failed',
+      description: err.message || 'Unable to connect to the server',
+      status: 'error',
+      duration: 5000,
+      isClosable: true,
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
