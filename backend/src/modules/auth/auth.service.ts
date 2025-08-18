@@ -396,7 +396,22 @@ async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
   }
 
   private sanitizeUser(user: User) {
-    const { password, passwordResetToken, emailVerificationToken, phoneVerificationCode, ...sanitized } = user;
-    return sanitized;
-  }
+  const { 
+    password, 
+    passwordResetToken, 
+    emailVerificationToken, 
+    phoneVerificationCode,
+    loginAttempts, // 🔥 EXCLUDE sensitive fields
+    isLocked,      // 🔥 EXCLUDE sensitive fields
+    lockUntil,     // 🔥 EXCLUDE sensitive fields
+    ...sanitized 
+  } = user;
+  
+  return {
+    ...sanitized,
+    // Ensure dates are properly serialized (they'll become ISO strings in JSON)
+    createdAt: sanitized.createdAt,
+    updatedAt: sanitized.updatedAt,
+  };
+}
 }
