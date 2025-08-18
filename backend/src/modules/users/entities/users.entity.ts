@@ -1,4 +1,4 @@
-// backend/src/modules/users/entities/users.entity.ts - Clean Fixed Version
+// backend/src/modules/users/entities/users.entity.ts - Fixed with Column Mapping
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -38,16 +38,17 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column()
+  // Map to the actual database column names (most likely with underscores)
+  @Column({ name: 'first_name' })
   firstName: string;
 
-  @Column()
+  @Column({ name: 'last_name' })
   lastName: string;
 
   @Column({ unique: true })
   phone: string;
 
-  @Column()
+  @Column({ name: 'password_hash' })
   @Exclude()
   password: string;
 
@@ -57,13 +58,13 @@ export class User {
   @Column({ type: 'enum', enum: UserStatus, default: UserStatus.ACTIVE })
   status: UserStatus;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'date', nullable: true, name: 'date_of_birth' })
   dateOfBirth: Date;
 
   @Column({ type: 'enum', enum: Gender, nullable: true })
   gender: Gender;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'national_id' })
   nationalId: string;
 
   @Column({ type: 'text', nullable: true })
@@ -75,55 +76,59 @@ export class User {
   @Column({ nullable: true })
   city: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'avatar_url' })
   avatar: string;
 
-  @Column({ default: true })
+  @Column({ default: true, name: 'is_email_verified' })
   isEmailVerified: boolean;
 
-  @Column({ default: true })
+  @Column({ default: true, name: 'is_phone_verified' })
   isPhoneVerified: boolean;
 
-  @Column({ nullable: true })
+  // Additional Supabase-specific column
+  @Column({ nullable: true, name: 'supabase_user_id' })
+  supabaseUserId: string;
+
+  @Column({ nullable: true, name: 'email_verification_token' })
   @Exclude()
   emailVerificationToken: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'phone_verification_code' })
   @Exclude()
   phoneVerificationCode: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'password_reset_token' })
   @Exclude()
   passwordResetToken: string;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true, name: 'password_reset_expires' })
   passwordResetExpires: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true, name: 'last_login_at' })
   lastLoginAt: Date;
 
-  @Column({ default: 0 })
+  @Column({ default: 0, name: 'login_attempts' })
   loginAttempts: number;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true, name: 'lock_until' })
   lockUntil: Date;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'emergency_contact_name' })
   emergencyContactName: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'emergency_contact_phone' })
   emergencyContactPhone: string;
 
-  @Column({ default: 'en' })
+  @Column({ default: 'en', name: 'preferred_language' })
   preferredLanguage: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true, name: 'medical_history' })
   medicalHistory: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
   // Hash password before saving (only on insert)
