@@ -1,5 +1,11 @@
 // src/utils/api.ts - API helper with automatic token handling
-const API_BASE_URL = 'http://localhost:3001/api/v1';
+
+// Dynamic API base URL - uses Vite environment variable
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
+                    'https://royal-health.onrender.com/api/v1';
+
+// For debugging - log which URL is being used
+console.log('🔗 API Base URL:', API_BASE_URL);
 
 interface ApiResponse<T = any> {
   data?: T;
@@ -34,6 +40,19 @@ const handleUnauthorized = () => {
   window.location.href = '/login';
 };
 
+// Helper function to wake up backend (for Render free tier)
+const wakeUpBackend = async (): Promise<void> => {
+  try {
+    // Make a simple request to wake up the backend
+    await fetch(API_BASE_URL.replace('/api/v1', '/health'), {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error) {
+    console.log('Backend wake-up request sent...');
+  }
+};
+
 // Generic API request function
 export const apiRequest = async <T = any>(
   endpoint: string,
@@ -59,6 +78,11 @@ export const apiRequest = async <T = any>(
   };
 
   try {
+    // Wake up backend before first request (helps with Render free tier)
+    if (API_BASE_URL.includes('onrender.com')) {
+      await wakeUpBackend();
+    }
+
     const response = await fetch(url, {
       ...options,
       headers,
