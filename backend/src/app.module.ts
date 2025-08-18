@@ -31,42 +31,42 @@ import { Booking } from './modules/bookings/entities/booking.entity';
     // Database Configuration
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
+      inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const databaseUrl = configService.get('DATABASE_URL');
-        
-        // If DATABASE_URL exists (production/cloud), use it
-        if (databaseUrl) {
-              return {
-                type: 'postgres',
-                url: databaseUrl,
-                entities: [User, Booking],
-                synchronize: false, // Always false in production
-                logging: configService.get('NODE_ENV') === 'development',
-                ssl: {
-                  rejectUnauthorized: false,
-                },
-                extra: {
-                  ssl: true,
-                  host: 'db.mmbeoacbxdlymimsafpl.supabase.co', // force IPv4
-                },
-              };
-            }
-                    
-        // Otherwise use individual variables (local development)
+        const isProduction = configService.get('NODE_ENV') === 'production';
+        const databaseUrl = configService.get<string>('DATABASE_URL');
+
+        if (isProduction && databaseUrl) {
+          console.log('🔗 Connecting to Supabase/Render Database (Production)...');
+          return {
+            type: 'postgres',
+            url: databaseUrl, // Pooler URI from Supabase
+            entities: [User, Booking],
+            synchronize: false, // Never sync in production
+            logging: false,
+            ssl: {
+              rejectUnauthorized: false,
+            },
+            extra: {
+              ssl: true,
+            },
+          };
+        }
+
+        console.log('💻 Connecting to Local Postgres Database (Development)...');
         return {
           type: 'postgres',
           host: configService.get('DB_HOST', 'localhost'),
-          port: parseInt(configService.get('DB_PORT', '5432')), // Parse to number
+          port: parseInt(configService.get('DB_PORT', '5432')),
           username: configService.get('DB_USERNAME'),
-          password: String(configService.get('DB_PASSWORD')), // Ensure it's a string
+          password: String(configService.get('DB_PASSWORD')),
           database: configService.get('DB_NAME'),
           entities: [User, Booking],
-          synchronize: configService.get('NODE_ENV') === 'development',
-          logging: configService.get('NODE_ENV') === 'development',
-          ssl: false, // No SSL for local development
+          synchronize: true, // OK for dev
+          logging: true,
+          ssl: false,
         };
       },
-      inject: [ConfigService],
     }),
 
     // Feature modules
