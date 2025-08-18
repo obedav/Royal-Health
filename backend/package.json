@@ -4,7 +4,9 @@
   "description": "Backend API for Royal Health Consult - Healthcare services platform",
   "main": "dist/main.js",
   "scripts": {
-    "build": "nest build",
+    "build": "npm run prebuild && npm run compile",
+  "prebuild": "rimraf dist",  
+  "compile": "tsc -p tsconfig.build.json",
     "start": "node dist/main",
     "start:prod": "node dist/main",
     "start:dev": "nest start --watch",
