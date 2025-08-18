@@ -36,16 +36,22 @@ import { Booking } from './modules/bookings/entities/booking.entity';
         
         // If DATABASE_URL exists (production/cloud), use it
         if (databaseUrl) {
-          return {
-            type: 'postgres',
-            url: databaseUrl,
-            entities: [User, Booking],
-            synchronize: false, // Always false in production
-            logging: configService.get('NODE_ENV') === 'development',
-            ssl: { rejectUnauthorized: false }, // Required for cloud databases
-          };
-        }
-        
+              return {
+                type: 'postgres',
+                url: databaseUrl,
+                entities: [User, Booking],
+                synchronize: false, // Always false in production
+                logging: configService.get('NODE_ENV') === 'development',
+                ssl: {
+                  rejectUnauthorized: false,
+                },
+                extra: {
+                  ssl: true,
+                  host: 'db.mmbeoacbxdlymimsafpl.supabase.co', // force IPv4
+                },
+              };
+            }
+                    
         // Otherwise use individual variables (local development)
         return {
           type: 'postgres',
