@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import path from 'path'
 
 export default defineConfig({
   plugins: [
@@ -33,7 +34,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/api\.royalhealthconsult\.ng\/.*/i,
+            urlPattern: /^https:\/\/royal-health\.onrender\.com\/.*/i, // Updated to your actual API URL
             handler: 'NetworkFirst',
             options: {
               cacheName: 'api-cache',
@@ -47,6 +48,14 @@ export default defineConfig({
       }
     })
   ],
+  // Add these for better Netlify compatibility
+  root: '.',
+  base: './', // Use relative paths for production
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src')
+    }
+  },
   server: {
     port: 3000,
     proxy: {
@@ -59,7 +68,12 @@ export default defineConfig({
   },
   build: {
     target: 'es2015',
+    outDir: 'dist',
+    emptyOutDir: true,
     rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html') // Explicit input path
+      },
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
