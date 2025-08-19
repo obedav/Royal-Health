@@ -58,23 +58,22 @@ async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
 
   // Create new user - only include fields that exist in the User entity
   const user = this.userRepository.create({
-    email,
-    phone,
-    password,
-    firstName: userData.firstName,
-    lastName: userData.lastName,
-    role: userData.role,
-    state: userData.state,
-    city: userData.city,
-    preferredLanguage: userData.preferredLanguage || 'en',
-    // Set verification fields if they exist in your entity
-    emailVerificationToken: this.generateVerificationToken(),
-    phoneVerificationCode: this.generatePhoneVerificationCode(),
-    // For development, set as active and verified
-    status: UserStatus.ACTIVE,
-    isEmailVerified: true,
-    isPhoneVerified: true,
-  });
+  email,
+  phone,
+  password_hash: password, // assign here
+  firstName: userData.firstName,
+  lastName: userData.lastName,
+  role: userData.role,
+  state: userData.state,
+  city: userData.city,
+  preferredLanguage: userData.preferredLanguage || 'en',
+  emailVerificationToken: this.generateVerificationToken(),
+  phoneVerificationCode: this.generatePhoneVerificationCode(),
+  status: UserStatus.ACTIVE,
+  isEmailVerified: true,
+  isPhoneVerified: true,
+});
+
 
   const savedUser = await this.userRepository.save(user);
 
@@ -142,9 +141,9 @@ async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
 
     if (!isPasswordValid) {
       console.log('❌ Password invalid - incrementing login attempts');
-      // Use direct SQL update to avoid @BeforeUpdate hooks
+      // Use direct SQL update with correct column names (snake_case)
       await this.userRepository.query(
-        'UPDATE users SET "loginAttempts" = "loginAttempts" + 1 WHERE id = $1',
+        'UPDATE users SET "login_attempts" = "login_attempts" + 1 WHERE id = $1',
         [user.id]
       );
       
@@ -152,7 +151,7 @@ async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
       if (user.loginAttempts + 1 >= 5) {
         const lockUntil = new Date(Date.now() + 2 * 60 * 60 * 1000);
         await this.userRepository.query(
-          'UPDATE users SET "lockUntil" = $1 WHERE id = $2',
+          'UPDATE users SET "lock_until" = $1 WHERE id = $2',
           [lockUntil, user.id]
         );
       }
@@ -162,9 +161,9 @@ async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
 
     console.log('✅ Password valid - logging in user');
 
-    // Update login info using direct SQL to avoid password re-hashing
+    // Update login info using direct SQL with correct column names (snake_case)
     await this.userRepository.query(
-      'UPDATE users SET "loginAttempts" = 0, "lockUntil" = NULL, "lastLoginAt" = NOW() WHERE id = $1',
+      'UPDATE users SET "login_attempts" = 0, "lock_until" = NULL, "last_login_at" = NOW() WHERE id = $1',
       [user.id]
     );
 
@@ -226,7 +225,7 @@ async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
     }
 
     // Update password
-    user.password = password;
+    user.password_hash = password;
     user.passwordResetToken = null;
     user.passwordResetExpires = null;
     user.resetLoginAttempts(); // Reset any login attempts
@@ -257,7 +256,7 @@ async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
     }
 
     // Update password
-    user.password = newPassword;
+    user.password_hash = newPassword;
     await this.userRepository.save(user);
 
     return { message: 'Password changed successfully' };
@@ -397,7 +396,7 @@ async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
 
   private sanitizeUser(user: User) {
   const { 
-    password, 
+    password_hash, // 🔥 EXCLUDE sensitive fields
     passwordResetToken, 
     emailVerificationToken, 
     phoneVerificationCode,

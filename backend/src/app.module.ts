@@ -11,6 +11,9 @@ import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
+import { CompanyModule } from './modules/company/company.module';
+import { SupportModule } from './modules/support/support.module';
+import { ContactModule } from './modules/contact/contact.module';
 
 // Import guards
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
@@ -29,53 +32,63 @@ import { Booking } from './modules/bookings/entities/booking.entity';
     }),
 
     // Database Configuration
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        const isProduction = configService.get('NODE_ENV') === 'production';
-        const directUrl = configService.get<string>('DATABASE_URL_DIRECT');
-        const poolerUrl = configService.get<string>('DATABASE_URL_POOLER');
-        const fallbackUrl = configService.get<string>('DATABASE_URL'); // optional legacy
+   TypeOrmModule.forRootAsync({
+  imports: [ConfigModule],
+  inject: [ConfigService],
+  useFactory: (configService: ConfigService) => {
+    const isProduction = configService.get('NODE_ENV') === 'production';
 
-        if (isProduction) {
-          // Prefer Direct, fallback to Pooler, then legacy DATABASE_URL
-          const databaseUrl = directUrl || poolerUrl || fallbackUrl;
-          if (!databaseUrl) {
-            throw new Error('❌ No production DATABASE_URL found');
-          }
+    if (isProduction) {
+      const directUrl = configService.get<string>('DATABASE_URL_DIRECT');
+      const poolerUrl = configService.get<string>('DATABASE_URL_POOLER');
+      const fallbackUrl = configService.get<string>('DATABASE_URL');
 
-          console.log(`🔗 Connecting to Supabase Database (${directUrl ? 'Direct' : poolerUrl ? 'Pooler' : 'Default'})...`);
-          return {
-            type: 'postgres',
-            url: databaseUrl,
-            entities: [User, Booking],
-            synchronize: false, // Never in prod
-            logging: false,
-            ssl: { rejectUnauthorized: false },
-          };
-        }
+      const databaseUrl = directUrl || poolerUrl || fallbackUrl;
+      if (!databaseUrl) {
+        throw new Error('❌ No production DATABASE_URL found');
+      }
 
-        console.log('💻 Connecting to Local Postgres Database (Development)...');
-        return {
-          type: 'postgres',
-          host: configService.get('DB_HOST', 'localhost'),
-          port: parseInt(configService.get('DB_PORT', '5432')),
-          username: configService.get('DB_USERNAME', 'postgres'),
-          password: String(configService.get('DB_PASSWORD', 'postgres')),
-          database: configService.get('DB_NAME', 'postgres'),
-          entities: [User, Booking],
-          synchronize: true, // Safe for dev
-          logging: true,
-          ssl: { rejectUnauthorized: false },
-        };
-      },
-    }),
+      console.log(
+        `🔗 Connecting to Supabase Database (${directUrl ? 'Direct' : poolerUrl ? 'Pooler' : 'Default'})...`
+      );
+
+      return {
+        type: 'postgres',
+        url: databaseUrl,
+        entities: [User, Booking],
+        synchronize: false, // Never in production
+        logging: false,
+        ssl: { rejectUnauthorized: false }, // SSL enabled for production
+      };
+    }
+
+    // Local development config
+    console.log('💻 Connecting to Local Postgres Database (Development)...');
+
+    return {
+      type: 'postgres',
+      host: configService.get('DB_HOST', 'localhost'),
+      port: parseInt(configService.get('DB_PORT', '5432')),
+      username: configService.get('DB_USERNAME', 'postgres'),
+      password: String(configService.get('DB_PASSWORD', 'postgres')),
+      database: configService.get('DB_NAME', 'postgres'),
+      entities: [User, Booking],
+      synchronize: true,
+      logging: true,
+      ssl: false, // SSL disabled for local dev
+    };
+  },
+}),
 
     // Feature modules
     AuthModule,
     UsersModule,
     BookingsModule,
+    
+    // New modules for Contact page
+    CompanyModule,
+    SupportModule,
+    ContactModule,
   ],
   controllers: [AppController],
   providers: [

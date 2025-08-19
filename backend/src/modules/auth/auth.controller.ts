@@ -235,7 +235,7 @@ export class AuthController {
     description: 'Unauthorized - invalid token',
   })
   async getProfile(@Req() req: Request & { user: User }) {
-    const { password, passwordResetToken, emailVerificationToken, phoneVerificationCode, ...user } = req.user;
+    const { password_hash, passwordResetToken, emailVerificationToken, phoneVerificationCode, ...user } = req.user;
     return {
       success: true,
       data: user,

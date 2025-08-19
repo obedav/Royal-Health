@@ -24,7 +24,6 @@ import {
   StatLabel,
   StatNumber,
   StatHelpText,
-  StatArrow,
   VStack,
   HStack,
   Spinner,
@@ -33,18 +32,7 @@ import {
   AlertIcon,
   AlertTitle,
   AlertDescription,
-  Progress,
   useToast,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalCloseButton,
-  useDisclosure,
-  Input,
-  FormControl,
-  FormLabel,
 } from '@chakra-ui/react';
 import {
   FaUsers,
@@ -55,9 +43,10 @@ import {
   FaFileExport,
   FaEye,
   FaEdit,
-  FaSignInAlt,
   FaExclamationTriangle,
 } from 'react-icons/fa';
+import { useAuth } from '../../hooks/useAuth';
+import { Navigate } from 'react-router-dom';
 
 // Types
 interface BookingStats {
@@ -97,19 +86,15 @@ interface Booking {
 }
 
 const AdminDashboard: React.FC = () => {
+  // Use the main auth system
+  const { user, isAuthenticated, logout } = useAuth();
+  
   // State
   const [stats, setStats] = useState<BookingStats | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  
-  // Login modal state
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [loginEmail, setLoginEmail] = useState('fresh.new@royalhealth.ng');
-  const [loginPassword, setLoginPassword] = useState('password123');
-  const [loginLoading, setLoginLoading] = useState(false);
 
   // Theme
   const bg = useColorModeValue('gray.50', 'gray.900');
@@ -117,89 +102,55 @@ const AdminDashboard: React.FC = () => {
   const toast = useToast();
 
   // API Base URL
-  const API_BASE_URL = 'http://localhost:3001/api/v1';
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api/v1';
 
-  // Check if user is authenticated
-  const checkAuthentication = (): boolean => {
-    const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
-    if (token) {
-      console.log('✅ Authentication token found');
-      setIsAuthenticated(true);
-      return true;
+  // Debug user info
+  useEffect(() => {
+    console.log('🔍 DEBUG: Current user data:', user);
+    console.log('🔍 DEBUG: User role:', user?.role);
+    console.log('🔍 DEBUG: Is authenticated:', isAuthenticated);
+    
+    // Check localStorage data
+    const storedUser = localStorage.getItem('user');
+    const storedToken = localStorage.getItem('accessToken');
+    
+    console.log('🔍 DEBUG: Stored user:', storedUser ? JSON.parse(storedUser) : null);
+    console.log('🔍 DEBUG: Has token:', !!storedToken);
+    
+    if (storedToken) {
+      console.log('🔍 DEBUG: Token (first 50 chars):', storedToken.substring(0, 50) + '...');
+      
+      // Decode JWT payload to see what's inside (just for debugging)
+      try {
+        const payload = JSON.parse(atob(storedToken.split('.')[1]));
+        console.log('🔍 DEBUG: JWT payload:', payload);
+      } catch (e) {
+        console.log('🔍 DEBUG: Could not decode JWT');
+      }
     }
-    console.log('❌ No authentication token found');
-    setIsAuthenticated(false);
-    return false;
-  };
+  }, [user, isAuthenticated]);
 
   // Get auth headers
   const getAuthHeaders = () => {
-    const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+    const token = localStorage.getItem('accessToken');
     return {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
     };
   };
 
-  // Login function
-  const handleLogin = async () => {
-    setLoginLoading(true);
-    try {
-      console.log('🔐 Attempting login...');
-      
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: loginEmail,
-          password: loginPassword,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('✅ Login successful:', data);
-        
-        // Store the token
-        localStorage.setItem('token', data.accessToken || data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
-        setIsAuthenticated(true);
-        onClose();
-        
-        toast({
-          title: 'Login Successful',
-          description: 'Welcome back! Loading dashboard data...',
-          status: 'success',
-          duration: 3000,
-        });
-        
-        // Fetch data after successful login
-        fetchData();
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
-      }
-    } catch (err) {
-      console.error('❌ Login failed:', err);
-      toast({
-        title: 'Login Failed',
-        description: err instanceof Error ? err.message : 'Please check your credentials',
-        status: 'error',
-        duration: 5000,
-      });
-    } finally {
-      setLoginLoading(false);
-    }
-  };
-
-  // Fetch real data from APIs
+  // Fetch data from APIs
   const fetchData = async () => {
-    if (!checkAuthentication()) {
+    if (!isAuthenticated || !user) {
       setLoading(false);
       setError('Please log in to access admin dashboard');
+      return;
+    }
+
+    // Check if user has admin role
+    if (user.role !== 'admin') {
+      setLoading(false);
+      setError(`Access denied. This dashboard requires admin privileges. Your current role: ${user.role}`);
       return;
     }
 
@@ -207,7 +158,9 @@ const AdminDashboard: React.FC = () => {
     setError('');
 
     try {
-      console.log('🔄 Fetching real data from backend...');
+      console.log('🔄 Fetching admin dashboard data...');
+      console.log('🔍 Using API URL:', API_BASE_URL);
+      console.log('🔍 User role:', user.role);
 
       // Fetch booking statistics
       try {
@@ -216,12 +169,17 @@ const AdminDashboard: React.FC = () => {
           headers: getAuthHeaders(),
         });
 
+        console.log('📊 Stats response status:', statsResponse.status);
+
         if (statsResponse.ok) {
           const statsData = await statsResponse.json();
           console.log('✅ Real booking stats:', statsData);
           setStats(statsData);
         } else if (statsResponse.status === 401) {
           throw new Error('Authentication expired');
+        } else if (statsResponse.status === 403) {
+          console.warn('⚠️ Stats endpoint returned 403 - insufficient permissions');
+          setError('Insufficient permissions for booking stats');
         } else {
           console.warn('⚠️ Stats endpoint returned:', statsResponse.status);
         }
@@ -236,12 +194,17 @@ const AdminDashboard: React.FC = () => {
           headers: getAuthHeaders(),
         });
 
+        console.log('📅 Bookings response status:', bookingsResponse.status);
+
         if (bookingsResponse.ok) {
           const bookingsData = await bookingsResponse.json();
           console.log('✅ Real bookings data:', bookingsData);
           setBookings(Array.isArray(bookingsData) ? bookingsData : []);
         } else if (bookingsResponse.status === 401) {
           throw new Error('Authentication expired');
+        } else if (bookingsResponse.status === 403) {
+          console.warn('⚠️ Bookings endpoint returned 403 - insufficient permissions');
+          setError('Insufficient permissions for bookings data');
         } else {
           console.warn('⚠️ Bookings endpoint returned:', bookingsResponse.status);
         }
@@ -256,12 +219,17 @@ const AdminDashboard: React.FC = () => {
           headers: getAuthHeaders(),
         });
 
+        console.log('👥 Users response status:', usersResponse.status);
+
         if (usersResponse.ok) {
           const usersData = await usersResponse.json();
           console.log('✅ Real users data:', usersData);
           setUsers(Array.isArray(usersData) ? usersData : []);
         } else if (usersResponse.status === 401) {
           throw new Error('Authentication expired');
+        } else if (usersResponse.status === 403) {
+          console.warn('⚠️ Users endpoint returned 403 - insufficient permissions');
+          setError('Insufficient permissions for users data');
         } else {
           console.warn('⚠️ Users endpoint returned:', usersResponse.status);
         }
@@ -272,9 +240,8 @@ const AdminDashboard: React.FC = () => {
     } catch (err) {
       console.error('❌ Error fetching dashboard data:', err);
       if (err instanceof Error && err.message === 'Authentication expired') {
-        localStorage.removeItem('token');
         localStorage.removeItem('accessToken');
-        setIsAuthenticated(false);
+        localStorage.removeItem('user');
         setError('Session expired. Please log in again.');
       } else {
         setError('Failed to load dashboard data');
@@ -286,7 +253,45 @@ const AdminDashboard: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [isAuthenticated, user]);
+
+  // Redirect if not authenticated
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Show access denied if not admin
+  if (user && user.role !== 'admin') {
+    return (
+      <Box bg={bg} minH="100vh">
+        <Container maxW="md" py={20}>
+          <VStack spacing={8} align="center">
+            <Icon as={FaExclamationTriangle} fontSize="6xl" color="red.500" />
+            <VStack spacing={4} textAlign="center">
+              <Heading size="lg" color="gray.700">
+                Access Denied
+              </Heading>
+              <Text color="gray.600">
+                This dashboard requires admin privileges.
+              </Text>
+              <Text color="gray.500" fontSize="sm">
+                Your current role: <Badge colorScheme="blue">{user.role}</Badge>
+              </Text>
+            </VStack>
+            
+            <VStack spacing={4}>
+              <Button colorScheme="purple" onClick={() => window.history.back()}>
+                Go Back
+              </Button>
+              <Button variant="outline" onClick={logout}>
+                Logout
+              </Button>
+            </VStack>
+          </VStack>
+        </Container>
+      </Box>
+    );
+  }
 
   // Calculate derived stats
   const totalPatients = users.filter(user => user.role === 'client' || user.role === 'patient').length;
@@ -319,79 +324,12 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  // Show login prompt if not authenticated
-  if (!isAuthenticated) {
-    return (
-      <Box bg={bg} minH="100vh">
-        <Container maxW="md" py={20}>
-          <VStack spacing={8} align="center">
-            <Icon as={FaExclamationTriangle} fontSize="6xl" color="orange.500" />
-            <VStack spacing={4} textAlign="center">
-              <Heading size="lg" color="gray.700">
-                Admin Access Required
-              </Heading>
-              <Text color="gray.600">
-                Please log in with admin credentials to access the dashboard
-              </Text>
-            </VStack>
-            
-            <Card bg={cardBg} p={6} w="full">
-              <VStack spacing={4}>
-                <FormControl>
-                  <FormLabel>Email</FormLabel>
-                  <Input
-                    type="email"
-                    value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
-                    placeholder="admin@royalhealth.ng"
-                  />
-                </FormControl>
-                
-                <FormControl>
-                  <FormLabel>Password</FormLabel>
-                  <Input
-                    type="password"
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    placeholder="Enter password"
-                  />
-                </FormControl>
-                
-                <Button
-                  colorScheme="purple"
-                  size="lg"
-                  leftIcon={<FaSignInAlt />}
-                  onClick={handleLogin}
-                  isLoading={loginLoading}
-                  loadingText="Logging in..."
-                  w="full"
-                >
-                  Login to Dashboard
-                </Button>
-              </VStack>
-            </Card>
-            
-            <Alert status="info" borderRadius="md">
-              <AlertIcon />
-              <Box>
-                <AlertTitle fontSize="sm">Demo Credentials</AlertTitle>
-                <AlertDescription fontSize="sm">
-                  Use the pre-filled credentials or create an admin account through your backend
-                </AlertDescription>
-              </Box>
-            </Alert>
-          </VStack>
-        </Container>
-      </Box>
-    );
-  }
-
   if (loading) {
     return (
       <Center h="100vh">
         <VStack spacing={4}>
           <Spinner size="xl" color="purple.500" thickness="4px" />
-          <Text>Loading real dashboard data...</Text>
+          <Text>Loading admin dashboard...</Text>
         </VStack>
       </Center>
     );
@@ -408,8 +346,9 @@ const AdminDashboard: React.FC = () => {
                 Admin Dashboard
               </Heading>
               <Text color="gray.600">
-                Real-time data from Royal Health Consult backend
+                Welcome back, {user?.firstName} {user?.lastName}
               </Text>
+              <Badge colorScheme="green">Role: {user?.role}</Badge>
             </VStack>
             
             <HStack spacing={4}>
@@ -428,6 +367,9 @@ const AdminDashboard: React.FC = () => {
                 })}
               >
                 Export Report
+              </Button>
+              <Button variant="outline" onClick={logout}>
+                Logout
               </Button>
             </HStack>
           </HStack>
@@ -457,9 +399,9 @@ const AdminDashboard: React.FC = () => {
                       <StatNumber fontSize="3xl" color="blue.600">
                         {totalPatients}
                       </StatNumber>
-                      <StatHelpText color="blue.500" fontSize="sm">
+                      <StatLabel color="blue.500" fontSize="sm">
                         Registered users
-                      </StatHelpText>
+                      </StatLabel>
                     </VStack>
                     <Icon as={FaUsers} fontSize="3xl" color="blue.500" />
                   </HStack>
@@ -479,9 +421,9 @@ const AdminDashboard: React.FC = () => {
                       <StatNumber fontSize="3xl" color="green.600">
                         {totalNurses}
                       </StatNumber>
-                      <StatHelpText color="green.500" fontSize="sm">
+                      <StatLabel color="green.500" fontSize="sm">
                         Active staff
-                      </StatHelpText>
+                      </StatLabel>
                     </VStack>
                     <Icon as={FaUserMd} fontSize="3xl" color="green.500" />
                   </HStack>
@@ -501,9 +443,9 @@ const AdminDashboard: React.FC = () => {
                       <StatNumber fontSize="3xl" color="orange.600">
                         {todayBookings}
                       </StatNumber>
-                      <StatHelpText color="orange.500" fontSize="sm">
+                      <StatLabel color="orange.500" fontSize="sm">
                         Scheduled for today
-                      </StatHelpText>
+                      </StatLabel>
                     </VStack>
                     <Icon as={FaCalendarAlt} fontSize="3xl" color="orange.500" />
                   </HStack>
@@ -523,9 +465,9 @@ const AdminDashboard: React.FC = () => {
                       <StatNumber fontSize="3xl" color="purple.600">
                         {formatCurrency(stats?.revenue || 0)}
                       </StatNumber>
-                      <StatHelpText color="purple.500" fontSize="sm">
+                      <StatLabel color="purple.500" fontSize="sm">
                         From bookings
-                      </StatHelpText>
+                      </StatLabel>
                     </VStack>
                     <Icon as={FaMoneyBillWave} fontSize="3xl" color="purple.500" />
                   </HStack>

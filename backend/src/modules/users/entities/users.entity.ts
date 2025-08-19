@@ -1,4 +1,4 @@
-// backend/src/modules/users/entities/users.entity.ts - Fixed with Column Mapping
+// backend/src/modules/users/entities/users.entity.ts - Corrected to match Supabase schema exactly
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -38,37 +38,38 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  // Map to the actual database column names (most likely with underscores)
-  @Column({ name: 'first_name' })
-  firstName: string;
+  @Column({ type: 'varchar', nullable: false, default: '' })
+  password_hash: string;
 
-  @Column({ name: 'last_name' })
-  lastName: string;
+  @Column({ name: 'first_name', nullable: true })
+firstName: string;
+
+@Column({ name: 'last_name', nullable: true })
+lastName: string;
 
   @Column({ unique: true })
   phone: string;
 
-  @Column({ name: 'password_hash' })
-  @Exclude()
-  password: string;
-
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.CLIENT })
+  @Column({ type: 'varchar', enum: UserRole, default: UserRole.CLIENT })
   role: UserRole;
 
-  @Column({ type: 'enum', enum: UserStatus, default: UserStatus.ACTIVE })
+  @Column({ type: 'varchar', enum: UserStatus, default: UserStatus.ACTIVE })
   status: UserStatus;
+
+@Column({ name: 'is_email_verified', default: false })
+isEmailVerified: boolean;
+
+@Column({ name: 'is_phone_verified', default: false })
+isPhoneVerified: boolean;
 
   @Column({ type: 'date', nullable: true, name: 'date_of_birth' })
   dateOfBirth: Date;
 
-  @Column({ type: 'enum', enum: Gender, nullable: true })
+  @Column({ type: 'varchar', enum: Gender, nullable: true })
   gender: Gender;
 
   @Column({ nullable: true, name: 'national_id' })
   nationalId: string;
-
-  @Column({ type: 'text', nullable: true })
-  address: string;
 
   @Column({ nullable: true })
   state: string;
@@ -76,16 +77,12 @@ export class User {
   @Column({ nullable: true })
   city: string;
 
-  @Column({ nullable: true, name: 'avatar_url' })
+  @Column({ type: 'text', nullable: true, name: 'avatar_url' })
   avatar: string;
 
-  @Column({ default: true, name: 'is_email_verified' })
-  isEmailVerified: boolean;
+  @Column({ nullable: true, name: 'preferred_language' })
+  preferredLanguage: string;
 
-  @Column({ default: true, name: 'is_phone_verified' })
-  isPhoneVerified: boolean;
-
-  // Additional Supabase-specific column
   @Column({ nullable: true, name: 'supabase_user_id' })
   supabaseUserId: string;
 
@@ -101,56 +98,44 @@ export class User {
   @Exclude()
   passwordResetToken: string;
 
-  @Column({ type: 'timestamp', nullable: true, name: 'password_reset_expires' })
+  @Column({ type: 'timestamptz', nullable: true, name: 'password_reset_expires' })
   passwordResetExpires: Date;
 
-  @Column({ type: 'timestamp', nullable: true, name: 'last_login_at' })
-  lastLoginAt: Date;
-
-  @Column({ default: 0, name: 'login_attempts' })
+  @Column({ type: 'integer', default: 0, name: 'login_attempts' })
   loginAttempts: number;
 
-  @Column({ type: 'timestamp', nullable: true, name: 'lock_until' })
+  @Column({ type: 'timestamptz', nullable: true, name: 'lock_until' })
   lockUntil: Date;
 
-  @Column({ nullable: true, name: 'emergency_contact_name' })
-  emergencyContactName: string;
+  @Column({ type: 'timestamptz', nullable: true, name: 'last_login_at' })
+  lastLoginAt: Date;
 
-  @Column({ nullable: true, name: 'emergency_contact_phone' })
-  emergencyContactPhone: string;
-
-  @Column({ default: 'en', name: 'preferred_language' })
-  preferredLanguage: string;
-
-  @Column({ type: 'text', nullable: true, name: 'medical_history' })
-  medicalHistory: string;
-
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ type: 'timestamptz', name: 'updated_at' })
   updatedAt: Date;
 
   // Hash password before saving (only on insert)
   @BeforeInsert()
   async hashPasswordOnInsert() {
-    if (this.password) {
-      this.password = await bcrypt.hash(this.password, 12);
+    if (this.password_hash) {
+      this.password_hash = await bcrypt.hash(this.password_hash, 12);
     }
   }
 
   // Only hash password on update if it's been modified and not already hashed
   @BeforeUpdate()
   async hashPasswordOnUpdate() {
-    if (this.password && !this.password.startsWith('$2a$') && !this.password.startsWith('$2b$')) {
-      this.password = await bcrypt.hash(this.password, 12);
+    if (this.password_hash && !this.password_hash.startsWith('$2a$') && !this.password_hash.startsWith('$2b$')) {
+      this.password_hash = await bcrypt.hash(this.password_hash, 12);
     }
   }
 
   // Compare password method
   async comparePassword(candidatePassword: string): Promise<boolean> {
     try {
-      return await bcrypt.compare(candidatePassword, this.password);
+      return await bcrypt.compare(candidatePassword, this.password_hash);
     } catch (error) {
       console.error('Password comparison error:', error);
       return false;

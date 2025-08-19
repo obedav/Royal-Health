@@ -1,10 +1,9 @@
-// src/hooks/useAuth.tsx - Updated to include Supabase authentication
+// src/hooks/useAuth.tsx - Fixed to use only your custom API
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { Box, Spinner, Center, VStack, Text } from '@chakra-ui/react';
-import { supabase } from '../lib/supabaseClient';
 
-const API_BASE_URL = 'http://localhost:3001/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api/v1';
 
 // Types
 interface User {
@@ -21,7 +20,6 @@ interface User {
   city?: string;
   avatar?: string;
   preferredLanguage?: string;
-  supabaseUserId?: string;
 }
 
 interface AuthContextType {
@@ -45,7 +43,6 @@ interface RegisterData {
   state?: string;
   city?: string;
   preferredLanguage?: string;
-  supabaseUserId?: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -54,21 +51,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Load user from localStorage and check Supabase session on app start
+  // Load user from localStorage on app start
   useEffect(() => {
     const loadUser = async () => {
       try {
-        // Check Supabase session first
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('Error getting Supabase session:', error);
-        }
-
         const token = localStorage.getItem('accessToken');
         const savedUser = localStorage.getItem('user');
         
-        if (session && token && savedUser) {
+        if (token && savedUser) {
           try {
             const parsedUser = JSON.parse(savedUser);
             setUser(parsedUser);
@@ -78,40 +68,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           } catch (error) {
             console.error('Error loading saved user:', error);
             // Clear invalid data
-            await clearAuthData();
+            clearAuthData();
           }
         } else {
-          // If no valid session or tokens, clear everything
-          await clearAuthData();
+          // No valid tokens, clear everything
+          clearAuthData();
         }
       } catch (error) {
         console.error('Error during auth initialization:', error);
-        await clearAuthData();
+        clearAuthData();
       } finally {
         setLoading(false);
       }
     };
 
     loadUser();
-
-    // Listen for Supabase auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Supabase auth state changed:', event);
-        
-        if (event === 'SIGNED_OUT' || !session) {
-          await clearAuthData();
-        } else if (event === 'SIGNED_IN' && session) {
-          // Session exists, but we still need our backend tokens
-          // This will be handled by the login/register functions
-        }
-      }
-    );
-
-    return () => subscription.unsubscribe();
   }, []);
 
-  const clearAuthData = async () => {
+  const clearAuthData = () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
@@ -129,11 +103,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       if (response.ok) {
         const data = await response.json();
-        setUser(data.data);
-        localStorage.setItem('user', JSON.stringify(data.data));
+        setUser(data.data || data.user);
+        localStorage.setItem('user', JSON.stringify(data.data || data.user));
       } else if (response.status === 401) {
         // Token is invalid, clear auth data
-        await logout();
+        logout();
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
@@ -143,125 +117,141 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const register = async (userData: RegisterData): Promise<{ success: boolean; error?: string }> => {
     try {
-      // First, register with Supabase
-      const { data: supabaseData, error: supabaseError } = await supabase.auth.signUp({
-        email: userData.email,
-        password: userData.password,
-      });
-
-      if (supabaseError) {
-        return { 
-          success: false, 
-          error: supabaseError.message 
-        };
-      }
-
-      // Then register with backend API
+      console.log('🚀 Starting registration with custom API...');
+      
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...userData,
-          supabaseUserId: supabaseData.user?.id
-        }),
+        body: JSON.stringify(userData),
       });
 
       const data = await response.json();
+      console.log('📊 Registration response:', { status: response.status, data });
 
       if (response.ok) {
-        // Registration successful - API returns { accessToken, refreshToken, user, expiresIn }
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('refreshToken', data.refreshToken);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        setUser(data.user);
+        // Registration successful
+        if (data.accessToken) {
+          localStorage.setItem('accessToken', data.accessToken);
+        }
+        if (data.refreshToken) {
+          localStorage.setItem('refreshToken', data.refreshToken);
+        }
+        if (data.user) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+          setUser(data.user);
+        }
+        
+        console.log('✅ Registration successful');
         return { success: true };
       } else {
-        // Backend registration failed, should we sign out from Supabase?
-        await supabase.auth.signOut();
+        console.error('❌ Registration failed:', data.message);
         return { 
           success: false, 
           error: data.message || 'Registration failed. Please try again.' 
         };
       }
-    } catch (error) {
-      console.error('Registration error:', error);
-      // Clean up Supabase session on error
-      await supabase.auth.signOut();
+    } catch (error: any) {
+      console.error('❌ Registration network error:', error);
       return { 
         success: false, 
-        error: 'Network error. Please check your connection and try again.' 
+        error: error.message || 'Network error. Please check your connection and try again.' 
       };
     }
   };
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      // First, authenticate with Supabase
-      const { data: supabaseData, error: supabaseError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (supabaseError) {
-        return { 
-          success: false, 
-          error: supabaseError.message 
-        };
-      }
-
-      // Then authenticate with backend API
+      console.log('🚀 Starting login with custom API...');
+      console.log('API URL:', `${API_BASE_URL}/auth/login`);
+      
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          email, 
-          password,
-          supabaseUserId: supabaseData.user?.id 
+          email: email.trim(), 
+          password: password 
         }),
       });
 
+      console.log('📊 Login response status:', response.status);
+      
       const data = await response.json();
+      console.log('📊 Login response data:', data);
 
       if (response.ok) {
-        // Login successful - API returns { accessToken, refreshToken, user, expiresIn }
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('refreshToken', data.refreshToken);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        setUser(data.user);
+        // Login successful
+        console.log('✅ Login successful');
+        
+        if (data.accessToken || data.token) {
+          localStorage.setItem('accessToken', data.accessToken || data.token);
+        }
+        if (data.refreshToken) {
+          localStorage.setItem('refreshToken', data.refreshToken);
+        }
+        if (data.user || data.data) {
+          const userData = data.user || data.data;
+          localStorage.setItem('user', JSON.stringify(userData));
+          setUser(userData);
+        }
+        
         return { success: true };
       } else {
-        // Backend login failed, sign out from Supabase
-        await supabase.auth.signOut();
+        console.error('❌ Login failed:', data.message);
+        
+        // Handle specific error messages
+        let errorMessage = data.message || 'Login failed';
+        
+        if (data.message && data.message.includes('Invalid credentials')) {
+          errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+        } else if (data.message && data.message.includes('Account locked')) {
+          errorMessage = 'Your account has been temporarily locked due to multiple failed login attempts. Please try again later.';
+        } else if (data.message && data.message.includes('Email not verified')) {
+          errorMessage = 'Please verify your email address before logging in.';
+        }
+        
         return { 
           success: false, 
-          error: data.message || 'Invalid email or password.' 
+          error: errorMessage
         };
       }
-    } catch (error) {
-      console.error('Login error:', error);
-      // Clean up Supabase session on error
-      await supabase.auth.signOut();
+    } catch (error: any) {
+      console.error('❌ Login network error:', error);
+      
+      let errorMessage = 'Network error. Please check your connection and try again.';
+      
+      if (error.message && error.message.includes('fetch')) {
+        errorMessage = 'Unable to connect to the server. Please check your internet connection.';
+      }
+      
       return { 
         success: false, 
-        error: 'Network error. Please check your connection and try again.' 
+        error: errorMessage
       };
     }
   };
 
-  const logout = async () => {
-    try {
-      // Sign out from Supabase first
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error('Error signing out from Supabase:', error);
-    }
+  const logout = () => {
+    console.log('🚪 Logging out user');
+    clearAuthData();
     
-    // Clear local storage and state
-    await clearAuthData();
+    // Optional: Call logout endpoint to invalidate token on server
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      fetch(`${API_BASE_URL}/auth/logout`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }).catch(error => {
+        console.error('Error during server logout:', error);
+        // Don't throw error here since we're already logging out
+      });
+    }
   };
 
   const updateUser = (userData: Partial<User>) => {

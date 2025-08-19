@@ -481,7 +481,7 @@ const onSubmit = async (formData: RegisterFormSchema) => {
                 </Link>
               </Text>
 
-              {/* Demo Credentials */}
+              {/* Demo Credentials 
               <Box 
                 bg="blue.50" 
                 p={4} 
@@ -494,7 +494,7 @@ const onSubmit = async (formData: RegisterFormSchema) => {
                 <Text fontSize="xs" color="blue.600">
                   You can also test with: john.doe@royalhealth.ng / SecurePassword123!
                 </Text>
-              </Box>
+              </Box>   */}
 
               {/* Security Notice */}
               <Box 

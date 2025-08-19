@@ -234,7 +234,7 @@ export class UsersService {
   }
 
   private sanitizeUser(user: User): any {
-    const { password, passwordResetToken, emailVerificationToken, phoneVerificationCode, ...sanitized } = user;
+    const { password_hash, passwordResetToken, emailVerificationToken, phoneVerificationCode, ...sanitized } = user;
     return sanitized;
   }
 
