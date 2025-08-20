@@ -53,7 +53,7 @@ const HeroSection: React.FC = () => {
   ]
 
   const stats = [
-    { number: '500+', label: 'Happy Patients' },
+    { number: '50+', label: 'Happy Patients' },
     { number: '50+', label: 'Qualified Nurses' },
     { number: '99%', label: 'Satisfaction Rate' },
     { number: '24/7', label: 'Availability' }

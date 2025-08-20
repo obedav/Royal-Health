@@ -6,6 +6,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import theme from './styles/theme'
 import './styles/globals.css'
 
+
 // Import components
 import Header from './components/common/Header'
 import { AuthProvider, ProtectedRoute } from './hooks/useAuth'
@@ -19,6 +20,7 @@ import Services from './pages/Services'
 import Dashboard from './pages/Dashboard'
 import About from './pages/About'
 import Contact from './pages/Contact'
+
 
 // Admin components (if you want to add admin routes)
 // import AdminDashboard from './components/admin/AdminDashboard'

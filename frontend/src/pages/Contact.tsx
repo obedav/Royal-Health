@@ -117,7 +117,7 @@ const Contact: React.FC = () => {
 
   // Default contact info fallback
   const getDefaultContactInfo = (): ContactInfo => ({
-    phones: ['+234 706 332 5184', '+234 808 374 7339'],
+    phones: ['+234 706 332 5184', '+234 808 374 7339', '+234 803 404 7213'],
     emails: ['info@royalhealthconsult.ng', 'support@royalhealthconsult.ng'],
     address: {
       street: '4 Barthlomew Ezeogu Street',
@@ -275,7 +275,7 @@ const Contact: React.FC = () => {
       icon: FaUserTie,
       title: 'Partnership Inquiries',
       description: 'Partnerships and collaborations',
-      phone: contactInfo?.phones[0] || '+234 803 404 7213',
+      phone: contactInfo?.phones[2] || '+234 803 404 7213',
       available: 'Mon-Fri 9AM-5PM',
       color: 'purple'
     },

@@ -1,5 +1,5 @@
-// src/pages/About.tsx - Updated with RHC operational dynamics and values
-import React, { useState, useEffect } from 'react';
+// src/pages/About.tsx - Comprehensive About Page with All Company Information
+import React from 'react';
 import {
   Box,
   Container,
@@ -17,479 +17,547 @@ import {
   Stat,
   StatLabel,
   StatNumber,
-  Avatar,
   Divider,
   List,
   ListItem,
   ListIcon,
-  Spinner,
-  Center,
-  Alert,
-  AlertIcon,
-  useToast,
-  OrderedList,
-  UnorderedList,
+  Flex,
+  Wrap,
+  WrapItem
 } from '@chakra-ui/react';
 import {
   FaHeart,
   FaUserMd,
   FaHome,
   FaShieldAlt,
-  FaClock,
   FaPhone,
   FaCheck,
   FaAward,
   FaUsers,
   FaStethoscope,
-  FaHandsHelping,
-  FaGlobe,
-  FaClipboardList,
-  FaFileAlt,
-  FaWhatsapp,
-  FaEnvelope,
-  FaStar,
   FaGraduationCap,
   FaLightbulb,
+  FaStar,
   FaEye,
-  FaUserGraduate,
+  FaWhatsapp,
+  FaEnvelope,
+  FaClipboardList,
+  FaCalendarAlt,
+  FaBaby,
+  FaPills,
+  FaBandAid,
+  FaHeartbeat,
+  FaHandsHelping,
+  FaUserNurse,
+  FaBuilding,
+  FaUserFriends
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
-// Types for real data
-interface CompanyStats {
-  totalPatients: number;
-  totalProfessionals: number;
-  statesCovered: number;
-  successRate: number;
-  totalBookings: number;
-  completedAssessments: number;
-}
-
-interface TeamMember {
-  id: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-  specialization: string;
-  experience: number;
-  credentials: string[];
-  bio?: string;
-  profileImage?: string;
-  isActive: boolean;
-}
-
-interface CompanyInfo {
-  mission: string;
-  vision: string;
-  foundedYear: number;
-  story: string;
-  values: Array<{
-    title: string;
-    description: string;
-    icon: string;
-  }>;
-}
-
 const About: React.FC = () => {
   const navigate = useNavigate();
-  const toast = useToast();
-  const bg = useColorModeValue('gray.50', 'gray.900');
+  const bg = useColorModeValue('white', 'gray.900');
   const cardBg = useColorModeValue('white', 'gray.800');
+  const sectionBg = useColorModeValue('gray.50', 'gray.800');
   
-  // State for real data
-  const [companyStats, setCompanyStats] = useState<CompanyStats | null>(null);
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const stats = [
+    { label: 'Happy Clients', value: '500+', icon: FaUsers, color: 'blue' },
+    { label: 'Healthcare Professionals', value: '50+', icon: FaUserMd, color: 'green' },
+    { label: 'Years of Experience', value: '5+', icon: FaAward, color: 'purple' },
+    { label: 'Success Rate', value: '98%', icon: FaStar, color: 'orange' }
+  ];
 
-  const API_BASE_URL = 'http://localhost:3001/api/v1';
-
-  // Fetch real data from backend
-  const fetchAboutData = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      // Fetch company statistics
-      const statsResponse = await fetch(`${API_BASE_URL}/company/stats`);
-      if (statsResponse.ok) {
-        const statsData = await statsResponse.json();
-        setCompanyStats(statsData);
-      }
-
-      // Fetch team members
-      const teamResponse = await fetch(`${API_BASE_URL}/team/members`);
-      if (teamResponse.ok) {
-        const teamData = await teamResponse.json();
-        setTeamMembers(teamData.filter((member: TeamMember) => member.isActive));
-      }
-
-      // Fetch company information
-      const companyResponse = await fetch(`${API_BASE_URL}/company/info`);
-      if (companyResponse.ok) {
-        const companyData = await companyResponse.json();
-        setCompanyInfo(companyData);
-      }
-
-    } catch (err) {
-      console.error('Error fetching about data:', err);
-      setError('Failed to load company information');
-      
-      // Fallback: Use minimal real data from other endpoints
-      try {
-        const bookingStatsResponse = await fetch(`${API_BASE_URL}/bookings/stats`);
-        const usersResponse = await fetch(`${API_BASE_URL}/users`);
-        
-        if (bookingStatsResponse.ok && usersResponse.ok) {
-          const bookingStats = await bookingStatsResponse.json();
-          const users = await usersResponse.json();
-          
-          // Calculate stats from existing data
-          const patients = users.filter((user: any) => user.role === 'client' || user.role === 'patient');
-          const professionals = users.filter((user: any) => user.role === 'nurse' || user.role === 'healthcare_professional');
-          
-          setCompanyStats({
-            totalPatients: patients.length,
-            totalProfessionals: professionals.length,
-            statesCovered: 15,
-            successRate: bookingStats.total > 0 ? Math.round((bookingStats.completed / bookingStats.total) * 100) : 0,
-            totalBookings: bookingStats.total || 0,
-            completedAssessments: bookingStats.completed || 0,
-          });
-        }
-      } catch (fallbackErr) {
-        console.error('Fallback data fetch failed:', fallbackErr);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchAboutData();
-  }, []);
-
-  // Updated company information based on RHC document
-  const defaultCompanyInfo: CompanyInfo = {
-    mission: "To provide personalized professional healthcare service that enhances the quality of life of our clients while ensuring that our twin goal of comfortability and affordability is achieved.",
-    vision: "To be the trusted provider for compassionate care and excellent home care service",
-    foundedYear: 2023,
-    story: "Royal Health Consult was founded with a commitment to making professional healthcare accessible and comfortable for everyone.",
-    values: [
-      {
-        title: 'Professionalism',
-        description: 'We consistently deliver ethical and reliable nursing care.',
-        icon: 'award'
-      },
-      {
-        title: 'Integrity',
-        description: 'We practice in honesty and transparency in all our interaction.',
-        icon: 'shield'
-      },
-      {
-        title: 'Compassionate Care',
-        description: 'We care genuinely for every client',
-        icon: 'heart'
-      },
-      {
-        title: 'Knowledge',
-        description: 'We are committed to continuous improvement and learning to better serve our clients.',
-        icon: 'graduation'
-      },
-      {
-        title: 'Understanding',
-        description: 'We take the time to truly listen and respond to unique needs of our clients',
-        icon: 'lightbulb'
-      },
-      {
-        title: 'Service Excellence',
-        description: 'We are in business to exceed your expectation',
-        icon: 'star'
-      }
-    ]
-  };
-
-  // Operational process steps from the document
-  const operationalSteps = [
+  const services = [
     {
-      step: 1,
-      title: "Initial Contact",
-      description: "Reach out to us through phone calls, WhatsApp message, or email to book for an assessment.",
-      icon: FaPhone,
-      methods: ["Phone Call", "WhatsApp", "Email"]
+      title: 'Home Nursing',
+      description: 'Professional nursing care in the comfort of your home',
+      icon: FaUserNurse,
+      color: 'blue'
     },
     {
-      step: 2,
-      title: "Professional Assessment",
-      description: "Our trained professionals conduct a comprehensive assessment of your healthcare needs.",
-      icon: FaUserMd,
-      methods: ["Trained Professionals", "Comprehensive Evaluation"]
+      title: 'Postnatal & Mother-Baby Care',
+      description: 'Specialized care for new mothers and their babies',
+      icon: FaBaby,
+      color: 'pink'
     },
     {
-      step: 3,
-      title: "Client Assessment Report (CAR)",
-      description: "We provide you with a detailed Client Assessment Report with personalized recommendations.",
-      icon: FaFileAlt,
-      methods: ["Detailed Report", "Personalized Recommendations"]
+      title: 'Medication Management',
+      description: 'Safe and proper administration of medications',
+      icon: FaPills,
+      color: 'green'
     },
     {
-      step: 4,
-      title: "Service Deployment",
-      description: "Upon satisfactory review of CAR, sign up for your preferred healthcare package and services begin.",
-      icon: FaHome,
-      methods: ["Package Selection", "Service Deployment"]
+      title: 'Wound Dressing',
+      description: 'Expert wound care and dressing services',
+      icon: FaBandAid,
+      color: 'red'
+    },
+    {
+      title: 'Health Screenings',
+      description: 'Comprehensive health assessments and monitoring',
+      icon: FaHeartbeat,
+      color: 'purple'
+    },
+    {
+      title: 'Physiotherapy',
+      description: 'Rehabilitation and physical therapy services',
+      icon: FaHandsHelping,
+      color: 'orange'
+    },
+    {
+      title: 'Caregiver Support',
+      description: 'Training and support for family caregivers',
+      icon: FaUserFriends,
+      color: 'teal'
     }
   ];
 
-  const getIconComponent = (iconName: string) => {
-    const iconMap: { [key: string]: any } = {
-      heart: FaHeart,
-      shield: FaShieldAlt,
-      home: FaHome,
-      clock: FaClock,
-      award: FaAward,
-      graduation: FaGraduationCap,
-      lightbulb: FaLightbulb,
-      star: FaStar,
-    };
-    return iconMap[iconName] || FaCheck;
-  };
+  const values = [
+    {
+      title: 'Professionalism',
+      description: 'We consistently deliver ethical and reliable nursing care with the highest standards.',
+      icon: FaAward,
+      color: 'blue'
+    },
+    {
+      title: 'Integrity',
+      description: 'We practice honesty and transparency in all our interactions with clients and families.',
+      icon: FaShieldAlt,
+      color: 'green'
+    },
+    {
+      title: 'Compassionate Care',
+      description: 'We care genuinely for every client, treating them with empathy and understanding.',
+      icon: FaHeart,
+      color: 'red'
+    },
+    {
+      title: 'Knowledge',
+      description: 'We are committed to continuous improvement and learning to better serve our clients.',
+      icon: FaGraduationCap,
+      color: 'purple'
+    },
+    {
+      title: 'Understanding',
+      description: 'We take the time to truly listen and respond to the unique needs of our clients.',
+      icon: FaLightbulb,
+      color: 'yellow'
+    },
+    {
+      title: 'Service Excellence',
+      description: 'We are in business to exceed your expectations and deliver outstanding care.',
+      icon: FaStar,
+      color: 'orange'
+    }
+  ];
 
-  const getColorScheme = (index: number) => {
-    const colors = ['red', 'blue', 'green', 'orange', 'purple', 'teal'];
-    return colors[index % colors.length];
-  };
+  const careLocations = [
+    { name: 'Your Home', icon: FaHome, description: 'Comfort and familiarity of your own space' },
+    { name: 'Workplace', icon: FaBuilding, description: 'On-site care for working professionals' },
+    { name: 'Community Centers', icon: FaUsers, description: 'Community-based healthcare services' }
+  ];
 
-  if (loading) {
-    return (
-      <Center h="100vh">
-        <VStack spacing={4}>
-          <Spinner size="xl" color="primary.500" thickness="4px" />
-          <Text>Loading company information...</Text>
-        </VStack>
-      </Center>
-    );
-  }
+  const process = [
+    {
+      step: '01',
+      title: 'Initial Contact',
+      description: 'Reach out to us through phone, WhatsApp, or email to schedule your assessment.',
+      icon: FaPhone
+    },
+    {
+      step: '02',
+      title: 'Professional Assessment',
+      description: 'Our trained professionals conduct a comprehensive evaluation of your healthcare needs.',
+      icon: FaUserMd
+    },
+    {
+      step: '03',
+      title: 'Personalized Report',
+      description: 'Receive a detailed Client Assessment Report with tailored recommendations.',
+      icon: FaClipboardList
+    },
+    {
+      step: '04',
+      title: 'Service Begins',
+      description: 'Choose your preferred package and begin receiving professional healthcare at home.',
+      icon: FaHome
+    }
+  ];
 
   return (
     <Box bg={bg} minH="100vh">
       {/* Hero Section */}
-      <Box bg="primary.600" color="white" py={20}>
-        <Container maxW="6xl">
-          <VStack spacing={6} textAlign="center">
-            <Heading size="2xl" fontWeight="bold">
+      <Box 
+        bgGradient="linear(135deg, pink.500 0%, pink.600 50%, pink.700 100%)" 
+        color="white" 
+        py={{ base: 16, md: 24 }}
+        position="relative"
+        overflow="hidden"
+      >
+        <Box
+          position="absolute"
+          top="0"
+          left="0"
+          right="0"
+          bottom="0"
+          opacity={0.1}
+          background="repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px)"
+        />
+        <Container maxW="6xl" position="relative">
+          <VStack spacing={8} textAlign="center">
+            <Badge 
+              bg="whiteAlpha.200" 
+              color="white" 
+              px={4} 
+              py={2} 
+              fontSize="sm" 
+              borderRadius="full"
+              backdropFilter="blur(10px)"
+            >
+              Professional Healthcare Since 2020
+            </Badge>
+            <Heading 
+              size={{ base: "xl", md: "2xl" }} 
+              fontWeight="700"
+              lineHeight="1.2"
+              maxW="4xl"
+            >
               About Royal Health Consult (RHC)
             </Heading>
-            <Text fontSize="xl" maxW="4xl" opacity={0.9}>
-              {companyInfo?.mission || defaultCompanyInfo.mission}
+            <Text 
+              fontSize={{ base: "lg", md: "xl" }} 
+              maxW="4xl" 
+              opacity={0.9}
+              lineHeight="1.8"
+            >
+              A professional nursing and healthcare service provider dedicated to delivering 
+              compassionate, reliable, and family-centered care. We are your partner in wellness and care.
             </Text>
-            <Badge bg="white" color="primary.600" px={6} py={3} fontSize="lg" borderRadius="full">
-              Professional • Compassionate • Excellence
-            </Badge>
+            <HStack spacing={4}>
+              <Button 
+                size="lg" 
+                bg="white" 
+                color="pink.600" 
+                _hover={{ bg: "gray.50", transform: "translateY(-2px)" }}
+                leftIcon={<FaCalendarAlt />}
+                boxShadow="xl"
+                transition="all 0.3s"
+                onClick={() => navigate('/booking')}
+              >
+                Book Assessment
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                borderColor="white" 
+                color="white"
+                _hover={{ bg: "whiteAlpha.200", transform: "translateY(-2px)" }}
+                transition="all 0.3s"
+                onClick={() => navigate('/contact')}
+              >
+                Contact Us
+              </Button>
+            </HStack>
           </VStack>
         </Container>
       </Box>
 
-      <Container maxW="6xl" py={16}>
+      <Container maxW="6xl" py={20}>
         <VStack spacing={20} align="stretch">
-          {/* Error Alert */}
-          {error && (
-            <Alert status="warning">
-              <AlertIcon />
-              <Box>
-                <Text fontWeight="bold">Notice</Text>
-                <Text fontSize="sm">{error}. Showing available data from the system.</Text>
+
+          {/* Company Introduction */}
+          <Box textAlign="center">
+            <VStack spacing={8}>
+              <Heading size="xl" color="gray.800">Who We Are</Heading>
+              <VStack spacing={6} maxW="5xl">
+                <Text fontSize="lg" lineHeight="tall" color="gray.700">
+                  <strong>Royal Health Consult (RHC)</strong> is a professional nursing and healthcare service 
+                  provider dedicated to delivering compassionate, reliable, and family-centered care since 2020.
+                </Text>
+                <Text fontSize="lg" lineHeight="tall" color="gray.700">
+                  We support individuals and families by offering personalized services that promote health, 
+                  dignity, and quality of life.
+                </Text>
+                <Text fontSize="lg" lineHeight="tall" color="gray.700">
+                  At RHC, we understand that every client is unique. That's why we provide tailored healthcare 
+                  solutions ranging from home nursing, postnatal and mother-baby care, medication management, 
+                  wound dressing, health screenings, physiotherapy, and caregiver support.
+                </Text>
+                <Text fontSize="lg" lineHeight="tall" color="gray.700">
+                  Whether it's in the comfort of your home, workplace, or community, our team ensures care is 
+                  delivered with professionalism, integrity, and compassion.
+                </Text>
+                <Box bg="pink.50" p={6} borderRadius="xl" borderLeft="4px solid" borderLeftColor="pink.500">
+                  <Text fontSize="lg" lineHeight="tall" color="gray.700" fontStyle="italic">
+                    We are committed to redefining how families experience home care services. With a strong 
+                    foundation built on knowledge, service excellence, and trust, Royal Health Consult is more 
+                    than a healthcare provider — <strong>we are your partner in wellness and care.</strong>
+                  </Text>
+                </Box>
+              </VStack>
+            </VStack>
+          </Box>
+
+          {/* Our Services - Detailed */}
+          <Box>
+            <VStack spacing={12} textAlign="center">
+              <VStack spacing={4}>
+                <Heading size="xl" color="gray.800">Our Comprehensive Services</Heading>
+                <Text fontSize="lg" color="gray.600" maxW="3xl">
+                  Tailored healthcare solutions designed to meet your unique needs and promote quality of life
+                </Text>
+              </VStack>
+
+              <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={8}>
+                {services.map((service, index) => (
+                  <Card 
+                    key={index} 
+                    bg="white" 
+                    shadow="lg" 
+                    borderRadius="xl"
+                    border="1px solid"
+                    borderColor="gray.100"
+                    transition="all 0.3s"
+                    _hover={{ transform: "translateY(-4px)", shadow: "xl" }}
+                  >
+                    <CardBody p={8} textAlign="center">
+                      <VStack spacing={6}>
+                        <Box bg={`${service.color}.100`} p={4} borderRadius="xl">
+                          <Icon as={service.icon} fontSize="2xl" color={`${service.color}.600`} />
+                        </Box>
+                        <VStack spacing={3}>
+                          <Heading size="md" color="gray.800">
+                            {service.title}
+                          </Heading>
+                          <Text color="gray.600" lineHeight="tall" fontSize="sm">
+                            {service.description}
+                          </Text>
+                        </VStack>
+                      </VStack>
+                    </CardBody>
+                  </Card>
+                ))}
+              </SimpleGrid>
+            </VStack>
+          </Box>
+
+          {/* Where We Serve */}
+          <Box bg={sectionBg} borderRadius="3xl" p={12}>
+            <VStack spacing={12} textAlign="center">
+              <VStack spacing={4}>
+                <Heading size="xl" color="gray.800">Where We Provide Care</Heading>
+                <Text fontSize="lg" color="gray.600" maxW="3xl">
+                  Professional healthcare services delivered wherever you need them most
+                </Text>
+              </VStack>
+
+              <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8} maxW="4xl">
+                {careLocations.map((location, index) => (
+                  <Card key={index} bg="white" shadow="md" borderRadius="xl" border="1px solid" borderColor="gray.100">
+                    <CardBody textAlign="center" py={8}>
+                      <VStack spacing={4}>
+                        <Box bg="pink.100" p={4} borderRadius="xl">
+                          <Icon as={location.icon} fontSize="2xl" color="pink.600" />
+                        </Box>
+                        <VStack spacing={2}>
+                          <Heading size="md" color="gray.800">
+                            {location.name}
+                          </Heading>
+                          <Text fontSize="sm" color="gray.600">
+                            {location.description}
+                          </Text>
+                        </VStack>
+                      </VStack>
+                    </CardBody>
+                  </Card>
+                ))}
+              </SimpleGrid>
+
+              <Box bg="white" p={8} borderRadius="xl" maxW="4xl">
+                <Text fontSize="lg" color="gray.700" textAlign="center" lineHeight="tall">
+                  <strong>Our commitment:</strong> Whether it's in the comfort of your home, workplace, 
+                  or community, our team ensures care is delivered with professionalism, integrity, and compassion.
+                </Text>
               </Box>
-            </Alert>
-          )}
+            </VStack>
+          </Box>
 
           {/* Mission & Vision */}
           <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={12}>
-            <Card bg={cardBg} shadow="xl" borderRadius="2xl" overflow="hidden">
-              <CardBody p={8}>
+            <Card 
+              bg={cardBg} 
+              shadow="xl" 
+              borderRadius="2xl" 
+              border="1px solid"
+              borderColor="gray.100"
+              transition="all 0.3s"
+              _hover={{ transform: "translateY(-4px)", shadow: "2xl" }}
+            >
+              <CardBody p={10}>
                 <VStack spacing={6} align="start">
                   <HStack spacing={3}>
-                    <Icon as={FaStethoscope} fontSize="2xl" color="primary.500" />
-                    <Heading size="lg" color="primary.600">Our Mission</Heading>
+                    <Box bg="pink.100" p={3} borderRadius="xl">
+                      <Icon as={FaStethoscope} fontSize="2xl" color="pink.600" />
+                    </Box>
+                    <Heading size="lg" color="gray.800">Our Mission</Heading>
                   </HStack>
                   <Text fontSize="lg" lineHeight="tall" color="gray.600">
-                    {companyInfo?.mission || defaultCompanyInfo.mission}
+                    To deliver compassionate, reliable, and family-centered healthcare services that support 
+                    individuals and families by offering personalized care solutions that promote health, 
+                    dignity, and quality of life since 2020.
                   </Text>
                 </VStack>
               </CardBody>
             </Card>
 
-            <Card bg={cardBg} shadow="xl" borderRadius="2xl" overflow="hidden">
-              <CardBody p={8}>
+            <Card 
+              bg={cardBg} 
+              shadow="xl" 
+              borderRadius="2xl" 
+              border="1px solid"
+              borderColor="gray.100"
+              transition="all 0.3s"
+              _hover={{ transform: "translateY(-4px)", shadow: "2xl" }}
+            >
+              <CardBody p={10}>
                 <VStack spacing={6} align="start">
                   <HStack spacing={3}>
-                    <Icon as={FaEye} fontSize="2xl" color="secondary.500" />
-                    <Heading size="lg" color="secondary.600">Our Vision</Heading>
+                    <Box bg="blue.100" p={3} borderRadius="xl">
+                      <Icon as={FaEye} fontSize="2xl" color="blue.600" />
+                    </Box>
+                    <Heading size="lg" color="gray.800">Our Vision</Heading>
                   </HStack>
                   <Text fontSize="lg" lineHeight="tall" color="gray.600">
-                    {companyInfo?.vision || defaultCompanyInfo.vision}
+                    To be the trusted provider for compassionate care and excellent home care service, 
+                    redefining how families experience professional healthcare in their homes and communities.
                   </Text>
                 </VStack>
               </CardBody>
             </Card>
           </SimpleGrid>
 
-          {/* Operational Dynamics Section */}
-          <Box>
-            <VStack spacing={8} textAlign="center" mb={12}>
-              <Heading size="xl" color="gray.800">Our Operational Dynamics</Heading>
-              <Text fontSize="lg" maxW="4xl" color="gray.600">
-                We follow a systematic approach to ensure you receive the best personalized healthcare service
+          {/* Statistics Section */}
+          <Box bg={sectionBg} borderRadius="3xl" p={12}>
+            <VStack spacing={12} textAlign="center">
+              <VStack spacing={4}>
+                <Heading size="xl" color="gray.800">Our Impact in Numbers</Heading>
+                <Text fontSize="lg" color="gray.600" maxW="3xl">
+                  Building trust through professional excellence and compassionate care since 2020
+                </Text>
+              </VStack>
+
+              <SimpleGrid columns={{ base: 2, md: 4 }} spacing={8} w="full">
+                {stats.map((stat, index) => (
+                  <Card key={index} bg="white" shadow="md" borderRadius="xl" border="1px solid" borderColor="gray.100">
+                    <CardBody textAlign="center" py={8}>
+                      <VStack spacing={4}>
+                        <Box bg={`${stat.color}.100`} p={4} borderRadius="xl">
+                          <Icon as={stat.icon} fontSize="2xl" color={`${stat.color}.600`} />
+                        </Box>
+                        <VStack spacing={1}>
+                          <Text fontSize="3xl" fontWeight="bold" color="gray.800">
+                            {stat.value}
+                          </Text>
+                          <Text fontSize="sm" color="gray.600" fontWeight="medium">
+                            {stat.label}
+                          </Text>
+                        </VStack>
+                      </VStack>
+                    </CardBody>
+                  </Card>
+                ))}
+              </SimpleGrid>
+            </VStack>
+          </Box>
+
+          {/* How We Work */}
+          <VStack spacing={12} textAlign="center">
+            <VStack spacing={4}>
+              <Heading size="xl" color="gray.800">How We Work</Heading>
+              <Text fontSize="lg" color="gray.600" maxW="3xl">
+                Our simple, professional process to provide you with personalized healthcare solutions
               </Text>
             </VStack>
 
-            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={8}>
-              {operationalSteps.map((process, index) => (
-                <Card key={index} bg={cardBg} shadow="lg" borderRadius="xl" overflow="hidden">
+            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={8} w="full">
+              {process.map((step, index) => (
+                <Card 
+                  key={index} 
+                  bg="white" 
+                  shadow="lg" 
+                  borderRadius="xl" 
+                  border="1px solid"
+                  borderColor="gray.100"
+                  transition="all 0.3s"
+                  _hover={{ transform: "translateY(-2px)", shadow: "xl" }}
+                >
                   <CardBody p={8}>
                     <HStack spacing={6} align="start">
-                      <Box bg={`${getColorScheme(index)}.100`} p={4} borderRadius="full" position="relative">
-                        <Icon as={process.icon} fontSize="xl" color={`${getColorScheme(index)}.500`} />
-                        <Badge 
-                          position="absolute" 
-                          top="-2" 
-                          right="-2" 
-                          bg={`${getColorScheme(index)}.500`} 
+                      <VStack spacing={0}>
+                        <Box 
+                          bg="pink.600" 
                           color="white" 
-                          borderRadius="full"
-                          minW="24px"
-                          h="24px"
-                          display="flex"
-                          alignItems="center"
+                          w="50px" 
+                          h="50px" 
+                          borderRadius="xl" 
+                          display="flex" 
+                          alignItems="center" 
                           justifyContent="center"
-                          fontSize="sm"
+                          fontWeight="bold"
+                          fontSize="lg"
                         >
-                          {process.step}
-                        </Badge>
-                      </Box>
+                          {step.step}
+                        </Box>
+                        <Box bg="pink.100" p={3} borderRadius="xl" mt={4}>
+                          <Icon as={step.icon} fontSize="xl" color="pink.600" />
+                        </Box>
+                      </VStack>
                       <VStack spacing={3} align="start" flex={1}>
-                        <Heading size="md" color={`${getColorScheme(index)}.600`}>
-                          {process.title}
+                        <Heading size="md" color="gray.800">
+                          {step.title}
                         </Heading>
                         <Text color="gray.600" lineHeight="tall">
-                          {process.description}
+                          {step.description}
                         </Text>
-                        <HStack spacing={2} flexWrap="wrap">
-                          {process.methods.map((method, idx) => (
-                            <Badge key={idx} variant="outline" colorScheme={getColorScheme(index)} fontSize="xs">
-                              {method}
-                            </Badge>
-                          ))}
-                        </HStack>
                       </VStack>
                     </HStack>
                   </CardBody>
                 </Card>
               ))}
             </SimpleGrid>
-          </Box>
+          </VStack>
 
-          {/* Real Statistics from Backend */}
-          {companyStats && (
-            <Box bg="gray.100" borderRadius="3xl" p={12}>
-              <VStack spacing={8} textAlign="center" mb={12}>
-                <Heading size="xl" color="gray.800">Our Real Impact</Heading>
-                <Text fontSize="lg" maxW="3xl" color="gray.600">
-                  Live statistics from our healthcare platform
-                </Text>
-              </VStack>
-
-              <SimpleGrid columns={{ base: 2, md: 4 }} spacing={8}>
-                <Card bg="white" shadow="md" borderRadius="xl">
-                  <CardBody textAlign="center" py={8}>
-                    <Stat>
-                      <VStack spacing={3}>
-                        <Icon as={FaUsers} fontSize="3xl" color="primary.500" />
-                        <StatNumber fontSize="3xl" color="gray.800" fontWeight="bold">
-                          {companyStats.totalPatients.toLocaleString()}
-                        </StatNumber>
-                        <StatLabel fontSize="md" color="gray.600" fontWeight="medium">
-                          Clients Served
-                        </StatLabel>
-                      </VStack>
-                    </Stat>
-                  </CardBody>
-                </Card>
-
-                <Card bg="white" shadow="md" borderRadius="xl">
-                  <CardBody textAlign="center" py={8}>
-                    <Stat>
-                      <VStack spacing={3}>
-                        <Icon as={FaUserMd} fontSize="3xl" color="green.500" />
-                        <StatNumber fontSize="3xl" color="gray.800" fontWeight="bold">
-                          {companyStats.totalProfessionals}
-                        </StatNumber>
-                        <StatLabel fontSize="md" color="gray.600" fontWeight="medium">
-                          Trained Professionals
-                        </StatLabel>
-                      </VStack>
-                    </Stat>
-                  </CardBody>
-                </Card>
-
-                <Card bg="white" shadow="md" borderRadius="xl">
-                  <CardBody textAlign="center" py={8}>
-                    <Stat>
-                      <VStack spacing={3}>
-                        <Icon as={FaClipboardList} fontSize="3xl" color="blue.500" />
-                        <StatNumber fontSize="3xl" color="gray.800" fontWeight="bold">
-                          {companyStats.completedAssessments}
-                        </StatNumber>
-                        <StatLabel fontSize="md" color="gray.600" fontWeight="medium">
-                          Assessments Completed
-                        </StatLabel>
-                      </VStack>
-                    </Stat>
-                  </CardBody>
-                </Card>
-
-                <Card bg="white" shadow="md" borderRadius="xl">
-                  <CardBody textAlign="center" py={8}>
-                    <Stat>
-                      <VStack spacing={3}>
-                        <Icon as={FaAward} fontSize="3xl" color="purple.500" />
-                        <StatNumber fontSize="3xl" color="gray.800" fontWeight="bold">
-                          {companyStats.successRate}%
-                        </StatNumber>
-                        <StatLabel fontSize="md" color="gray.600" fontWeight="medium">
-                          Client Satisfaction
-                        </StatLabel>
-                      </VStack>
-                    </Stat>
-                  </CardBody>
-                </Card>
-              </SimpleGrid>
-            </Box>
-          )}
-
-          {/* PICK US Values - Core Values from Document */}
-          <Box>
-            <VStack spacing={8} textAlign="center" mb={12}>
-              <Heading size="xl" color="gray.800">Our Core Values - "PICK US"</Heading>
-              <Text fontSize="lg" maxW="4xl" color="gray.600">
-                The RHC values form the acronym "PICK US" - representing our commitment to excellence in every aspect of our service delivery.
+          {/* Core Values */}
+          <VStack spacing={12} textAlign="center">
+            <VStack spacing={4}>
+              <Heading size="xl" color="gray.800">Our Core Values</Heading>
+              <Text fontSize="lg" color="gray.600" maxW="3xl">
+                The foundation of knowledge, service excellence, and trust that guides our every action
               </Text>
             </VStack>
 
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={8}>
-              {(companyInfo?.values || defaultCompanyInfo.values).map((value, index) => (
-                <Card key={index} bg={cardBg} shadow="lg" borderRadius="xl" overflow="hidden">
+              {values.map((value, index) => (
+                <Card 
+                  key={index} 
+                  bg="white" 
+                  shadow="lg" 
+                  borderRadius="xl"
+                  border="1px solid"
+                  borderColor="gray.100"
+                  transition="all 0.3s"
+                  _hover={{ transform: "translateY(-4px)", shadow: "xl" }}
+                >
                   <CardBody p={8} textAlign="center">
                     <VStack spacing={6}>
-                      <Box bg={`${getColorScheme(index)}.100`} p={4} borderRadius="full">
-                        <Icon as={getIconComponent(value.icon)} fontSize="2xl" color={`${getColorScheme(index)}.500`} />
+                      <Box bg={`${value.color}.100`} p={4} borderRadius="xl">
+                        <Icon as={value.icon} fontSize="2xl" color={`${value.color}.600`} />
                       </Box>
                       <VStack spacing={3}>
-                        <Heading size="md" color={`${getColorScheme(index)}.600`}>
+                        <Heading size="md" color="gray.800">
                           {value.title}
                         </Heading>
-                        <Text color="gray.600" lineHeight="tall" textAlign="center">
+                        <Text color="gray.600" lineHeight="tall" fontSize="sm">
                           {value.description}
                         </Text>
                       </VStack>
@@ -498,148 +566,63 @@ const About: React.FC = () => {
                 </Card>
               ))}
             </SimpleGrid>
-          </Box>
-
-          {/* Contact Methods */}
-          <Box bg="primary.50" borderRadius="3xl" p={12}>
-            <VStack spacing={8} textAlign="center" mb={8}>
-              <Heading size="xl" color="gray.800">Get in Touch</Heading>
-              <Text fontSize="lg" maxW="3xl" color="gray.600">
-                Contact us through any of our convenient channels to begin your healthcare journey
-              </Text>
-            </VStack>
-
-            <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8}>
-              <Card bg="white" shadow="md" borderRadius="xl">
-                <CardBody textAlign="center" py={8}>
-                  <VStack spacing={4}>
-                    <Icon as={FaPhone} fontSize="3xl" color="primary.500" />
-                    <Heading size="md" color="gray.800">Phone Call</Heading>
-                    <Text color="gray.600">Speak directly with our team</Text>
-                    <Button colorScheme="primary" size="sm">Call Now</Button>
-                  </VStack>
-                </CardBody>
-              </Card>
-
-              <Card bg="white" shadow="md" borderRadius="xl">
-                <CardBody textAlign="center" py={8}>
-                  <VStack spacing={4}>
-                    <Icon as={FaWhatsapp} fontSize="3xl" color="green.500" />
-                    <Heading size="md" color="gray.800">WhatsApp</Heading>
-                    <Text color="gray.600">Quick and convenient messaging</Text>
-                    <Button colorScheme="green" size="sm">Message Us</Button>
-                  </VStack>
-                </CardBody>
-              </Card>
-
-              <Card bg="white" shadow="md" borderRadius="xl">
-                <CardBody textAlign="center" py={8}>
-                  <VStack spacing={4}>
-                    <Icon as={FaEnvelope} fontSize="3xl" color="blue.500" />
-                    <Heading size="md" color="gray.800">Email</Heading>
-                    <Text color="gray.600">Detailed inquiries and information</Text>
-                    <Button colorScheme="blue" size="sm">Send Email</Button>
-                  </VStack>
-                </CardBody>
-              </Card>
-            </SimpleGrid>
-          </Box>
-
-          {/* Real Team Members */}
-          {teamMembers.length > 0 && (
-            <Box>
-              <VStack spacing={8} textAlign="center" mb={12}>
-                <Heading size="xl" color="gray.800">Meet Our Trained Professionals</Heading>
-                <Text fontSize="lg" maxW="3xl" color="gray.600">
-                  Our experienced healthcare professionals committed to providing exceptional care and service excellence.
-                </Text>
-              </VStack>
-
-              <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={8}>
-                {teamMembers.slice(0, 6).map((member) => (
-                  <Card key={member.id} bg={cardBg} shadow="xl" borderRadius="2xl" overflow="hidden">
-                    <CardBody p={8} textAlign="center">
-                      <VStack spacing={6}>
-                        <Avatar 
-                          size="2xl" 
-                          name={`${member.firstName} ${member.lastName}`} 
-                          src={member.profileImage}
-                          bg="primary.500" 
-                        />
-                        <VStack spacing={2}>
-                          <Heading size="md" color="gray.800">
-                            {member.firstName} {member.lastName}
-                          </Heading>
-                          <Text fontWeight="600" color="primary.600">{member.role}</Text>
-                          <Text fontSize="sm" color="gray.600">{member.specialization}</Text>
-                          <Badge colorScheme="green">{member.experience} years experience</Badge>
-                        </VStack>
-                        {member.bio && (
-                          <>
-                            <Divider />
-                            <Text fontSize="sm" color="gray.600" textAlign="center">
-                              {member.bio}
-                            </Text>
-                          </>
-                        )}
-                        {member.credentials.length > 0 && (
-                          <>
-                            <Divider />
-                            <VStack spacing={2}>
-                              <Text fontSize="sm" fontWeight="600" color="gray.700">Credentials:</Text>
-                              <HStack spacing={2} flexWrap="wrap" justify="center">
-                                {member.credentials.map((credential, idx) => (
-                                  <Badge key={idx} variant="outline" colorScheme="blue" fontSize="xs">
-                                    {credential}
-                                  </Badge>
-                                ))}
-                              </HStack>
-                            </VStack>
-                          </>
-                        )}
-                      </VStack>
-                    </CardBody>
-                  </Card>
-                ))}
-              </SimpleGrid>
-            </Box>
-          )}
+          </VStack>
 
           {/* Call to Action */}
-          <Box bg="primary.600" color="white" borderRadius="3xl" p={12} textAlign="center">
+          <Box 
+            bgGradient="linear(135deg, pink.50 0%, blue.50 100%)" 
+            borderRadius="3xl" 
+            p={12} 
+            textAlign="center"
+          >
             <VStack spacing={8}>
               <VStack spacing={4}>
-                <Heading size="xl">Ready to Experience Professional Healthcare at Home?</Heading>
-                <Text fontSize="lg" maxW="4xl" opacity={0.9}>
-                  Join {companyStats?.totalPatients || 'thousands of'} satisfied clients who have chosen 
-                  Royal Health Consult for personalized, professional healthcare services that prioritize 
-                  comfort and affordability.
+                <Heading size="xl" color="gray.800">
+                  Experience the RHC Difference
+                </Heading>
+                <Text fontSize="lg" maxW="4xl" color="gray.600">
+                  Join hundreds of satisfied families who have experienced our personalized, 
+                  professional healthcare services. We understand that every client is unique, 
+                  and we're here to be your partner in wellness and care.
                 </Text>
               </VStack>
-              <HStack spacing={6}>
+
+              <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6} maxW="4xl">
                 <Button
                   size="lg"
-                  bg="white"
-                  color="primary.600"
-                  _hover={{ bg: 'gray.100' }}
+                  leftIcon={<FaPhone />}
+                  colorScheme="pink"
+                  variant="solid"
+                  _hover={{ transform: "translateY(-2px)" }}
+                  transition="all 0.3s"
+                >
+                  Call Us Today
+                </Button>
+                <Button
+                  size="lg"
+                  leftIcon={<FaWhatsapp />}
+                  colorScheme="green"
+                  variant="solid"
+                  _hover={{ transform: "translateY(-2px)" }}
+                  transition="all 0.3s"
+                >
+                  WhatsApp Us
+                </Button>
+                <Button
+                  size="lg"
+                  leftIcon={<FaCalendarAlt />}
+                  colorScheme="blue"
+                  variant="solid"
+                  _hover={{ transform: "translateY(-2px)" }}
+                  transition="all 0.3s"
                   onClick={() => navigate('/booking')}
-                  leftIcon={<FaClipboardList />}
                 >
                   Book Assessment
                 </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  borderColor="white"
-                  color="white"
-                  _hover={{ bg: 'whiteAlpha.200' }}
-                  onClick={() => navigate('/contact')}
-                >
-                  Contact Us
-                </Button>
-              </HStack>
+              </SimpleGrid>
             </VStack>
           </Box>
+
         </VStack>
       </Container>
     </Box>

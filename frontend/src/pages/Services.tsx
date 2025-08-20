@@ -433,7 +433,7 @@ const Services: React.FC = () => {
             {/* Stats */}
             <HStack spacing={8} pt={4}>
               <VStack spacing={1}>
-                <Text fontSize="2xl" fontWeight="bold" color="primary.500">1000+</Text>
+                <Text fontSize="2xl" fontWeight="bold" color="primary.500">500+</Text>
                 <Text fontSize="sm" color="gray.600">Satisfied Clients</Text>
               </VStack>
               <VStack spacing={1}>
