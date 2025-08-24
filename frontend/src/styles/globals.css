@@ -1,4 +1,4 @@
-/* Global Styles for Royal Health Consult - Fixed Centering */
+/* Global Styles for Royal Health Consult - Enhanced Colors */
 
 /* Import Inter font from Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -86,26 +86,46 @@ body {
   align-items: center;
 }
 
-/* Royal Health brand gradient */
+/* Enhanced Royal Health brand gradient - Darker Pink & Sharp Purple */
 .brand-gradient {
-  background: linear-gradient(45deg, #E91E63, #9C27B0);
+  background: linear-gradient(45deg, #C2185B, #7B1FA2);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
 }
 
-/* Button hover animations */
+/* Alternative gradient for variety */
+.brand-gradient-alt {
+  background: linear-gradient(135deg, #AD1457, #6A1B9A);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Enhanced brand colors as CSS variables */
+:root {
+  --brand-pink-dark: #C2185B;
+  --brand-pink-darker: #AD1457;
+  --brand-purple-sharp: #7B1FA2;
+  --brand-purple-darker: #6A1B9A;
+  --brand-gradient: linear-gradient(45deg, #C2185B, #7B1FA2);
+  --brand-gradient-alt: linear-gradient(135deg, #AD1457, #6A1B9A);
+  --brand-gradient-radial: radial-gradient(circle, #C2185B, #7B1FA2);
+}
+
+/* Button hover animations with enhanced colors */
 .hover-lift {
   transition: all 0.2s ease-in-out;
 }
 
 .hover-lift:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 14px 0 rgba(233, 30, 99, 0.15);
+  box-shadow: 0 4px 14px 0 rgba(194, 24, 91, 0.25);
 }
 
-/* Card hover effects */
+/* Card hover effects with enhanced colors */
 .card-hover {
   transition: all 0.3s ease-in-out;
   cursor: pointer;
@@ -113,7 +133,7 @@ body {
 
 .card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 25px 0 rgba(233, 30, 99, 0.2);
+  box-shadow: 0 10px 25px 0 rgba(194, 24, 91, 0.3);
 }
 
 /* Loading animation */
@@ -130,20 +150,37 @@ body {
   }
 }
 
-/* Pulse animation for important elements */
+/* Enhanced pulse animation with darker pink */
 .pulse-animation {
   animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(233, 30, 99, 0.4);
+    box-shadow: 0 0 0 0 rgba(194, 24, 91, 0.5);
   }
   70% {
-    box-shadow: 0 0 0 10px rgba(233, 30, 99, 0);
+    box-shadow: 0 0 0 12px rgba(194, 24, 91, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(233, 30, 99, 0);
+    box-shadow: 0 0 0 0 rgba(194, 24, 91, 0);
+  }
+}
+
+/* Alternative pulse with purple */
+.pulse-animation-purple {
+  animation: pulsePurple 2s infinite;
+}
+
+@keyframes pulsePurple {
+  0% {
+    box-shadow: 0 0 0 0 rgba(123, 31, 162, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(123, 31, 162, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(123, 31, 162, 0);
   }
 }
 
@@ -226,7 +263,7 @@ body {
   }
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar with enhanced colors */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -236,21 +273,21 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(45deg, #E91E63, #9C27B0);
+  background: linear-gradient(45deg, #C2185B, #7B1FA2);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(45deg, #D81B60, #8E24AA);
+  background: linear-gradient(45deg, #AD1457, #6A1B9A);
 }
 
-/* Focus styles for accessibility */
+/* Enhanced focus styles for accessibility */
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 a:focus-visible {
-  outline: 2px solid #E91E63;
+  outline: 2px solid #C2185B;
   outline-offset: 2px;
 }
 
@@ -265,11 +302,11 @@ a:focus-visible {
   }
 }
 
-/* High contrast mode support */
+/* High contrast mode support with enhanced colors */
 @media (prefers-contrast: high) {
   .brand-gradient {
-    -webkit-text-fill-color: #E91E63;
-    color: #E91E63;
+    -webkit-text-fill-color: #C2185B;
+    color: #C2185B;
   }
 }
 
@@ -310,4 +347,46 @@ a:focus-visible {
 .centered-grid {
   margin: 0 auto;
   max-width: 1200px;
+}
+
+/* Additional utility classes for the enhanced colors */
+.bg-brand-pink {
+  background-color: #C2185B;
+}
+
+.bg-brand-purple {
+  background-color: #7B1FA2;
+}
+
+.text-brand-pink {
+  color: #C2185B;
+}
+
+.text-brand-purple {
+  color: #7B1FA2;
+}
+
+.border-brand-pink {
+  border-color: #C2185B;
+}
+
+.border-brand-purple {
+  border-color: #7B1FA2;
+}
+
+/* Button styles with enhanced colors */
+.btn-brand {
+  background: linear-gradient(45deg, #C2185B, #7B1FA2);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-brand:hover {
+  background: linear-gradient(45deg, #AD1457, #6A1B9A);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(194, 24, 91, 0.3);
 }

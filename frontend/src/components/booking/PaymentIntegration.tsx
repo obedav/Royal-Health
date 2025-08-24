@@ -50,9 +50,9 @@ import {
   FaGift,
 } from 'react-icons/fa'
 import { useState, useEffect } from 'react'
-import { BookingService } from '../../types/booking.types'
-import { ScheduleData } from './AppointmentScheduling'
-import { PatientInformation } from './PatientInformationForm'
+import type { BookingService } from '../../types/booking.types'
+import type { ScheduleData } from './AppointmentScheduling'
+import type { PatientInformation } from './PatientInformationForm'
 
 interface PaymentIntegrationProps {
   selectedService: BookingService

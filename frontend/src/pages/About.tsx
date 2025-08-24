@@ -1,4 +1,4 @@
-// src/pages/About.tsx - Comprehensive About Page with All Company Information
+// src/pages/About.tsx - Comprehensive About Page with Enhanced Colors
 import React from 'react';
 import {
   Box,
@@ -61,7 +61,7 @@ const About: React.FC = () => {
   const sectionBg = useColorModeValue('gray.50', 'gray.800');
   
   const stats = [
-    { label: 'Happy Clients', value: '500+', icon: FaUsers, color: 'blue' },
+    { label: 'Happy Clients', value: '200+', icon: FaUsers, color: 'brand' },
     { label: 'Healthcare Professionals', value: '50+', icon: FaUserMd, color: 'green' },
     { label: 'Years of Experience', value: '5+', icon: FaAward, color: 'purple' },
     { label: 'Success Rate', value: '98%', icon: FaStar, color: 'orange' }
@@ -72,13 +72,13 @@ const About: React.FC = () => {
       title: 'Home Nursing',
       description: 'Professional nursing care in the comfort of your home',
       icon: FaUserNurse,
-      color: 'blue'
+      color: 'brand'
     },
     {
       title: 'Postnatal & Mother-Baby Care',
       description: 'Specialized care for new mothers and their babies',
       icon: FaBaby,
-      color: 'pink'
+      color: 'purple'
     },
     {
       title: 'Medication Management',
@@ -117,7 +117,7 @@ const About: React.FC = () => {
       title: 'Professionalism',
       description: 'We consistently deliver ethical and reliable nursing care with the highest standards.',
       icon: FaAward,
-      color: 'blue'
+      color: 'brand'
     },
     {
       title: 'Integrity',
@@ -186,74 +186,121 @@ const About: React.FC = () => {
 
   return (
     <Box bg={bg} minH="100vh">
-      {/* Hero Section */}
+      {/* Hero Section - Enhanced */}
       <Box 
-        bgGradient="linear(135deg, pink.500 0%, pink.600 50%, pink.700 100%)" 
+        bgGradient="linear(135deg, brand.500 0%, purple.500 50%, brand.600 100%)" 
         color="white" 
-        py={{ base: 16, md: 24 }}
+        py={{ base: 20, md: 28 }}
         position="relative"
         overflow="hidden"
       >
+        {/* Background Decorative Elements */}
         <Box
           position="absolute"
-          top="0"
-          left="0"
-          right="0"
-          bottom="0"
-          opacity={0.1}
-          background="repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px)"
+          top="10%"
+          right="10%"
+          w="150px"
+          h="150px"
+          borderRadius="full"
+          bg="whiteAlpha.200"
+          filter="blur(60px)"
         />
+        <Box
+          position="absolute"
+          bottom="20%"
+          left="15%"
+          w="120px"
+          h="120px"
+          borderRadius="full"
+          bg="whiteAlpha.300"
+          filter="blur(50px)"
+        />
+        
         <Container maxW="6xl" position="relative">
           <VStack spacing={8} textAlign="center">
             <Badge 
-              bg="whiteAlpha.200" 
-              color="white" 
-              px={4} 
-              py={2} 
-              fontSize="sm" 
+              bgGradient="linear(45deg, whiteAlpha.300, whiteAlpha.400)"
+              color="brand.600" 
+              px={6} 
+              py={3} 
+              fontSize="md" 
               borderRadius="full"
               backdropFilter="blur(10px)"
+              border="1px solid"
+              borderColor="whiteAlpha.300"
+              fontWeight="700"
+              boxShadow="0 8px 25px rgba(0, 0, 0, 0.1)"
             >
               Professional Healthcare Since 2020
             </Badge>
             <Heading 
-              size={{ base: "xl", md: "2xl" }} 
-              fontWeight="700"
-              lineHeight="1.2"
-              maxW="4xl"
+              size={{ base: "xl", md: "3xl" }} 
+              fontWeight="900"
+              lineHeight="1.1"
+              maxW="5xl"
             >
-              About Royal Health Consult (RHC)
+              About{' '}
+              <Text
+                as="span"
+                textShadow="0 0 30px rgba(255, 255, 255, 0.5)"
+              >
+                Royal Health Consult
+              </Text>
+              <br />
+              <Text as="span" fontSize={{ base: "xl", md: "2xl" }} opacity="0.9">
+                (RHC)
+              </Text>
             </Heading>
             <Text 
               fontSize={{ base: "lg", md: "xl" }} 
               maxW="4xl" 
-              opacity={0.9}
+              opacity={0.95}
               lineHeight="1.8"
+              fontWeight="500"
             >
               A professional nursing and healthcare service provider dedicated to delivering 
               compassionate, reliable, and family-centered care. We are your partner in wellness and care.
             </Text>
-            <HStack spacing={4}>
+            <HStack spacing={6} flexWrap="wrap" justify="center">
               <Button 
-                size="lg" 
+                size="xl" 
                 bg="white" 
-                color="pink.600" 
-                _hover={{ bg: "gray.50", transform: "translateY(-2px)" }}
+                color="brand.600" 
+                _hover={{ 
+                  bg: "gray.50", 
+                  transform: "translateY(-3px)",
+                  boxShadow: "0 12px 35px rgba(0, 0, 0, 0.15)"
+                }}
                 leftIcon={<FaCalendarAlt />}
-                boxShadow="xl"
-                transition="all 0.3s"
+                boxShadow="0 8px 25px rgba(0, 0, 0, 0.1)"
+                transition="all 0.3s ease-in-out"
                 onClick={() => navigate('/booking')}
+                borderRadius="xl"
+                px={8}
+                py={6}
+                fontSize="lg"
+                fontWeight="800"
               >
                 Book Assessment
               </Button>
               <Button 
-                size="lg" 
+                size="xl" 
                 variant="outline" 
                 borderColor="white" 
+                borderWidth="2px"
                 color="white"
-                _hover={{ bg: "whiteAlpha.200", transform: "translateY(-2px)" }}
-                transition="all 0.3s"
+                _hover={{ 
+                  bg: "whiteAlpha.200", 
+                  transform: "translateY(-3px)",
+                  boxShadow: "0 8px 25px rgba(255, 255, 255, 0.2)"
+                }}
+                transition="all 0.3s ease-in-out"
                 onClick={() => navigate('/contact')}
+                borderRadius="xl"
+                px={8}
+                py={6}
+                fontSize="lg"
+                fontWeight="700"
               >
                 Contact Us
               </Button>
@@ -265,30 +312,55 @@ const About: React.FC = () => {
       <Container maxW="6xl" py={20}>
         <VStack spacing={20} align="stretch">
 
-          {/* Company Introduction */}
+          {/* Company Introduction - Enhanced */}
           <Box textAlign="center">
             <VStack spacing={8}>
-              <Heading size="xl" color="gray.800">Who We Are</Heading>
+              <Heading 
+                size="2xl" 
+                color="gray.800"
+                fontWeight="800"
+              >
+                <Text
+                  as="span"
+                  bgGradient="linear(45deg, brand.500, purple.500)"
+                  bgClip="text"
+                  sx={{
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}
+                >
+                  Who We Are
+                </Text>
+              </Heading>
               <VStack spacing={6} maxW="5xl">
-                <Text fontSize="lg" lineHeight="tall" color="gray.700">
+                <Text fontSize="xl" lineHeight="tall" color="gray.700" fontWeight="500">
                   <strong>Royal Health Consult (RHC)</strong> is a professional nursing and healthcare service 
                   provider dedicated to delivering compassionate, reliable, and family-centered care since 2020.
                 </Text>
-                <Text fontSize="lg" lineHeight="tall" color="gray.700">
+                <Text fontSize="xl" lineHeight="tall" color="gray.700" fontWeight="500">
                   We support individuals and families by offering personalized services that promote health, 
                   dignity, and quality of life.
                 </Text>
-                <Text fontSize="lg" lineHeight="tall" color="gray.700">
+                <Text fontSize="xl" lineHeight="tall" color="gray.700" fontWeight="500">
                   At RHC, we understand that every client is unique. That's why we provide tailored healthcare 
                   solutions ranging from home nursing, postnatal and mother-baby care, medication management, 
                   wound dressing, health screenings, physiotherapy, and caregiver support.
                 </Text>
-                <Text fontSize="lg" lineHeight="tall" color="gray.700">
+                <Text fontSize="xl" lineHeight="tall" color="gray.700" fontWeight="500">
                   Whether it's in the comfort of your home, workplace, or community, our team ensures care is 
                   delivered with professionalism, integrity, and compassion.
                 </Text>
-                <Box bg="pink.50" p={6} borderRadius="xl" borderLeft="4px solid" borderLeftColor="pink.500">
-                  <Text fontSize="lg" lineHeight="tall" color="gray.700" fontStyle="italic">
+                <Box 
+                  bgGradient="linear(135deg, brand.50, purple.50)" 
+                  p={8} 
+                  borderRadius="2xl" 
+                  borderLeft="4px solid" 
+                  borderLeftColor="brand.500"
+                  boxShadow="0 8px 25px rgba(194, 24, 91, 0.1)"
+                  border="1px solid"
+                  borderColor="brand.200"
+                >
+                  <Text fontSize="xl" lineHeight="tall" color="gray.700" fontStyle="italic" fontWeight="600">
                     We are committed to redefining how families experience home care services. With a strong 
                     foundation built on knowledge, service excellence, and trust, Royal Health Consult is more 
                     than a healthcare provider — <strong>we are your partner in wellness and care.</strong>
@@ -298,12 +370,29 @@ const About: React.FC = () => {
             </VStack>
           </Box>
 
-          {/* Our Services - Detailed */}
+          {/* Our Services - Enhanced */}
           <Box>
             <VStack spacing={12} textAlign="center">
               <VStack spacing={4}>
-                <Heading size="xl" color="gray.800">Our Comprehensive Services</Heading>
-                <Text fontSize="lg" color="gray.600" maxW="3xl">
+                <Heading 
+                  size="2xl" 
+                  color="gray.800"
+                  fontWeight="800"
+                >
+                  <Text
+                    as="span"
+                    bgGradient="linear(45deg, brand.500, purple.500)"
+                    bgClip="text"
+                    sx={{
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                    }}
+                  >
+                    Our Comprehensive
+                  </Text>{' '}
+                  Services
+                </Heading>
+                <Text fontSize="xl" color="gray.600" maxW="3xl" fontWeight="500">
                   Tailored healthcare solutions designed to meet your unique needs and promote quality of life
                 </Text>
               </VStack>
@@ -314,22 +403,39 @@ const About: React.FC = () => {
                     key={index} 
                     bg="white" 
                     shadow="lg" 
-                    borderRadius="xl"
-                    border="1px solid"
+                    borderRadius="2xl"
+                    border="2px solid"
                     borderColor="gray.100"
-                    transition="all 0.3s"
-                    _hover={{ transform: "translateY(-4px)", shadow: "xl" }}
+                    transition="all 0.3s ease-in-out"
+                    _hover={{ 
+                      transform: "translateY(-6px)", 
+                      shadow: "0 15px 35px rgba(194, 24, 91, 0.15)",
+                      borderColor: service.color === 'brand' ? 'brand.300' : `${service.color}.300`
+                    }}
                   >
                     <CardBody p={8} textAlign="center">
                       <VStack spacing={6}>
-                        <Box bg={`${service.color}.100`} p={4} borderRadius="xl">
-                          <Icon as={service.icon} fontSize="2xl" color={`${service.color}.600`} />
+                        <Box 
+                          bgGradient={service.color === 'brand' 
+                            ? "linear(45deg, brand.100, purple.100)" 
+                            : `linear(45deg, ${service.color}.100, ${service.color}.200)`
+                          } 
+                          p={5} 
+                          borderRadius="2xl"
+                          border="2px solid"
+                          borderColor={service.color === 'brand' ? 'brand.200' : `${service.color}.200`}
+                        >
+                          <Icon 
+                            as={service.icon} 
+                            fontSize="3xl" 
+                            color={service.color === 'brand' ? 'brand.600' : `${service.color}.600`} 
+                          />
                         </Box>
                         <VStack spacing={3}>
-                          <Heading size="md" color="gray.800">
+                          <Heading size="md" color="gray.800" fontWeight="700">
                             {service.title}
                           </Heading>
-                          <Text color="gray.600" lineHeight="tall" fontSize="sm">
+                          <Text color="gray.600" lineHeight="tall" fontSize="md" fontWeight="500">
                             {service.description}
                           </Text>
                         </VStack>
@@ -341,29 +447,60 @@ const About: React.FC = () => {
             </VStack>
           </Box>
 
-          {/* Where We Serve */}
-          <Box bg={sectionBg} borderRadius="3xl" p={12}>
+          {/* Where We Serve - Enhanced */}
+          <Box 
+            bgGradient="linear(135deg, brand.50, purple.50)" 
+            borderRadius="3xl" 
+            p={12}
+            border="2px solid"
+            borderColor="brand.200"
+            boxShadow="0 10px 30px rgba(194, 24, 91, 0.1)"
+          >
             <VStack spacing={12} textAlign="center">
               <VStack spacing={4}>
-                <Heading size="xl" color="gray.800">Where We Provide Care</Heading>
-                <Text fontSize="lg" color="gray.600" maxW="3xl">
+                <Heading 
+                  size="2xl" 
+                  color="gray.800"
+                  fontWeight="800"
+                >
+                  Where We Provide Care
+                </Heading>
+                <Text fontSize="xl" color="gray.600" maxW="3xl" fontWeight="500">
                   Professional healthcare services delivered wherever you need them most
                 </Text>
               </VStack>
 
               <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8} maxW="4xl">
                 {careLocations.map((location, index) => (
-                  <Card key={index} bg="white" shadow="md" borderRadius="xl" border="1px solid" borderColor="gray.100">
+                  <Card 
+                    key={index} 
+                    bg="white" 
+                    shadow="md" 
+                    borderRadius="2xl" 
+                    border="2px solid" 
+                    borderColor="brand.200"
+                    _hover={{
+                      transform: "translateY(-4px)",
+                      shadow: "0 12px 30px rgba(194, 24, 91, 0.15)"
+                    }}
+                    transition="all 0.3s ease-in-out"
+                  >
                     <CardBody textAlign="center" py={8}>
                       <VStack spacing={4}>
-                        <Box bg="pink.100" p={4} borderRadius="xl">
-                          <Icon as={location.icon} fontSize="2xl" color="pink.600" />
+                        <Box 
+                          bgGradient="linear(45deg, brand.100, purple.100)" 
+                          p={5} 
+                          borderRadius="2xl"
+                          border="2px solid"
+                          borderColor="brand.200"
+                        >
+                          <Icon as={location.icon} fontSize="3xl" color="brand.600" />
                         </Box>
                         <VStack spacing={2}>
-                          <Heading size="md" color="gray.800">
+                          <Heading size="md" color="gray.800" fontWeight="700">
                             {location.name}
                           </Heading>
-                          <Text fontSize="sm" color="gray.600">
+                          <Text fontSize="md" color="gray.600" fontWeight="500">
                             {location.description}
                           </Text>
                         </VStack>
@@ -373,8 +510,8 @@ const About: React.FC = () => {
                 ))}
               </SimpleGrid>
 
-              <Box bg="white" p={8} borderRadius="xl" maxW="4xl">
-                <Text fontSize="lg" color="gray.700" textAlign="center" lineHeight="tall">
+              <Box bg="white" p={8} borderRadius="2xl" maxW="4xl" border="2px solid" borderColor="brand.200">
+                <Text fontSize="xl" color="gray.700" textAlign="center" lineHeight="tall" fontWeight="600">
                   <strong>Our commitment:</strong> Whether it's in the comfort of your home, workplace, 
                   or community, our team ensures care is delivered with professionalism, integrity, and compassion.
                 </Text>
@@ -382,26 +519,37 @@ const About: React.FC = () => {
             </VStack>
           </Box>
 
-          {/* Mission & Vision */}
+          {/* Mission & Vision - Enhanced */}
           <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={12}>
             <Card 
               bg={cardBg} 
               shadow="xl" 
-              borderRadius="2xl" 
-              border="1px solid"
-              borderColor="gray.100"
-              transition="all 0.3s"
-              _hover={{ transform: "translateY(-4px)", shadow: "2xl" }}
+              borderRadius="3xl" 
+              border="2px solid"
+              borderColor="brand.200"
+              transition="all 0.3s ease-in-out"
+              _hover={{ 
+                transform: "translateY(-6px)", 
+                shadow: "0 20px 40px rgba(194, 24, 91, 0.15)" 
+              }}
             >
               <CardBody p={10}>
                 <VStack spacing={6} align="start">
-                  <HStack spacing={3}>
-                    <Box bg="pink.100" p={3} borderRadius="xl">
-                      <Icon as={FaStethoscope} fontSize="2xl" color="pink.600" />
+                  <HStack spacing={4}>
+                    <Box 
+                      bgGradient="linear(45deg, brand.100, purple.100)" 
+                      p={4} 
+                      borderRadius="2xl"
+                      border="2px solid"
+                      borderColor="brand.200"
+                    >
+                      <Icon as={FaStethoscope} fontSize="3xl" color="brand.600" />
                     </Box>
-                    <Heading size="lg" color="gray.800">Our Mission</Heading>
+                    <Heading size="xl" color="gray.800" fontWeight="800">
+                      Our Mission
+                    </Heading>
                   </HStack>
-                  <Text fontSize="lg" lineHeight="tall" color="gray.600">
+                  <Text fontSize="xl" lineHeight="tall" color="gray.600" fontWeight="500">
                     To deliver compassionate, reliable, and family-centered healthcare services that support 
                     individuals and families by offering personalized care solutions that promote health, 
                     dignity, and quality of life since 2020.
@@ -413,21 +561,32 @@ const About: React.FC = () => {
             <Card 
               bg={cardBg} 
               shadow="xl" 
-              borderRadius="2xl" 
-              border="1px solid"
-              borderColor="gray.100"
-              transition="all 0.3s"
-              _hover={{ transform: "translateY(-4px)", shadow: "2xl" }}
+              borderRadius="3xl" 
+              border="2px solid"
+              borderColor="purple.200"
+              transition="all 0.3s ease-in-out"
+              _hover={{ 
+                transform: "translateY(-6px)", 
+                shadow: "0 20px 40px rgba(123, 31, 162, 0.15)" 
+              }}
             >
               <CardBody p={10}>
                 <VStack spacing={6} align="start">
-                  <HStack spacing={3}>
-                    <Box bg="blue.100" p={3} borderRadius="xl">
-                      <Icon as={FaEye} fontSize="2xl" color="blue.600" />
+                  <HStack spacing={4}>
+                    <Box 
+                      bgGradient="linear(45deg, purple.100, brand.100)" 
+                      p={4} 
+                      borderRadius="2xl"
+                      border="2px solid"
+                      borderColor="purple.200"
+                    >
+                      <Icon as={FaEye} fontSize="3xl" color="purple.600" />
                     </Box>
-                    <Heading size="lg" color="gray.800">Our Vision</Heading>
+                    <Heading size="xl" color="gray.800" fontWeight="800">
+                      Our Vision
+                    </Heading>
                   </HStack>
-                  <Text fontSize="lg" lineHeight="tall" color="gray.600">
+                  <Text fontSize="xl" lineHeight="tall" color="gray.600" fontWeight="500">
                     To be the trusted provider for compassionate care and excellent home care service, 
                     redefining how families experience professional healthcare in their homes and communities.
                   </Text>
@@ -436,29 +595,92 @@ const About: React.FC = () => {
             </Card>
           </SimpleGrid>
 
-          {/* Statistics Section */}
-          <Box bg={sectionBg} borderRadius="3xl" p={12}>
+          {/* Statistics Section - Enhanced */}
+          <Box 
+            bgGradient="linear(135deg, purple.50, brand.50)" 
+            borderRadius="3xl" 
+            p={12}
+            border="2px solid"
+            borderColor="purple.200"
+            boxShadow="0 10px 30px rgba(123, 31, 162, 0.1)"
+          >
             <VStack spacing={12} textAlign="center">
               <VStack spacing={4}>
-                <Heading size="xl" color="gray.800">Our Impact in Numbers</Heading>
-                <Text fontSize="lg" color="gray.600" maxW="3xl">
+                <Heading 
+                  size="2xl" 
+                  color="gray.800"
+                  fontWeight="800"
+                >
+                  <Text
+                    as="span"
+                    bgGradient="linear(45deg, brand.500, purple.500)"
+                    bgClip="text"
+                    sx={{
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                    }}
+                  >
+                    Our Impact
+                  </Text>{' '}
+                  in Numbers
+                </Heading>
+                <Text fontSize="xl" color="gray.600" maxW="3xl" fontWeight="500">
                   Building trust through professional excellence and compassionate care since 2020
                 </Text>
               </VStack>
 
               <SimpleGrid columns={{ base: 2, md: 4 }} spacing={8} w="full">
                 {stats.map((stat, index) => (
-                  <Card key={index} bg="white" shadow="md" borderRadius="xl" border="1px solid" borderColor="gray.100">
+                  <Card 
+                    key={index} 
+                    bg="white" 
+                    shadow="lg" 
+                    borderRadius="2xl" 
+                    border="2px solid" 
+                    borderColor={stat.color === 'brand' ? 'brand.200' : `${stat.color}.200`}
+                    _hover={{
+                      transform: "translateY(-4px)",
+                      shadow: stat.color === 'brand' 
+                        ? "0 15px 35px rgba(194, 24, 91, 0.15)"
+                        : `0 15px 35px rgba(0, 0, 0, 0.1)`
+                    }}
+                    transition="all 0.3s ease-in-out"
+                  >
                     <CardBody textAlign="center" py={8}>
                       <VStack spacing={4}>
-                        <Box bg={`${stat.color}.100`} p={4} borderRadius="xl">
-                          <Icon as={stat.icon} fontSize="2xl" color={`${stat.color}.600`} />
+                        <Box 
+                          bgGradient={stat.color === 'brand'
+                            ? "linear(45deg, brand.100, purple.100)"
+                            : `linear(45deg, ${stat.color}.100, ${stat.color}.200)`
+                          } 
+                          p={5} 
+                          borderRadius="2xl"
+                          border="2px solid"
+                          borderColor={stat.color === 'brand' ? 'brand.200' : `${stat.color}.200`}
+                        >
+                          <Icon 
+                            as={stat.icon} 
+                            fontSize="3xl" 
+                            color={stat.color === 'brand' ? 'brand.600' : `${stat.color}.600`} 
+                          />
                         </Box>
                         <VStack spacing={1}>
-                          <Text fontSize="3xl" fontWeight="bold" color="gray.800">
+                          <Text 
+                            fontSize="4xl" 
+                            fontWeight="900" 
+                            bgGradient={stat.color === 'brand'
+                              ? "linear(45deg, brand.500, purple.500)"
+                              : `linear(45deg, ${stat.color}.500, ${stat.color}.600)`
+                            }
+                            bgClip="text"
+                            sx={{
+                              WebkitBackgroundClip: 'text',
+                              WebkitTextFillColor: 'transparent',
+                            }}
+                          >
                             {stat.value}
                           </Text>
-                          <Text fontSize="sm" color="gray.600" fontWeight="medium">
+                          <Text fontSize="md" color="gray.600" fontWeight="700">
                             {stat.label}
                           </Text>
                         </VStack>
@@ -470,11 +692,27 @@ const About: React.FC = () => {
             </VStack>
           </Box>
 
-          {/* How We Work */}
+          {/* How We Work - Enhanced */}
           <VStack spacing={12} textAlign="center">
             <VStack spacing={4}>
-              <Heading size="xl" color="gray.800">How We Work</Heading>
-              <Text fontSize="lg" color="gray.600" maxW="3xl">
+              <Heading 
+                size="2xl" 
+                color="gray.800"
+                fontWeight="800"
+              >
+                <Text
+                  as="span"
+                  bgGradient="linear(45deg, brand.500, purple.500)"
+                  bgClip="text"
+                  sx={{
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}
+                >
+                  How We Work
+                </Text>
+              </Heading>
+              <Text fontSize="xl" color="gray.600" maxW="3xl" fontWeight="500">
                 Our simple, professional process to provide you with personalized healthcare solutions
               </Text>
             </VStack>
@@ -485,38 +723,49 @@ const About: React.FC = () => {
                   key={index} 
                   bg="white" 
                   shadow="lg" 
-                  borderRadius="xl" 
-                  border="1px solid"
-                  borderColor="gray.100"
-                  transition="all 0.3s"
-                  _hover={{ transform: "translateY(-2px)", shadow: "xl" }}
+                  borderRadius="2xl" 
+                  border="2px solid"
+                  borderColor="brand.200"
+                  transition="all 0.3s ease-in-out"
+                  _hover={{ 
+                    transform: "translateY(-4px)", 
+                    shadow: "0 15px 35px rgba(194, 24, 91, 0.15)" 
+                  }}
                 >
                   <CardBody p={8}>
                     <HStack spacing={6} align="start">
                       <VStack spacing={0}>
                         <Box 
-                          bg="pink.600" 
+                          bgGradient="linear(45deg, brand.500, purple.500)" 
                           color="white" 
-                          w="50px" 
-                          h="50px" 
-                          borderRadius="xl" 
+                          w="60px" 
+                          h="60px" 
+                          borderRadius="2xl" 
                           display="flex" 
                           alignItems="center" 
                           justifyContent="center"
-                          fontWeight="bold"
-                          fontSize="lg"
+                          fontWeight="900"
+                          fontSize="xl"
+                          boxShadow="0 8px 25px rgba(194, 24, 91, 0.3)"
                         >
                           {step.step}
                         </Box>
-                        <Box bg="pink.100" p={3} borderRadius="xl" mt={4}>
-                          <Icon as={step.icon} fontSize="xl" color="pink.600" />
+                        <Box 
+                          bgGradient="linear(45deg, brand.100, purple.100)" 
+                          p={4} 
+                          borderRadius="2xl" 
+                          mt={4}
+                          border="2px solid"
+                          borderColor="brand.200"
+                        >
+                          <Icon as={step.icon} fontSize="2xl" color="brand.600" />
                         </Box>
                       </VStack>
                       <VStack spacing={3} align="start" flex={1}>
-                        <Heading size="md" color="gray.800">
+                        <Heading size="lg" color="gray.800" fontWeight="800">
                           {step.title}
                         </Heading>
-                        <Text color="gray.600" lineHeight="tall">
+                        <Text color="gray.600" lineHeight="tall" fontSize="lg" fontWeight="500">
                           {step.description}
                         </Text>
                       </VStack>
@@ -527,11 +776,27 @@ const About: React.FC = () => {
             </SimpleGrid>
           </VStack>
 
-          {/* Core Values */}
+          {/* Core Values - Enhanced */}
           <VStack spacing={12} textAlign="center">
             <VStack spacing={4}>
-              <Heading size="xl" color="gray.800">Our Core Values</Heading>
-              <Text fontSize="lg" color="gray.600" maxW="3xl">
+              <Heading 
+                size="2xl" 
+                color="gray.800"
+                fontWeight="800"
+              >
+                <Text
+                  as="span"
+                  bgGradient="linear(45deg, brand.500, purple.500)"
+                  bgClip="text"
+                  sx={{
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}
+                >
+                  Our Core Values
+                </Text>
+              </Heading>
+              <Text fontSize="xl" color="gray.600" maxW="3xl" fontWeight="500">
                 The foundation of knowledge, service excellence, and trust that guides our every action
               </Text>
             </VStack>
@@ -542,22 +807,39 @@ const About: React.FC = () => {
                   key={index} 
                   bg="white" 
                   shadow="lg" 
-                  borderRadius="xl"
-                  border="1px solid"
+                  borderRadius="2xl"
+                  border="2px solid"
                   borderColor="gray.100"
-                  transition="all 0.3s"
-                  _hover={{ transform: "translateY(-4px)", shadow: "xl" }}
+                  transition="all 0.3s ease-in-out"
+                  _hover={{ 
+                    transform: "translateY(-6px)", 
+                    shadow: "0 15px 35px rgba(194, 24, 91, 0.15)",
+                    borderColor: value.color === 'brand' ? 'brand.300' : `${value.color}.300`
+                  }}
                 >
                   <CardBody p={8} textAlign="center">
                     <VStack spacing={6}>
-                      <Box bg={`${value.color}.100`} p={4} borderRadius="xl">
-                        <Icon as={value.icon} fontSize="2xl" color={`${value.color}.600`} />
+                      <Box 
+                        bgGradient={value.color === 'brand' 
+                          ? "linear(45deg, brand.100, purple.100)" 
+                          : `linear(45deg, ${value.color}.100, ${value.color}.200)`
+                        } 
+                        p={5} 
+                        borderRadius="2xl"
+                        border="2px solid"
+                        borderColor={value.color === 'brand' ? 'brand.200' : `${value.color}.200`}
+                      >
+                        <Icon 
+                          as={value.icon} 
+                          fontSize="3xl" 
+                          color={value.color === 'brand' ? 'brand.600' : `${value.color}.600`} 
+                        />
                       </Box>
                       <VStack spacing={3}>
-                        <Heading size="md" color="gray.800">
+                        <Heading size="md" color="gray.800" fontWeight="700">
                           {value.title}
                         </Heading>
-                        <Text color="gray.600" lineHeight="tall" fontSize="sm">
+                        <Text color="gray.600" lineHeight="tall" fontSize="md" fontWeight="500">
                           {value.description}
                         </Text>
                       </VStack>
@@ -568,58 +850,147 @@ const About: React.FC = () => {
             </SimpleGrid>
           </VStack>
 
-          {/* Call to Action */}
+          {/* Call to Action - Enhanced */}
           <Box 
-            bgGradient="linear(135deg, pink.50 0%, blue.50 100%)" 
+            bgGradient="linear(135deg, brand.50 0%, purple.50 50%, brand.25 100%)" 
             borderRadius="3xl" 
             p={12} 
             textAlign="center"
+            border="2px solid"
+            borderColor="brand.200"
+            boxShadow="0 15px 40px rgba(194, 24, 91, 0.1)"
+            position="relative"
+            overflow="hidden"
           >
-            <VStack spacing={8}>
-              <VStack spacing={4}>
-                <Heading size="xl" color="gray.800">
-                  Experience the RHC Difference
+            {/* Background Decorative Elements */}
+            <Box
+              position="absolute"
+              top="20%"
+              right="10%"
+              w="100px"
+              h="100px"
+              borderRadius="full"
+              bgGradient="linear(45deg, brand.200, purple.200)"
+              opacity="0.3"
+              filter="blur(40px)"
+            />
+            <Box
+              position="absolute"
+              bottom="20%"
+              left="15%"
+              w="80px"
+              h="80px"
+              borderRadius="full"
+              bgGradient="linear(45deg, purple.200, brand.200)"
+              opacity="0.4"
+              filter="blur(30px)"
+            />
+
+            <VStack spacing={8} position="relative" zIndex={1}>
+              <VStack spacing={6}>
+                <Heading 
+                  size="2xl" 
+                  color="gray.800"
+                  fontWeight="800"
+                >
+                  Experience the{' '}
+                  <Text
+                    as="span"
+                    bgGradient="linear(45deg, brand.500, purple.500)"
+                    bgClip="text"
+                    sx={{
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                    }}
+                  >
+                    RHC Difference
+                  </Text>
                 </Heading>
-                <Text fontSize="lg" maxW="4xl" color="gray.600">
+                <Text fontSize="xl" maxW="4xl" color="gray.600" fontWeight="500" lineHeight="tall">
                   Join hundreds of satisfied families who have experienced our personalized, 
                   professional healthcare services. We understand that every client is unique, 
                   and we're here to be your partner in wellness and care.
                 </Text>
               </VStack>
 
-              <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6} maxW="4xl">
+              <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6} maxW="5xl">
                 <Button
-                  size="lg"
+                  size="xl"
                   leftIcon={<FaPhone />}
-                  colorScheme="pink"
+                  bgGradient="linear(45deg, brand.500, purple.500)"
+                  color="white"
                   variant="solid"
-                  _hover={{ transform: "translateY(-2px)" }}
-                  transition="all 0.3s"
+                  _hover={{ 
+                    bgGradient: "linear(45deg, brand.600, purple.600)",
+                    transform: "translateY(-3px)",
+                    boxShadow: "0 12px 35px rgba(194, 24, 91, 0.3)"
+                  }}
+                  transition="all 0.3s ease-in-out"
+                  borderRadius="xl"
+                  py={6}
+                  px={8}
+                  fontSize="lg"
+                  fontWeight="800"
+                  boxShadow="0 8px 25px rgba(194, 24, 91, 0.25)"
                 >
                   Call Us Today
                 </Button>
                 <Button
-                  size="lg"
+                  size="xl"
                   leftIcon={<FaWhatsapp />}
-                  colorScheme="green"
+                  colorScheme=""
                   variant="solid"
-                  _hover={{ transform: "translateY(-2px)" }}
-                  transition="all 0.3s"
+                  _hover={{ 
+                    transform: "translateY(-3px)",
+                    boxShadow: "0 12px 35px rgba(34, 197, 94, 0.3)"
+                  }}
+                  transition="all 0.3s ease-in-out"
+                  borderRadius="xl"
+                  py={6}
+                  px={8}
+                  fontSize="lg"
+                  fontWeight="800"
+                  boxShadow="0 8px 25px rgba(34, 197, 94, 0.25)"
                 >
                   WhatsApp Us
                 </Button>
                 <Button
-                  size="lg"
+                  size="xl"
                   leftIcon={<FaCalendarAlt />}
-                  colorScheme="blue"
+                  colorScheme="purple"
                   variant="solid"
-                  _hover={{ transform: "translateY(-2px)" }}
-                  transition="all 0.3s"
+                  _hover={{ 
+                    transform: "translateY(-3px)",
+                    boxShadow: "0 12px 35px rgba(147, 51, 234, 0.3)"
+                  }}
+                  transition="all 0.3s ease-in-out"
                   onClick={() => navigate('/booking')}
+                  borderRadius="xl"
+                  py={6}
+                  px={8}
+                  fontSize="lg"
+                  fontWeight="800"
+                  boxShadow="0 8px 25px rgba(147, 51, 234, 0.25)"
                 >
                   Book Assessment
                 </Button>
               </SimpleGrid>
+
+              {/* Trust Badge */}
+              <Badge
+                bgGradient="linear(45deg, brand.500, purple.500)"
+                color="white"
+                px={6}
+                py={2}
+                borderRadius="full"
+                fontSize="md"
+                fontWeight="800"
+                textTransform="uppercase"
+                letterSpacing="wide"
+                boxShadow="0 4px 15px rgba(194, 24, 91, 0.3)"
+              >
+                Trusted by 200+ Families Since 2020
+              </Badge>
             </VStack>
           </Box>
 

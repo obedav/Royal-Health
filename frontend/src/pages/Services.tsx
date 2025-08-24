@@ -73,7 +73,7 @@ const Services: React.FC = () => {
       title: "Home Care Services",
       description: "Professional healthcare services delivered in the comfort of your home",
       icon: FaHome,
-      color: "blue",
+      color: "brand",
       services: [
         {
           id: "home-nursing",
@@ -368,90 +368,179 @@ const Services: React.FC = () => {
     <Box bg="gray.50" minH="100vh" py={8}>
       <Container maxW="7xl">
         <VStack spacing={10} align="stretch">
-          {/* Breadcrumb */}
+          {/* Breadcrumb - Enhanced */}
           <Breadcrumb spacing="8px" separator={<FaChevronRight color="gray.500" />}>
             <BreadcrumbItem>
-              <BreadcrumbLink onClick={() => navigate('/')} color="primary.500" cursor="pointer">
+              <BreadcrumbLink 
+                onClick={() => navigate('/')} 
+                color="brand.500" 
+                cursor="pointer"
+                _hover={{ color: "brand.600", textDecoration: "none" }}
+                fontWeight="600"
+              >
                 Home
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbItem isCurrentPage>
-              <BreadcrumbLink color="gray.600">Our Services</BreadcrumbLink>
+              <BreadcrumbLink color="gray.600" fontWeight="600">Our Services</BreadcrumbLink>
             </BreadcrumbItem>
           </Breadcrumb>
 
-          {/* Header Section */}
+          {/* Header Section - Enhanced */}
           <VStack spacing={6} textAlign="center" maxW="800px" mx="auto">
-            <Heading size="2xl" color="gray.800">
-              Royal Health Services
+            <Heading 
+              size="2xl" 
+              color="gray.800"
+              fontWeight="800"
+            >
+              <Text
+                as="span"
+                bgGradient="linear(45deg, brand.500, purple.500)"
+                bgClip="text"
+                sx={{
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                Royal Health
+              </Text>{' '}
+              Services
             </Heading>
             <Text color="gray.600" fontSize="xl" lineHeight="1.6">
               Comprehensive healthcare services delivered to your home by qualified professionals. 
               From routine care to specialized treatments, we bring quality healthcare to you.
             </Text>
             
-            {/* Service Value Highlight */}
+            {/* Service Value Highlight - Enhanced */}
             <Box 
-              bg="primary.50" 
+              bgGradient="linear(135deg, brand.50, purple.50)" 
               border="2px solid" 
-              borderColor="primary.200" 
-              borderRadius="xl" 
+              borderColor="brand.200" 
+              borderRadius="2xl" 
               p={6} 
               maxW="600px"
+              position="relative"
+              _before={{
+                content: '""',
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                right: '0',
+                bottom: '0',
+                bgGradient: 'linear(135deg, brand.100, purple.100)',
+                borderRadius: '2xl',
+                opacity: 0.3,
+                zIndex: -1,
+              }}
             >
-              <VStack spacing={2}>
-                <Text fontSize="sm" color="primary.600" fontWeight="600">
-                  PROFESSIONAL HEALTHCARE AT HOME
-                </Text>
-                <Text fontSize="xl" fontWeight="bold" color="primary.500">
+              <VStack spacing={3}>
+                <Badge
+                  bgGradient="linear(45deg, brand.500, purple.500)"
+                  color="white"
+                  px={4}
+                  py={1}
+                  borderRadius="full"
+                  fontSize="xs"
+                  fontWeight="700"
+                  textTransform="uppercase"
+                  letterSpacing="wide"
+                >
+                  Professional Healthcare at Home
+                </Badge>
+                <Text 
+                  fontSize="xl" 
+                  fontWeight="800" 
+                  bgGradient="linear(45deg, brand.600, purple.600)"
+                  bgClip="text"
+                  sx={{
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}
+                  textAlign="center"
+                >
                   Qualified Professionals • Comprehensive Care • Your Comfort
                 </Text>
-                <Text fontSize="sm" color="gray.600" textAlign="center">
+                <Text fontSize="sm" color="gray.600" textAlign="center" fontWeight="500">
                   Available 24/7 for emergencies • Flexible scheduling for all services
                 </Text>
               </VStack>
             </Box>
             
-            {/* Quick Action */}
+            {/* Quick Action - Enhanced */}
             <Button
               size="lg"
-              colorScheme="primary"
+              bgGradient="linear(45deg, brand.500, purple.500)"
+              color="white"
               rightIcon={<FaCalendarAlt />}
               onClick={handleQuickBook}
               px={8}
               py={6}
               fontSize="lg"
-              fontWeight="bold"
+              fontWeight="700"
+              borderRadius="xl"
+              boxShadow="0 4px 14px rgba(194, 24, 91, 0.25)"
               _hover={{
+                bgGradient: "linear(45deg, brand.600, purple.600)",
                 transform: 'translateY(-2px)',
-                boxShadow: 'lg'
+                boxShadow: '0 8px 25px rgba(194, 24, 91, 0.35)'
               }}
+              _active={{
+                transform: 'translateY(0)'
+              }}
+              transition="all 0.2s ease-in-out"
             >
               Book Service Now
             </Button>
 
-            {/* Stats */}
+            {/* Stats - Enhanced */}
             <HStack spacing={8} pt={4}>
-              <VStack spacing={1}>
-                <Text fontSize="2xl" fontWeight="bold" color="primary.500">500+</Text>
-                <Text fontSize="sm" color="gray.600">Satisfied Clients</Text>
-              </VStack>
-              <VStack spacing={1}>
-                <Text fontSize="2xl" fontWeight="bold" color="primary.500">25+</Text>
-                <Text fontSize="sm" color="gray.600">Service Types</Text>
-              </VStack>
-              <VStack spacing={1}>
-                <Text fontSize="2xl" fontWeight="bold" color="primary.500">24/7</Text>
-                <Text fontSize="sm" color="gray.600">Emergency Available</Text>
-              </VStack>
+              {[
+                { number: "200+", label: "Satisfied Clients" },
+                { number: "25+", label: "Service Types" },
+                { number: "24/7", label: "Emergency Available" }
+              ].map((stat, index) => (
+                <VStack key={index} spacing={1}>
+                  <Text 
+                    fontSize="2xl" 
+                    fontWeight="900" 
+                    bgGradient="linear(45deg, brand.500, purple.500)"
+                    bgClip="text"
+                    sx={{
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                    }}
+                  >
+                    {stat.number}
+                  </Text>
+                  <Text fontSize="sm" color="gray.600" fontWeight="600">
+                    {stat.label}
+                  </Text>
+                </VStack>
+              ))}
             </HStack>
           </VStack>
 
-          {/* Service Categories Tabs */}
-          <Tabs variant="enclosed" colorScheme="primary">
-            <TabList flexWrap="wrap" justifyContent="center">
+          {/* Service Categories Tabs - Enhanced */}
+          <Tabs variant="enclosed" colorScheme="brand">
+            <TabList flexWrap="wrap" justifyContent="center" bg="white" borderRadius="xl" p={2}>
               {Object.entries(serviceCategories).map(([key, category]) => (
-                <Tab key={key} fontWeight="medium" px={6}>
+                <Tab 
+                  key={key} 
+                  fontWeight="600" 
+                  px={6} 
+                  py={3}
+                  borderRadius="lg"
+                  _selected={{
+                    bgGradient: "linear(45deg, brand.500, purple.500)",
+                    color: "white",
+                    borderColor: "transparent",
+                  }}
+                  _hover={{
+                    bg: "brand.50",
+                    color: "brand.600",
+                  }}
+                  transition="all 0.2s ease-in-out"
+                >
                   <HStack spacing={2}>
                     <Icon as={category.icon} />
                     <Text>{category.title}</Text>
@@ -464,51 +553,58 @@ const Services: React.FC = () => {
               {Object.entries(serviceCategories).map(([key, category]) => (
                 <TabPanel key={key} px={0}>
                   <VStack spacing={8}>
-                    {/* Category Header */}
+                    {/* Category Header - Enhanced */}
                     <VStack spacing={4} textAlign="center">
                       <Box
                         w={20}
                         h={20}
-                        bg={`${category.color}.50`}
+                        bgGradient={`linear(45deg, ${category.color}.100, ${category.color === 'brand' ? 'purple' : category.color}.100)`}
                         borderRadius="2xl"
                         display="flex"
                         alignItems="center"
                         justifyContent="center"
+                        border="3px solid"
+                        borderColor={`${category.color}.200`}
                       >
-                        <Icon as={category.icon} color={`${category.color}.500`} fontSize="3xl" />
+                        <Icon 
+                          as={category.icon} 
+                          color={`${category.color}.600`} 
+                          fontSize="3xl" 
+                        />
                       </Box>
                       <VStack spacing={2}>
-                        <Heading size="lg" color="gray.800">
+                        <Heading size="lg" color="gray.800" fontWeight="700">
                           {category.title}
                         </Heading>
-                        <Text color="gray.600" maxW="600px">
+                        <Text color="gray.600" maxW="600px" fontWeight="500">
                           {category.description}
                         </Text>
                       </VStack>
                     </VStack>
 
-                    {/* Services Grid */}
+                    {/* Services Grid - Enhanced */}
                     <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={6} w="full">
                       {category.services.map((service) => (
                         <Card
                           key={service.id}
                           bg={cardBg}
                           borderColor={borderColor}
-                          borderWidth="1px"
-                          borderRadius="xl"
+                          borderWidth="2px"
+                          borderRadius="2xl"
                           overflow="hidden"
                           transition="all 0.3s"
                           _hover={{
-                            transform: 'translateY(-4px)',
-                            boxShadow: 'xl',
-                            borderColor: 'primary.300'
+                            transform: 'translateY(-6px)',
+                            boxShadow: '0 15px 35px rgba(194, 24, 91, 0.15)',
+                            borderColor: 'brand.300'
                           }}
                           position="relative"
                           h="full"
                         >
                           {service.popular && (
                             <Badge
-                              colorScheme="primary"
+                              bgGradient="linear(45deg, brand.500, purple.500)"
+                              color="white"
                               position="absolute"
                               top={4}
                               right={4}
@@ -516,8 +612,9 @@ const Services: React.FC = () => {
                               px={3}
                               py={1}
                               fontSize="xs"
-                              fontWeight="bold"
+                              fontWeight="700"
                               zIndex={1}
+                              boxShadow="md"
                             >
                               Popular
                             </Badge>
@@ -530,57 +627,67 @@ const Services: React.FC = () => {
                                 <Box
                                   w={14}
                                   h={14}
-                                  bg="primary.50"
+                                  bgGradient="linear(45deg, brand.50, purple.50)"
                                   borderRadius="xl"
                                   display="flex"
                                   alignItems="center"
                                   justifyContent="center"
+                                  border="2px solid"
+                                  borderColor="brand.200"
                                 >
-                                  <Icon as={service.icon} color="primary.500" fontSize="xl" />
+                                  <Icon as={service.icon} color="brand.600" fontSize="xl" />
                                 </Box>
                               </Flex>
 
-                              {/* Service Details */}
+                              {/* Service Details - Enhanced */}
                               <VStack spacing={3} align="start" flex={1}>
-                                <Heading size="md" color="gray.800" lineHeight="1.3">
+                                <Heading size="md" color="gray.800" lineHeight="1.3" fontWeight="700">
                                   {service.name}
                                 </Heading>
-                                <Text color="gray.600" fontSize="sm" lineHeight="1.5">
+                                <Text color="gray.600" fontSize="sm" lineHeight="1.5" fontWeight="500">
                                   {service.description}
                                 </Text>
 
                                 {/* Service Features */}
                                 <VStack spacing={2} align="start" w="full">
-                                  <Text fontSize="sm" fontWeight="600" color="gray.700">
+                                  <Text fontSize="sm" fontWeight="700" color="brand.600">
                                     Includes:
                                   </Text>
                                   {service.features.slice(0, 3).map((feature, index) => (
                                     <HStack key={index} spacing={2}>
                                       <Icon as={FaCheckCircle} color="green.500" fontSize="sm" />
-                                      <Text fontSize="xs" color="gray.600">{feature}</Text>
+                                      <Text fontSize="xs" color="gray.600" fontWeight="500">{feature}</Text>
                                     </HStack>
                                   ))}
                                   {service.features.length > 3 && (
-                                    <Text fontSize="xs" color="primary.500" fontWeight="500">
+                                    <Text fontSize="xs" color="brand.600" fontWeight="600">
                                       +{service.features.length - 3} more services included
                                     </Text>
                                   )}
                                 </VStack>
                               </VStack>
 
-                              <Divider />
+                              <Divider borderColor="brand.100" />
 
-                              {/* Book Service Button */}
+                              {/* Book Service Button - Enhanced */}
                               <Button
                                 w="full"
-                                colorScheme="primary"
+                                bgGradient="linear(45deg, brand.500, purple.500)"
+                                color="white"
                                 size="md"
                                 onClick={() => handleBookService(service.id)}
-                                fontWeight="bold"
+                                fontWeight="700"
                                 rightIcon={<FaArrowRight />}
+                                borderRadius="lg"
                                 _hover={{
-                                  transform: 'translateY(-1px)'
+                                  bgGradient: "linear(45deg, brand.600, purple.600)",
+                                  transform: 'translateY(-1px)',
+                                  boxShadow: "0 4px 12px rgba(194, 24, 91, 0.25)"
                                 }}
+                                _active={{
+                                  transform: 'translateY(0)'
+                                }}
+                                transition="all 0.2s ease-in-out"
                               >
                                 Book Service
                               </Button>
@@ -595,20 +702,21 @@ const Services: React.FC = () => {
             </TabPanels>
           </Tabs>
 
-          {/* Care Duration Options */}
+          {/* Care Duration Options - Enhanced */}
           <Box
             bg="white"
             borderRadius="2xl"
             p={8}
-            border="1px"
-            borderColor="gray.200"
+            border="2px"
+            borderColor="brand.100"
+            boxShadow="0 4px 20px rgba(194, 24, 91, 0.05)"
           >
             <VStack spacing={6}>
               <VStack spacing={3} textAlign="center">
-                <Heading size="lg" color="gray.800">
+                <Heading size="lg" color="gray.800" fontWeight="700">
                   Flexible Care Options
                 </Heading>
-                <Text color="gray.600" maxW="600px">
+                <Text color="gray.600" maxW="600px" fontWeight="500">
                   Choose the care schedule that works best for you and your loved ones
                 </Text>
               </VStack>
@@ -621,7 +729,14 @@ const Services: React.FC = () => {
                     borderRadius="xl"
                     p={6}
                     textAlign="center"
-                    _hover={{ bg: "primary.50", transform: "translateY(-2px)" }}
+                    border="2px solid"
+                    borderColor="transparent"
+                    _hover={{ 
+                      bg: "brand.50", 
+                      borderColor: "brand.200",
+                      transform: "translateY(-4px)",
+                      boxShadow: "0 8px 25px rgba(194, 24, 91, 0.1)"
+                    }}
                     transition="all 0.3s"
                     cursor="pointer"
                     onClick={() => handleBookService(careType.id)}
@@ -630,22 +745,33 @@ const Services: React.FC = () => {
                       <Box
                         w={12}
                         h={12}
-                        bg="primary.100"
+                        bgGradient="linear(45deg, brand.100, purple.100)"
                         borderRadius="full"
                         display="flex"
                         alignItems="center"
                         justifyContent="center"
+                        border="2px solid"
+                        borderColor="brand.200"
                       >
-                        <Icon as={careType.icon} color="primary.600" fontSize="xl" />
+                        <Icon as={careType.icon} color="brand.600" fontSize="xl" />
                       </Box>
                       <VStack spacing={2}>
-                        <Text fontWeight="bold" color="gray.800">
+                        <Text fontWeight="700" color="gray.800">
                           {careType.name}
                         </Text>
-                        <Text fontSize="sm" color="gray.600">
+                        <Text fontSize="sm" color="gray.600" fontWeight="500">
                           {careType.description}
                         </Text>
-                        <Badge colorScheme="primary" variant="subtle">
+                        <Badge 
+                          bgGradient="linear(45deg, brand.500, purple.500)"
+                          color="white"
+                          variant="solid"
+                          borderRadius="full"
+                          px={3}
+                          py={1}
+                          fontSize="xs"
+                          fontWeight="600"
+                        >
                           {careType.duration}
                         </Badge>
                       </VStack>
@@ -656,19 +782,21 @@ const Services: React.FC = () => {
             </VStack>
           </Box>
 
-          {/* Contact Section */}
+          {/* Contact Section - Enhanced */}
           <Box
-            bg="primary.50"
+            bgGradient="linear(135deg, brand.50, purple.50)"
             borderRadius="2xl"
             p={8}
             textAlign="center"
+            border="2px solid"
+            borderColor="brand.200"
           >
             <VStack spacing={6}>
               <VStack spacing={3}>
-                <Heading size="lg" color="gray.800">
+                <Heading size="lg" color="gray.800" fontWeight="700">
                   Need Help Choosing the Right Service?
                 </Heading>
-                <Text color="gray.600" maxW="600px">
+                <Text color="gray.600" maxW="600px" fontWeight="500">
                   Our healthcare consultants are available 24/7 to help you select the right service 
                   for your specific needs. Get personalized recommendations today.
                 </Text>
@@ -676,9 +804,18 @@ const Services: React.FC = () => {
               <HStack spacing={4} flexWrap="wrap" justify="center">
                 <Button
                   leftIcon={<FaPhone />}
-                  colorScheme="primary"
+                  bgGradient="linear(45deg, brand.500, purple.500)"
+                  color="white"
                   variant="solid"
                   size="lg"
+                  fontWeight="700"
+                  borderRadius="xl"
+                  _hover={{
+                    bgGradient: "linear(45deg, brand.600, purple.600)",
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 6px 20px rgba(194, 24, 91, 0.25)"
+                  }}
+                  transition="all 0.2s ease-in-out"
                 >
                   Call +234 801 234 5678
                 </Button>
@@ -687,15 +824,32 @@ const Services: React.FC = () => {
                   colorScheme="green"
                   variant="outline"
                   size="lg"
+                  fontWeight="600"
+                  borderRadius="xl"
+                  borderWidth="2px"
+                  _hover={{
+                    bg: "green.50",
+                    transform: "translateY(-2px)"
+                  }}
+                  transition="all 0.2s ease-in-out"
                 >
                   WhatsApp Us
                 </Button>
                 <Button
                   leftIcon={<FaCalendarAlt />}
-                  colorScheme="purple"
+                  color="purple.600"
+                  borderColor="purple.500"
                   variant="outline"
                   size="lg"
+                  fontWeight="600"
+                  borderRadius="xl"
+                  borderWidth="2px"
                   onClick={handleQuickBook}
+                  _hover={{
+                    bg: "purple.50",
+                    transform: "translateY(-2px)"
+                  }}
+                  transition="all 0.2s ease-in-out"
                 >
                   Quick Booking
                 </Button>
@@ -703,16 +857,17 @@ const Services: React.FC = () => {
             </VStack>
           </Box>
 
-          {/* How It Works */}
+          {/* How It Works - Enhanced */}
           <Box
             bg="white"
             borderRadius="2xl"
             p={8}
-            border="1px"
-            borderColor="gray.200"
+            border="2px"
+            borderColor="brand.100"
+            boxShadow="0 4px 20px rgba(194, 24, 91, 0.05)"
           >
             <VStack spacing={6}>
-              <Heading size="lg" color="gray.800" textAlign="center">
+              <Heading size="lg" color="gray.800" textAlign="center" fontWeight="700">
                 How Our Healthcare Services Work
               </Heading>
               <SimpleGrid columns={{ base: 1, md: 4 }} spacing={6}>
@@ -722,7 +877,7 @@ const Services: React.FC = () => {
                     title: 'Book Your Service',
                     description: 'Choose your service type and preferred schedule online or by phone',
                     icon: FaCalendarAlt,
-                    color: 'blue'
+                    color: 'brand'
                   },
                   {
                     step: '2',
@@ -750,19 +905,22 @@ const Services: React.FC = () => {
                     <Box
                       w={16}
                       h={16}
-                      bg={`${item.color}.50`}
+                      bgGradient={`linear(45deg, ${item.color}.100, ${item.color}.200)`}
                       borderRadius="full"
                       display="flex"
                       alignItems="center"
                       justifyContent="center"
                       position="relative"
+                      border="3px solid"
+                      borderColor={`${item.color}.300`}
                     >
-                      <Icon as={item.icon} color={`${item.color}.500`} fontSize="2xl" />
+                      <Icon as={item.icon} color={`${item.color}.600`} fontSize="2xl" />
                       <Badge
                         position="absolute"
                         top="-8px"
                         right="-8px"
-                        colorScheme={item.color}
+                        bgGradient="linear(45deg, brand.500, purple.500)"
+                        color="white"
                         borderRadius="full"
                         w={8}
                         h={8}
@@ -770,16 +928,17 @@ const Services: React.FC = () => {
                         alignItems="center"
                         justifyContent="center"
                         fontSize="sm"
-                        fontWeight="bold"
+                        fontWeight="800"
+                        boxShadow="md"
                       >
                         {item.step}
                       </Badge>
                     </Box>
                     <VStack spacing={2}>
-                      <Text fontWeight="600" color="gray.800">
+                      <Text fontWeight="700" color="gray.800">
                         {item.title}
                       </Text>
-                      <Text fontSize="sm" color="gray.600" textAlign="center">
+                      <Text fontSize="sm" color="gray.600" textAlign="center" fontWeight="500">
                         {item.description}
                       </Text>
                     </VStack>
@@ -789,23 +948,23 @@ const Services: React.FC = () => {
             </VStack>
           </Box>
 
-          {/* Emergency Notice */}
+          {/* Emergency Notice - Enhanced */}
           <Box
             bg="red.50"
-            border="1px"
-            borderColor="red.200"
+            border="2px solid"
+            borderColor="red.300"
             borderRadius="xl"
             p={6}
+            boxShadow="0 4px 15px rgba(220, 38, 38, 0.1)"
           >
             <HStack spacing={4} align="start">
               <Icon as={FaAmbulance} color="red.500" fontSize="2xl" mt={1} />
               <VStack spacing={2} align="start">
-                <Text fontWeight="bold" color="red.700" fontSize="lg">
+                <Text fontWeight="800" color="red.700" fontSize="lg">
                   Medical Emergency?
                 </Text>
-                <Text fontSize="sm" color="red.600" lineHeight="1.5">
-                  For life-threatening emergencies, please call <strong>199 (Nigeria Emergency)</strong> or 
-                  go to the nearest hospital immediately. Our services are for non-emergency healthcare needs.
+                <Text fontSize="sm" color="red.600" lineHeight="1.5" fontWeight="500">
+                  For life-threatening emergencies, please go to the nearest hospital immediately. Our services are for non-emergency healthcare needs.
                 </Text>
               </VStack>
             </HStack>

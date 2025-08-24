@@ -32,7 +32,7 @@ const HeroSection: React.FC = () => {
   const features = [
     {
       icon: FaUserMd,
-      title: 'Qualified Nurses',
+      title: 'Qualified Professionals',
       description: 'Licensed healthcare professionals'
     },
     {
@@ -53,8 +53,8 @@ const HeroSection: React.FC = () => {
   ]
 
   const stats = [
-    { number: '50+', label: 'Happy Patients' },
-    { number: '50+', label: 'Qualified Nurses' },
+    { number: '200+', label: 'Happy Patients' },
+    { number: '50+', label: 'Healthcare Professionals' },
     { number: '99%', label: 'Satisfaction Rate' },
     { number: '24/7', label: 'Availability' }
   ]
@@ -66,19 +66,21 @@ const HeroSection: React.FC = () => {
         <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={12} alignItems="center" minH="80vh">
           {/* Left Side - Content */}
           <VStack align="start" spacing={8} className="fade-in">
-            {/* Trust Badge */}
+            {/* Trust Badge - Enhanced */}
             <HStack>
               <Badge 
-                colorScheme="primary" 
-                variant="subtle" 
-                px={3} 
-                py={1} 
+                bgGradient="linear(45deg, brand.500, purple.500)"
+                color="white"
+                px={4} 
+                py={2} 
                 borderRadius="full"
                 fontSize="sm"
+                fontWeight="600"
+                boxShadow="md"
               >
-                <HStack spacing={1}>
+                <HStack spacing={2}>
                   <Icon as={FaStar} />
-                  <Text>Trusted by 500+ Nigerian Families</Text>
+                  <Text>Trusted by 200+ Nigerian Families</Text>
                 </HStack>
               </Badge>
             </HStack>
@@ -89,13 +91,19 @@ const HeroSection: React.FC = () => {
                 size={{ base: 'xl', md: '2xl' }}
                 lineHeight="1.2"
                 color="gray.800"
+                fontWeight="800"
               >
                 Professional{' '}
                 <Text
                   as="span"
-                  bgGradient="linear(45deg, primary.500, secondary.500)"
+                  bgGradient="linear(45deg, brand.500, purple.500)"
                   bgClip="text"
-                  color="transparent"
+                  fontWeight="900"
+                  sx={{
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                  }}
                 >
                   Healthcare
                 </Text>
@@ -104,21 +112,33 @@ const HeroSection: React.FC = () => {
               </Heading>
 
               <Text fontSize={{ base: 'lg', md: 'xl' }} color="gray.600" maxW="500px">
-                Book qualified nurses and healthcare professionals for home care services across Nigeria. 
+                Book qualified healthcare professionals for home care services across Nigeria. 
                 Safe, reliable, and professional healthcare when you need it most.
               </Text>
             </VStack>
 
-            {/* CTA Buttons */}
+            {/* CTA Buttons - Enhanced */}
             <HStack spacing={4} flexWrap="wrap">
               <Button
                 size="lg"
-                variant="gradient"
+                bgGradient="linear(45deg, brand.500, purple.500)"
+                color="white"
                 onClick={() => navigate('/booking')}
                 className="hover-lift pulse-animation"
                 px={8}
                 py={6}
                 fontSize="lg"
+                fontWeight="700"
+                borderRadius="xl"
+                _hover={{
+                  bgGradient: "linear(45deg, brand.600, purple.600)",
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 6px 20px 0 rgba(194, 24, 91, 0.3)",
+                }}
+                _active={{
+                  transform: "translateY(0)",
+                }}
+                transition="all 0.2s ease-in-out"
               >
                 Book Appointment Now
               </Button>
@@ -126,80 +146,122 @@ const HeroSection: React.FC = () => {
               <Button
                 size="lg"
                 variant="outline"
+                borderColor="brand.500"
+                color="brand.500"
                 onClick={() => navigate('/services')}
                 className="hover-lift"
                 px={8}
                 py={6}
                 fontSize="lg"
+                fontWeight="600"
+                borderRadius="xl"
+                borderWidth="2px"
+                _hover={{
+                  bg: "brand.50",
+                  borderColor: "brand.600",
+                  color: "brand.600",
+                  transform: "translateY(-2px)",
+                  boxShadow: "md",
+                }}
+                transition="all 0.2s ease-in-out"
               >
                 View Services
               </Button>
             </HStack>
 
-            {/* Contact Info */}
-            <VStack align="start" spacing={2} pt={4}>
-              <HStack spacing={4} color="gray.600">
+            {/* Contact Info - Enhanced */}
+            <VStack align="start" spacing={3} pt={4}>
+              <HStack spacing={6} color="gray.600">
                 <HStack>
-                  <Icon as={FaPhone} color="primary.500" />
-                  <Text fontWeight="500">+234 801 234 5678</Text>
+                  <Icon as={FaPhone} color="brand.500" fontSize="lg" />
+                  <Text fontWeight="600">+234 801 234 5678</Text>
                 </HStack>
                 <HStack>
-                  <Icon as={FaWhatsapp} color="green.500" />
-                  <Text fontWeight="500">WhatsApp Available</Text>
+                  <Icon as={FaWhatsapp} color="green.500" fontSize="lg" />
+                  <Text fontWeight="600">WhatsApp Available</Text>
                 </HStack>
               </HStack>
               <HStack>
-                <Icon as={FaMapMarkerAlt} color="primary.500" />
-                <Text color="gray.600">Serving Lagos, Abuja, Port Harcourt & Major Cities</Text>
+                <Icon as={FaMapMarkerAlt} color="brand.500" fontSize="lg" />
+                <Text color="gray.600" fontWeight="500">
+                  Serving Lagos, Abuja, Port Harcourt & Major Cities
+                </Text>
               </HStack>
             </VStack>
           </VStack>
 
-          {/* Right Side - Visual */}
+          {/* Right Side - Visual - Enhanced */}
           <Flex justify="center" align="center" className="slide-in-right">
             <Box
               position="relative"
               bg="white"
-              borderRadius="2xl"
+              borderRadius="3xl"
               p={8}
               boxShadow="2xl"
-              border="1px"
-              borderColor="primary.100"
+              border="2px"
+              borderColor="brand.100"
               maxW="400px"
               w="full"
+              _hover={{
+                transform: "translateY(-4px)",
+                boxShadow: "0 20px 40px 0 rgba(194, 24, 91, 0.15)",
+              }}
+              transition="all 0.3s ease-in-out"
             >
-              {/* Medical Professional Illustration */}
+              {/* Medical Professional Illustration - Enhanced */}
               <VStack spacing={6}>
                 <Box
                   w="120px"
                   h="120px"
-                  bg="linear-gradient(45deg, var(--chakra-colors-primary-500), var(--chakra-colors-secondary-500))"
+                  bgGradient="linear(45deg, brand.500, purple.500)"
                   borderRadius="full"
                   display="flex"
                   alignItems="center"
                   justifyContent="center"
-                  boxShadow="lg"
+                  boxShadow="xl"
+                  position="relative"
+                  _before={{
+                    content: '""',
+                    position: 'absolute',
+                    top: '-4px',
+                    left: '-4px',
+                    right: '-4px',
+                    bottom: '-4px',
+                    bgGradient: 'linear(45deg, brand.400, purple.400)',
+                    borderRadius: 'full',
+                    zIndex: -1,
+                    opacity: 0.3,
+                  }}
                 >
                   <Icon as={MdHealthAndSafety} color="white" fontSize="4xl" />
                 </Box>
 
                 <VStack spacing={3} textAlign="center">
-                  <Heading size="md" color="gray.800">
+                  <Heading size="md" color="gray.800" fontWeight="700">
                     Professional Care Team
                   </Heading>
                   <Text color="gray.600" fontSize="sm">
-                    Licensed nurses and healthcare professionals ready to serve you 24/7
+                    Licensed healthcare professionals ready to serve you 24/7
                   </Text>
                 </VStack>
 
-                {/* Quick Stats */}
+                {/* Quick Stats - Enhanced */}
                 <SimpleGrid columns={2} spacing={4} w="full">
                   {stats.map((stat, index) => (
                     <VStack key={index} spacing={1}>
-                      <Text fontSize="2xl" fontWeight="bold" color="primary.500">
+                      <Text 
+                        fontSize="2xl" 
+                        fontWeight="900" 
+                        bgGradient="linear(45deg, brand.500, purple.500)"
+                        bgClip="text"
+                        sx={{
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                        }}
+                      >
                         {stat.number}
                       </Text>
-                      <Text fontSize="xs" color="gray.600" textAlign="center">
+                      <Text fontSize="xs" color="gray.600" textAlign="center" fontWeight="500">
                         {stat.label}
                       </Text>
                     </VStack>
@@ -207,16 +269,17 @@ const HeroSection: React.FC = () => {
                 </SimpleGrid>
               </VStack>
 
-              {/* Decorative Elements */}
+              {/* Decorative Elements - Enhanced */}
               <Box
                 position="absolute"
                 top="-10px"
                 right="-10px"
                 w="20px"
                 h="20px"
-                bg="secondary.500"
+                bg="purple.500"
                 borderRadius="full"
-                opacity="0.6"
+                opacity="0.8"
+                boxShadow="lg"
               />
               <Box
                 position="absolute"
@@ -224,18 +287,29 @@ const HeroSection: React.FC = () => {
                 left="-10px"
                 w="30px"
                 h="30px"
-                bg="primary.500"
+                bg="brand.500"
                 borderRadius="full"
-                opacity="0.4"
+                opacity="0.6"
+                boxShadow="lg"
+              />
+              <Box
+                position="absolute"
+                top="20%"
+                left="-15px"
+                w="10px"
+                h="10px"
+                bg="purple.400"
+                borderRadius="full"
+                opacity="0.7"
               />
             </Box>
           </Flex>
         </SimpleGrid>
 
-        {/* Features Section */}
+        {/* Features Section - Enhanced */}
         <Box pb={16} pt={8}>
           <VStack spacing={8} className="fade-in">
-            <Heading size="lg" textAlign="center" color="gray.800">
+            <Heading size="lg" textAlign="center" color="gray.800" fontWeight="700">
               Why Choose Royal Health Consult?
             </Heading>
             
@@ -246,26 +320,34 @@ const HeroSection: React.FC = () => {
                   spacing={4}
                   p={6}
                   bg="white"
-                  borderRadius="xl"
+                  borderRadius="2xl"
                   boxShadow="sm"
                   border="1px"
                   borderColor="gray.200"
                   className="card-hover"
                   textAlign="center"
+                  _hover={{
+                    transform: "translateY(-4px)",
+                    boxShadow: "0 10px 25px 0 rgba(194, 24, 91, 0.15)",
+                    borderColor: "brand.200",
+                  }}
+                  transition="all 0.3s ease-in-out"
                 >
                   <Box
                     w="16"
                     h="16"
-                    bg="primary.50"
+                    bgGradient="linear(45deg, brand.50, purple.50)"
                     borderRadius="full"
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
+                    border="2px"
+                    borderColor="brand.100"
                   >
-                    <Icon as={feature.icon} color="primary.500" fontSize="2xl" />
+                    <Icon as={feature.icon} color="brand.500" fontSize="2xl" />
                   </Box>
                   <VStack spacing={2}>
-                    <Heading size="sm" color="gray.800">
+                    <Heading size="sm" color="gray.800" fontWeight="700">
                       {feature.title}
                     </Heading>
                     <Text fontSize="sm" color="gray.600">

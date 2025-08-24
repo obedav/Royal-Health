@@ -43,7 +43,8 @@ import {
   FaEnvelope,
   FaUserMd,
   FaUserFriends,
-  FaCheck
+  FaCheck,
+  FaShieldAlt
 } from 'react-icons/fa'
 
 // Nigerian phone regex
@@ -178,187 +179,339 @@ const onSubmit = async (formData: RegisterFormSchema) => {
   }
 }
 
-
   return (
     <div style={{
       width: '100vw',
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #FCE7F3 0%, #F3E5F5 100%)',
+      background: 'linear-gradient(135deg, #FCE7F3 0%, #F3E5F5 50%, #C2185B08 100%)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '2rem 1rem'
+      padding: '2rem 1rem',
+      position: 'relative'
     }}>
+      {/* Background Decorative Elements */}
+      <Box
+        position="absolute"
+        top="10%"
+        left="10%"
+        w="100px"
+        h="100px"
+        borderRadius="full"
+        bgGradient="linear(45deg, brand.200, purple.200)"
+        opacity="0.3"
+        filter="blur(40px)"
+      />
+      <Box
+        position="absolute"
+        bottom="20%"
+        right="15%"
+        w="150px"
+        h="150px"
+        borderRadius="full"
+        bgGradient="linear(45deg, purple.200, brand.200)"
+        opacity="0.2"
+        filter="blur(60px)"
+      />
+
       <Container maxW="lg">
-        <Card boxShadow="2xl" borderRadius="2xl" overflow="hidden">
-          <CardBody p={8}>
+        <Card 
+          boxShadow="0 25px 50px rgba(194, 24, 91, 0.15)" 
+          borderRadius="3xl" 
+          overflow="hidden"
+          border="1px solid"
+          borderColor="brand.100"
+          bg="white"
+          position="relative"
+          _before={{
+            content: '""',
+            position: 'absolute',
+            top: '0',
+            left: '0',
+            right: '0',
+            height: '4px',
+            bgGradient: 'linear(90deg, brand.500, purple.500)',
+          }}
+        >
+          <CardBody p={10}>
             <VStack spacing={8} align="stretch">
-              {/* Header */}
+              {/* Header - Enhanced */}
               <VStack spacing={4} textAlign="center">
                 <Box
-                  w="16"
-                  h="16"
-                  bg="linear-gradient(45deg, var(--chakra-colors-primary-500), var(--chakra-colors-secondary-500))"
+                  w="20"
+                  h="20"
+                  bgGradient="linear(45deg, brand.500, purple.500)"
                   borderRadius="full"
                   display="flex"
                   alignItems="center"
                   justifyContent="center"
                   mx="auto"
+                  boxShadow="0 8px 25px rgba(194, 24, 91, 0.3)"
+                  position="relative"
+                  _before={{
+                    content: '""',
+                    position: 'absolute',
+                    top: '-4px',
+                    left: '-4px',
+                    right: '-4px',
+                    bottom: '-4px',
+                    bgGradient: 'linear(45deg, brand.400, purple.400)',
+                    borderRadius: 'full',
+                    zIndex: -1,
+                    opacity: 0.3,
+                  }}
                 >
                   <Icon as={FaUserFriends} color="white" fontSize="2xl" />
                 </Box>
                 
-                <VStack spacing={2}>
-                  <Heading size="lg" color="gray.800">
-                    Join Royal Health
+                <VStack spacing={3}>
+                  <Heading 
+                    size="xl" 
+                    color="gray.800"
+                    fontWeight="800"
+                  >
+                    Join{' '}
+                    <Text
+                      as="span"
+                      bgGradient="linear(45deg, brand.500, purple.500)"
+                      bgClip="text"
+                      sx={{
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                      }}
+                    >
+                      Royal Health
+                    </Text>
                   </Heading>
-                  <Text color="gray.600">
+                  <Text color="gray.600" fontSize="lg" fontWeight="500">
                     Create your account to access professional healthcare services
                   </Text>
                 </VStack>
               </VStack>
 
-              {/* Error Alert */}
+              {/* Error Alert - Enhanced */}
               {error && (
-                <Alert status="error" borderRadius="lg">
+                <Alert 
+                  status="error" 
+                  borderRadius="xl"
+                  border="1px solid"
+                  borderColor="red.300"
+                  boxShadow="0 4px 15px rgba(220, 38, 38, 0.1)"
+                >
                   <AlertIcon />
-                  {error}
+                  <Text fontWeight="600">{error}</Text>
                 </Alert>
               )}
 
               {/* Registration Form */}
               <form onSubmit={handleSubmit(onSubmit)}>
                 <VStack spacing={6}>
-                  {/* Role Selection */}
+                  {/* Role Selection - Enhanced */}
                   <FormControl isInvalid={!!errors.role}>
-                    <FormLabel>I am a:</FormLabel>
+                    <FormLabel fontWeight="700" color="gray.700" fontSize="md">I am a:</FormLabel>
                     <RadioGroup 
                       value={selectedRole} 
                       onChange={(value) => setValue('role', value as 'client' | 'nurse')}
                     >
-                      <HStack spacing={8}>
-                        <HStack 
-                          spacing={3} 
-                          p={4} 
-                          borderRadius="lg" 
-                          border="2px" 
-                          borderColor={selectedRole === 'client' ? 'primary.500' : 'gray.200'} 
-                          bg={selectedRole === 'client' ? 'primary.50' : 'white'} 
+                      <HStack spacing={4}>
+                        <Box 
+                          flex={1}
+                          p={5} 
+                          borderRadius="xl" 
+                          border="3px solid" 
+                          borderColor={selectedRole === 'client' ? 'brand.500' : 'gray.200'} 
+                          bgGradient={selectedRole === 'client' ? 'linear(135deg, brand.50, brand.25)' : 'linear(135deg, gray.50, white)'} 
                           cursor="pointer" 
-                          flex={1} 
-                          justify="center"
                           onClick={() => setValue('role', 'client')}
+                          transition="all 0.3s ease-in-out"
+                          _hover={{
+                            transform: 'translateY(-2px)',
+                            boxShadow: selectedRole === 'client' 
+                              ? '0 8px 25px rgba(194, 24, 91, 0.15)' 
+                              : '0 4px 15px rgba(0, 0, 0, 0.1)'
+                          }}
                         >
-                          <Radio value="client" colorScheme="primary" />
-                          <VStack spacing={1} align="start">
-                            <HStack>
-                              <Icon as={FaUser} color="primary.500" />
-                              <Text fontWeight="bold" color="gray.800">Patient</Text>
+                          <VStack spacing={3}>
+                            <HStack justify="center" spacing={3}>
+                              <Radio value="client" colorScheme="brand" size="lg" />
+                              <Icon 
+                                as={FaUser} 
+                                color={selectedRole === 'client' ? 'brand.600' : 'gray.500'} 
+                                fontSize="xl"
+                              />
                             </HStack>
-                            <Text fontSize="xs" color="gray.600">Book healthcare services</Text>
+                            <VStack spacing={1}>
+                              <Text fontWeight="800" color="gray.800" fontSize="lg">Patient</Text>
+                              <Text fontSize="sm" color="gray.600" textAlign="center" fontWeight="500">
+                                Book healthcare services
+                              </Text>
+                            </VStack>
                           </VStack>
-                        </HStack>
+                        </Box>
                         
-                        <HStack 
-                          spacing={3} 
-                          p={4} 
-                          borderRadius="lg" 
-                          border="2px" 
-                          borderColor={selectedRole === 'nurse' ? 'secondary.500' : 'gray.200'} 
-                          bg={selectedRole === 'nurse' ? 'secondary.50' : 'white'} 
+                        <Box 
+                          flex={1}
+                          p={5} 
+                          borderRadius="xl" 
+                          border="3px solid" 
+                          borderColor={selectedRole === 'nurse' ? 'purple.500' : 'gray.200'} 
+                          bgGradient={selectedRole === 'nurse' ? 'linear(135deg, purple.50, purple.25)' : 'linear(135deg, gray.50, white)'} 
                           cursor="pointer" 
-                          flex={1} 
-                          justify="center"
                           onClick={() => setValue('role', 'nurse')}
+                          transition="all 0.3s ease-in-out"
+                          _hover={{
+                            transform: 'translateY(-2px)',
+                            boxShadow: selectedRole === 'nurse' 
+                              ? '0 8px 25px rgba(123, 31, 162, 0.15)' 
+                              : '0 4px 15px rgba(0, 0, 0, 0.1)'
+                          }}
                         >
-                          <Radio value="nurse" colorScheme="purple" />
-                          <VStack spacing={1} align="start">
-                            <HStack>
-                              <Icon as={FaUserMd} color="secondary.500" />
-                              <Text fontWeight="bold" color="gray.800">Nurse</Text>
+                          <VStack spacing={3}>
+                            <HStack justify="center" spacing={3}>
+                              <Radio value="nurse" colorScheme="purple" size="lg" />
+                              <Icon 
+                                as={FaUserMd} 
+                                color={selectedRole === 'nurse' ? 'purple.600' : 'gray.500'} 
+                                fontSize="xl"
+                              />
                             </HStack>
-                            <Text fontSize="xs" color="gray.600">Provide healthcare services</Text>
+                            <VStack spacing={1}>
+                              <Text fontWeight="800" color="gray.800" fontSize="lg">Nurse</Text>
+                              <Text fontSize="sm" color="gray.600" textAlign="center" fontWeight="500">
+                                Provide healthcare services
+                              </Text>
+                            </VStack>
                           </VStack>
-                        </HStack>
+                        </Box>
                       </HStack>
                     </RadioGroup>
-                    <FormErrorMessage>{errors.role?.message}</FormErrorMessage>
+                    <FormErrorMessage fontWeight="600">{errors.role?.message}</FormErrorMessage>
                   </FormControl>
 
-                  {/* Name Fields */}
+                  {/* Name Fields - Enhanced */}
                   <HStack spacing={4} w="full">
                     <FormControl isInvalid={!!errors.firstName}>
-                      <FormLabel>First Name</FormLabel>
+                      <FormLabel fontWeight="700" color="gray.700">First Name</FormLabel>
                       <Input
                         {...register('firstName')}
                         placeholder="First name"
                         size="lg"
-                        borderRadius="lg"
+                        borderRadius="xl"
+                        borderWidth="2px"
+                        borderColor="gray.300"
+                        _hover={{
+                          borderColor: "brand.400"
+                        }}
+                        _focus={{
+                          borderColor: "brand.500",
+                          boxShadow: "0 0 0 1px var(--chakra-colors-brand-500)"
+                        }}
+                        fontWeight="500"
                       />
-                      <FormErrorMessage>{errors.firstName?.message}</FormErrorMessage>
+                      <FormErrorMessage fontWeight="600">{errors.firstName?.message}</FormErrorMessage>
                     </FormControl>
 
                     <FormControl isInvalid={!!errors.lastName}>
-                      <FormLabel>Last Name</FormLabel>
+                      <FormLabel fontWeight="700" color="gray.700">Last Name</FormLabel>
                       <Input
                         {...register('lastName')}
                         placeholder="Last name"
                         size="lg"
-                        borderRadius="lg"
+                        borderRadius="xl"
+                        borderWidth="2px"
+                        borderColor="gray.300"
+                        _hover={{
+                          borderColor: "brand.400"
+                        }}
+                        _focus={{
+                          borderColor: "brand.500",
+                          boxShadow: "0 0 0 1px var(--chakra-colors-brand-500)"
+                        }}
+                        fontWeight="500"
                       />
-                      <FormErrorMessage>{errors.lastName?.message}</FormErrorMessage>
+                      <FormErrorMessage fontWeight="600">{errors.lastName?.message}</FormErrorMessage>
                     </FormControl>
                   </HStack>
 
-                  {/* Contact Fields */}
+                  {/* Contact Fields - Enhanced */}
                   <HStack spacing={4} w="full">
                     <FormControl isInvalid={!!errors.email}>
-                      <FormLabel>Email Address</FormLabel>
+                      <FormLabel fontWeight="700" color="gray.700">Email Address</FormLabel>
                       <InputGroup>
                         <InputLeftElement>
-                          <Icon as={FaEnvelope} color="gray.400" />
+                          <Icon as={FaEnvelope} color="brand.500" />
                         </InputLeftElement>
                         <Input
                           {...register('email')}
                           type="email"
                           placeholder="email@example.com"
                           size="lg"
-                          borderRadius="lg"
+                          borderRadius="xl"
+                          borderWidth="2px"
+                          borderColor="gray.300"
+                          _hover={{
+                            borderColor: "brand.400"
+                          }}
+                          _focus={{
+                            borderColor: "brand.500",
+                            boxShadow: "0 0 0 1px var(--chakra-colors-brand-500)"
+                          }}
+                          fontWeight="500"
                         />
                       </InputGroup>
-                      <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
+                      <FormErrorMessage fontWeight="600">{errors.email?.message}</FormErrorMessage>
                     </FormControl>
 
                     <FormControl isInvalid={!!errors.phone}>
-                      <FormLabel>Phone Number</FormLabel>
+                      <FormLabel fontWeight="700" color="gray.700">Phone Number</FormLabel>
                       <InputGroup>
                         <InputLeftElement>
-                          <Icon as={FaPhone} color="gray.400" />
+                          <Icon as={FaPhone} color="brand.500" />
                         </InputLeftElement>
                         <Input
                           {...register('phone')}
                           placeholder="+2348012345678"
                           size="lg"
-                          borderRadius="lg"
+                          borderRadius="xl"
+                          borderWidth="2px"
+                          borderColor="gray.300"
+                          _hover={{
+                            borderColor: "brand.400"
+                          }}
+                          _focus={{
+                            borderColor: "brand.500",
+                            boxShadow: "0 0 0 1px var(--chakra-colors-brand-500)"
+                          }}
+                          fontWeight="500"
                         />
                       </InputGroup>
-                      <FormErrorMessage>{errors.phone?.message}</FormErrorMessage>
+                      <FormErrorMessage fontWeight="600">{errors.phone?.message}</FormErrorMessage>
                     </FormControl>
                   </HStack>
 
-                  {/* Password Fields */}
+                  {/* Password Fields - Enhanced */}
                   <FormControl isInvalid={!!errors.password}>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel fontWeight="700" color="gray.700">Password</FormLabel>
                     <InputGroup>
                       <InputLeftElement>
-                        <Icon as={FaLock} color="gray.400" />
+                        <Icon as={FaLock} color="brand.500" />
                       </InputLeftElement>
                       <Input
                         {...register('password')}
                         type={showPassword ? 'text' : 'password'}
                         placeholder="Create a strong password"
                         size="lg"
-                        borderRadius="lg"
+                        borderRadius="xl"
+                        borderWidth="2px"
+                        borderColor="gray.300"
+                        _hover={{
+                          borderColor: "brand.400"
+                        }}
+                        _focus={{
+                          borderColor: "brand.500",
+                          boxShadow: "0 0 0 1px var(--chakra-colors-brand-500)"
+                        }}
+                        fontWeight="500"
                       />
                       <InputRightElement>
                         <IconButton
@@ -366,39 +519,63 @@ const onSubmit = async (formData: RegisterFormSchema) => {
                           icon={<Icon as={showPassword ? FaEyeSlash : FaEye} />}
                           variant="ghost"
                           size="sm"
+                          color="brand.500"
                           onClick={() => setShowPassword(!showPassword)}
                         />
                       </InputRightElement>
                     </InputGroup>
                     
-                    {/* Password Strength Indicator */}
+                    {/* Password Strength Indicator - Enhanced */}
                     {password && (
-                      <VStack spacing={2} mt={2} align="stretch">
+                      <VStack spacing={2} mt={3} align="stretch">
                         <HStack justify="space-between">
-                          <Text fontSize="xs" color="gray.600">Password strength:</Text>
-                          <Badge colorScheme={getPasswordStrengthColor(passwordStrength)} size="sm">
+                          <Text fontSize="sm" color="gray.600" fontWeight="600">Password strength:</Text>
+                          <Badge 
+                            colorScheme={getPasswordStrengthColor(passwordStrength)} 
+                            size="sm"
+                            borderRadius="full"
+                            px={3}
+                            py={1}
+                            fontWeight="700"
+                          >
                             {passwordStrength < 50 ? 'Weak' : passwordStrength < 75 ? 'Good' : 'Strong'}
                           </Badge>
                         </HStack>
-                        <Progress value={passwordStrength} colorScheme={getPasswordStrengthColor(passwordStrength)} size="sm" borderRadius="full" />
+                        <Progress 
+                          value={passwordStrength} 
+                          colorScheme={getPasswordStrengthColor(passwordStrength)} 
+                          size="md" 
+                          borderRadius="full"
+                          bg="gray.200"
+                        />
                       </VStack>
                     )}
                     
-                    <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
+                    <FormErrorMessage fontWeight="600">{errors.password?.message}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl isInvalid={!!errors.confirmPassword}>
-                    <FormLabel>Confirm Password</FormLabel>
+                    <FormLabel fontWeight="700" color="gray.700">Confirm Password</FormLabel>
                     <InputGroup>
                       <InputLeftElement>
-                        <Icon as={FaLock} color="gray.400" />
+                        <Icon as={FaLock} color="brand.500" />
                       </InputLeftElement>
                       <Input
                         {...register('confirmPassword')}
                         type={showConfirmPassword ? 'text' : 'password'}
                         placeholder="Confirm your password"
                         size="lg"
-                        borderRadius="lg"
+                        borderRadius="xl"
+                        borderWidth="2px"
+                        borderColor="gray.300"
+                        _hover={{
+                          borderColor: "brand.400"
+                        }}
+                        _focus={{
+                          borderColor: "brand.500",
+                          boxShadow: "0 0 0 1px var(--chakra-colors-brand-500)"
+                        }}
+                        fontWeight="500"
                       />
                       <InputRightElement>
                         <IconButton
@@ -406,110 +583,134 @@ const onSubmit = async (formData: RegisterFormSchema) => {
                           icon={<Icon as={showConfirmPassword ? FaEyeSlash : FaEye} />}
                           variant="ghost"
                           size="sm"
+                          color="brand.500"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                         />
                       </InputRightElement>
                     </InputGroup>
-                    <FormErrorMessage>{errors.confirmPassword?.message}</FormErrorMessage>
+                    <FormErrorMessage fontWeight="600">{errors.confirmPassword?.message}</FormErrorMessage>
                   </FormControl>
 
-                  {/* Agreement Checkboxes */}
-                  <VStack spacing={3} align="stretch">
+                  {/* Agreement Checkboxes - Enhanced */}
+                  <VStack spacing={4} align="stretch">
                     <FormControl isInvalid={!!errors.agreeToTerms}>
-                      <Checkbox {...register('agreeToTerms')} colorScheme="primary">
-                        <Text fontSize="sm">
+                      <Checkbox 
+                        {...register('agreeToTerms')} 
+                        colorScheme="brand" 
+                        size="lg"
+                        iconColor="white"
+                      >
+                        <Text fontSize="sm" fontWeight="500">
                           I agree to the{' '}
-                          <Link color="primary.500" textDecoration="underline">
+                          <Link 
+                            color="brand.600" 
+                            textDecoration="underline"
+                            fontWeight="700"
+                            _hover={{ color: "brand.700" }}
+                          >
                             Terms and Conditions
                           </Link>
                         </Text>
                       </Checkbox>
-                      <FormErrorMessage>{errors.agreeToTerms?.message}</FormErrorMessage>
+                      <FormErrorMessage fontWeight="600">{errors.agreeToTerms?.message}</FormErrorMessage>
                     </FormControl>
 
                     <FormControl isInvalid={!!errors.agreeToPrivacy}>
-                      <Checkbox {...register('agreeToPrivacy')} colorScheme="primary">
-                        <Text fontSize="sm">
+                      <Checkbox 
+                        {...register('agreeToPrivacy')} 
+                        colorScheme="brand" 
+                        size="lg"
+                        iconColor="white"
+                      >
+                        <Text fontSize="sm" fontWeight="500">
                           I agree to the{' '}
-                          <Link color="primary.500" textDecoration="underline">
+                          <Link 
+                            color="brand.600" 
+                            textDecoration="underline"
+                            fontWeight="700"
+                            _hover={{ color: "brand.700" }}
+                          >
                             Privacy Policy
-                          </Link>{' '}
-                          and consent to receiving SMS notifications
+                          </Link>
+                          {' '}and consent to receiving SMS notifications
                         </Text>
                       </Checkbox>
-                      <FormErrorMessage>{errors.agreeToPrivacy?.message}</FormErrorMessage>
+                      <FormErrorMessage fontWeight="600">{errors.agreeToPrivacy?.message}</FormErrorMessage>
                     </FormControl>
                   </VStack>
 
-                  {/* Register Button */}
+                  {/* Register Button - Enhanced */}
                   <Button
                     type="submit"
-                    colorScheme="primary"
+                    bgGradient="linear(45deg, brand.500, purple.500)"
+                    color="white"
                     size="lg"
                     w="full"
                     isLoading={isSubmitting}
                     loadingText="Creating account..."
-                    borderRadius="lg"
-                    py={6}
+                    borderRadius="xl"
+                    py={7}
                     fontSize="lg"
-                    fontWeight="bold"
+                    fontWeight="800"
+                    boxShadow="0 8px 25px rgba(194, 24, 91, 0.25)"
+                    _hover={{
+                      bgGradient: "linear(45deg, brand.600, purple.600)",
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 12px 35px rgba(194, 24, 91, 0.35)"
+                    }}
+                    _active={{
+                      transform: "translateY(0)"
+                    }}
+                    transition="all 0.2s ease-in-out"
                   >
                     Create Account
                   </Button>
                 </VStack>
               </form>
 
-              {/* Divider */}
+              {/* Divider - Enhanced */}
               <HStack>
-                <Divider />
-                <Text fontSize="sm" color="gray.500" px={3}>
+                <Divider borderColor="gray.300" />
+                <Text fontSize="sm" color="gray.500" px={4} fontWeight="600">
                   OR
                 </Text>
-                <Divider />
+                <Divider borderColor="gray.300" />
               </HStack>
 
-              {/* Login Link */}
-              <Text fontSize="sm" color="gray.600" textAlign="center">
+              {/* Login Link - Enhanced */}
+              <Text fontSize="md" color="gray.600" textAlign="center" fontWeight="500">
                 Already have an account?{' '}
                 <Link 
                   as={RouterLink} 
                   to="/login" 
-                  color="primary.500" 
-                  fontWeight="bold"
+                  color="brand.600" 
+                  fontWeight="800"
+                  textDecoration="none"
+                  _hover={{ 
+                    color: "brand.700",
+                    textDecoration: "underline"
+                  }}
                 >
                   Sign In
                 </Link>
               </Text>
 
-              {/* Demo Credentials 
+              {/* Security Notice - Enhanced */}
               <Box 
-                bg="blue.50" 
-                p={4} 
-                borderRadius="lg" 
+                bgGradient="linear(135deg, green.50, green.25)" 
+                p={5} 
+                borderRadius="xl" 
                 textAlign="center"
+                border="2px solid"
+                borderColor="green.200"
               >
-                <Text fontSize="xs" fontWeight="bold" color="blue.700" mb={2}>
-                  Demo Test Account
-                </Text>
-                <Text fontSize="xs" color="blue.600">
-                  You can also test with: john.doe@royalhealth.ng / SecurePassword123!
-                </Text>
-              </Box>   */}
-
-              {/* Security Notice */}
-              <Box 
-                bg="gray.50" 
-                p={4} 
-                borderRadius="lg" 
-                textAlign="center"
-              >
-                <HStack justify="center" mb={2}>
-                  <Icon as={FaCheck} color="green.500" fontSize="sm" />
-                  <Text fontSize="xs" fontWeight="bold" color="gray.700">
+                <HStack justify="center" mb={3}>
+                  <Icon as={FaShieldAlt} color="green.600" fontSize="lg" />
+                  <Text fontSize="sm" fontWeight="800" color="green.700">
                     Your data is secure and encrypted
                   </Text>
                 </HStack>
-                <Text fontSize="xs" color="gray.600">
+                <Text fontSize="sm" color="green.600" fontWeight="500">
                   We comply with Nigerian healthcare privacy regulations and never share your personal information.
                 </Text>
               </Box>

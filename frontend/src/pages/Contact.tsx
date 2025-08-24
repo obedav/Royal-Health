@@ -1,4 +1,5 @@
-// src/pages/Contact.tsx - Fixed version with proper error handling
+
+// src/pages/Contact.tsx - Enhanced with vibrant colors and premium styling
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -245,7 +246,7 @@ const Contact: React.FC = () => {
     { value: 'feedback', label: 'Feedback & Complaints' },
   ];
 
-  // Fixed quickServices array
+  // Enhanced quickServices array with brand colors
   const quickServices = [
     {
       icon: FaAmbulance,
@@ -261,7 +262,7 @@ const Contact: React.FC = () => {
       description: 'General inquiries and support',
       phone: contactInfo?.phones[0] || '+234 808 374 7339',
       available: 'Mon-Fri 8AM-6PM',
-      color: 'blue',
+      color: 'brand', // Using our enhanced brand color
     },
     {
       icon: FaQuestionCircle,
@@ -277,7 +278,7 @@ const Contact: React.FC = () => {
       description: 'Partnerships and collaborations',
       phone: contactInfo?.phones[2] || '+234 803 404 7213',
       available: 'Mon-Fri 9AM-5PM',
-      color: 'purple'
+      color: 'purple' // Using our enhanced purple
     },
   ];
 
@@ -412,33 +413,140 @@ const Contact: React.FC = () => {
 
   if (loading) {
     return (
-      <Center h="100vh">
-        <VStack spacing={4}>
-          <Spinner size="xl" color="primary.500" thickness="4px" />
-          <Text>Loading contact information...</Text>
-        </VStack>
-      </Center>
+      <Box
+        minH="100vh"
+        bgGradient="linear(135deg, brand.50 0%, purple.50 100%)"
+        position="relative"
+        overflow="hidden"
+      >
+        {/* Decorative Elements */}
+        <Box
+          position="absolute"
+          top="20px"
+          left="20px"
+          w="100px"
+          h="100px"
+          bg="brand.200"
+          borderRadius="full"
+          opacity={0.1}
+          blur="20px"
+        />
+        <Box
+          position="absolute"
+          bottom="40px"
+          right="40px"
+          w="150px"
+          h="150px"
+          bg="purple.200"
+          borderRadius="full"
+          opacity={0.1}
+          blur="30px"
+        />
+        
+        <Center h="100vh">
+          <VStack spacing={6}>
+            <Spinner
+              size="xl"
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              sx={{
+                background: "linear-gradient(45deg, #C2185B, #7B1FA2)",
+                borderRadius: "50px",
+                '& > circle': {
+                  stroke: 'white'
+                }
+              }}
+            />
+            <Text 
+              fontSize="lg" 
+              fontWeight="600"
+              bgGradient="linear(45deg, brand.500, purple.500)"
+              bgClip="text"
+            >
+              Loading contact information...
+            </Text>
+          </VStack>
+        </Center>
+      </Box>
     );
   }
 
   return (
     <Box bg={bg} minH="100vh">
-      {/* Hero Section */}
-      <Box bg="primary.600" color="white" py={20}>
-        <Container maxW="6xl">
+      {/* Enhanced Hero Section */}
+      <Box 
+        bgGradient="linear(135deg, brand.600 0%, purple.600 100%)"
+        color="white" 
+        py={20}
+        position="relative"
+        overflow="hidden"
+      >
+        {/* Decorative Elements */}
+        <Box
+          position="absolute"
+          top="-50px"
+          left="-50px"
+          w="200px"
+          h="200px"
+          bg="whiteAlpha.100"
+          borderRadius="full"
+          filter="blur(40px)"
+        />
+        <Box
+          position="absolute"
+          bottom="-100px"
+          right="-100px"
+          w="300px"
+          h="300px"
+          bg="whiteAlpha.100"
+          borderRadius="full"
+          filter="blur(60px)"
+        />
+
+        <Container maxW="6xl" position="relative">
           <VStack spacing={6} textAlign="center">
-            <Heading size="2xl" fontWeight="bold">
-              Contact Royal Health Consult
+            <Heading 
+              size="2xl" 
+              fontWeight="900"
+              textShadow="0 4px 12px rgba(0,0,0,0.3)"
+            >
+              Contact{' '}
+              <Text as="span" color="whiteAlpha.900">
+                Royal Health Consult
+              </Text>
             </Heading>
-            <Text fontSize="xl" maxW="3xl" opacity={0.9}>
+            <Text fontSize="xl" maxW="3xl" opacity={0.95} fontWeight="500">
               We're here to help you with all your healthcare needs. 
               Reach out to us anytime for professional medical assistance.
             </Text>
-            <HStack spacing={4}>
-              <Badge bg="white" color="primary.600" px={4} py={2} fontSize="md" borderRadius="full">
+            <HStack spacing={4} flexWrap="wrap" justify="center">
+              <Badge 
+                bg="whiteAlpha.200" 
+                color="white" 
+                px={6} 
+                py={3} 
+                fontSize="md" 
+                borderRadius="full"
+                backdropFilter="blur(10px)"
+                border="1px solid"
+                borderColor="whiteAlpha.200"
+                fontWeight="600"
+              >
                 24/7 Emergency Support
               </Badge>
-              <Badge bg="whiteAlpha.200" color="white" px={4} py={2} fontSize="md" borderRadius="full">
+              <Badge 
+                bg="whiteAlpha.200" 
+                color="white" 
+                px={6} 
+                py={3} 
+                fontSize="md" 
+                borderRadius="full"
+                backdropFilter="blur(10px)"
+                border="1px solid"
+                borderColor="whiteAlpha.200"
+                fontWeight="600"
+              >
                 Quick Response Guaranteed
               </Badge>
             </HStack>
@@ -448,46 +556,110 @@ const Contact: React.FC = () => {
 
       <Container maxW="6xl" py={16}>
         <VStack spacing={16} align="stretch">
-          {/* Emergency Alert */}
-          <Alert status="error" borderRadius="xl" p={6}>
-            <AlertIcon />
+          {/* Enhanced Emergency Alert */}
+          <Alert 
+            status="error" 
+            borderRadius="2xl" 
+            p={6}
+            border="2px solid"
+            borderColor="red.200"
+            bg="red.50"
+            shadow="xl"
+          >
+            <AlertIcon boxSize="24px" />
             <Box>
-              <AlertTitle fontSize="lg">Medical Emergency?</AlertTitle>
-              <AlertDescription>
+              <AlertTitle fontSize="lg" fontWeight="700" color="red.700">
+                Medical Emergency?
+              </AlertTitle>
+              <AlertDescription color="red.600" fontWeight="500">
                 For life-threatening emergencies, go to the nearest hospital immediately. 
-                For urgent but non-life-threatening situations, call our emergency line: <strong>{contactInfo?.phones[0] || '+234 808 374 7339'}</strong>
+                For urgent but non-life-threatening situations, call our emergency line: {' '}
+                <Text as="span" fontWeight="700" color="red.800">
+                  {contactInfo?.phones[0] || '+234 808 374 7339'}
+                </Text>
               </AlertDescription>
             </Box>
           </Alert>
 
-          {/* Quick Contact Services */}
+          {/* Enhanced Quick Contact Services */}
           <Box>
             <VStack spacing={8} textAlign="center" mb={12}>
-              <Heading size="xl" color="gray.800">Quick Contact Options</Heading>
-              <Text fontSize="lg" maxW="3xl" color="gray.600">
+              <Heading 
+                size="xl" 
+                fontWeight="800"
+                bgGradient="linear(45deg, brand.500, purple.500)"
+                bgClip="text"
+              >
+                Quick Contact Options
+              </Heading>
+              <Text fontSize="lg" maxW="3xl" color="gray.600" fontWeight="500">
                 Choose the best way to reach us based on your needs
               </Text>
             </VStack>
 
             <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6}>
               {quickServices.map((service, index) => (
-                <Card key={index} bg={cardBg} shadow="lg" borderRadius="xl" _hover={{ transform: 'translateY(-4px)', shadow: 'xl' }} transition="all 0.3s">
-                  <CardBody p={6} textAlign="center">
-                    <VStack spacing={4}>
-                      <Box bg={`${service.color}.100`} p={4} borderRadius="full">
-                        <Icon as={service.icon} fontSize="2xl" color={`${service.color}.500`} />
+                <Card 
+                  key={index} 
+                  bg={cardBg} 
+                  shadow="xl" 
+                  borderRadius="2xl"
+                  border="2px solid"
+                  borderColor={service.color === 'brand' ? 'brand.100' : `${service.color}.100`}
+                  _hover={{ 
+                    transform: 'translateY(-8px)', 
+                    shadow: `0 20px 40px rgba(${service.color === 'brand' ? '194, 24, 91' : service.color === 'purple' ? '123, 31, 162' : '0, 0, 0'}, 0.15)`,
+                    borderColor: service.color === 'brand' ? 'brand.200' : `${service.color}.200`
+                  }} 
+                  transition="all 0.3s ease-in-out"
+                >
+                  <CardBody p={8} textAlign="center">
+                    <VStack spacing={5}>
+                      <Box 
+                        bg={service.color === 'brand' ? 'brand.100' : `${service.color}.100`}
+                        p={5} 
+                        borderRadius="2xl"
+                        position="relative"
+                        _before={{
+                          content: '""',
+                          position: 'absolute',
+                          inset: '-2px',
+                          borderRadius: '2xl',
+                          background: service.color === 'brand' 
+                            ? 'linear-gradient(45deg, #C2185B, #7B1FA2)'
+                            : `linear-gradient(45deg, ${service.color}.400, ${service.color}.600)`,
+                          zIndex: -1,
+                          opacity: 0.1
+                        }}
+                      >
+                        <Icon 
+                          as={service.icon} 
+                          fontSize="3xl" 
+                          color={service.color === 'brand' ? 'brand.600' : `${service.color}.600`} 
+                        />
                       </Box>
-                      <VStack spacing={2}>
-                        <Heading size="md" color={`${service.color}.600`}>
+                      <VStack spacing={3}>
+                        <Heading 
+                          size="md" 
+                          color={service.color === 'brand' ? 'brand.600' : `${service.color}.600`}
+                          fontWeight="700"
+                        >
                           {service.title}
                         </Heading>
-                        <Text fontSize="sm" color="gray.600" textAlign="center">
+                        <Text fontSize="sm" color="gray.600" textAlign="center" fontWeight="500">
                           {service.description}
                         </Text>
                         <Text fontWeight="bold" color="gray.800" fontSize="sm">
                           {service.phone}
                         </Text>
-                        <Badge colorScheme={service.color} size="sm">
+                        <Badge 
+                          colorScheme={service.color === 'brand' ? 'pink' : service.color} 
+                          size="sm"
+                          px={3}
+                          py={1}
+                          borderRadius="full"
+                          fontWeight="600"
+                        >
                           {service.available}
                         </Badge>
                       </VStack>
@@ -498,113 +670,212 @@ const Contact: React.FC = () => {
             </SimpleGrid>
           </Box>
 
-          {/* Main Content */}
+          {/* Enhanced Main Content */}
           <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={16}>
-            {/* Contact Form */}
-            <Card bg={cardBg} shadow="xl" borderRadius="2xl">
-              <CardHeader>
+            {/* Enhanced Contact Form */}
+            <Card 
+              bg={cardBg} 
+              shadow="2xl" 
+              borderRadius="3xl"
+              border="3px solid"
+              borderColor="brand.100"
+              position="relative"
+              _before={{
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '6px',
+                borderTopRadius: '3xl',
+                bgGradient: 'linear(90deg, brand.500, purple.500)'
+              }}
+            >
+              <CardHeader pb={2}>
                 <VStack spacing={3} align="start">
-                  <Heading size="lg" color="primary.600">Send Us a Message</Heading>
-                  <Text color="gray.600">
+                  <Heading 
+                    size="lg" 
+                    fontWeight="800"
+                    bgGradient="linear(45deg, brand.600, purple.600)"
+                    bgClip="text"
+                  >
+                    Send Us a Message
+                  </Heading>
+                  <Text color="gray.600" fontWeight="500">
                     Fill out the form below and we'll get back to you as soon as possible.
                   </Text>
                 </VStack>
               </CardHeader>
-              <CardBody>
+              <CardBody pt={2}>
                 <form onSubmit={handleSubmit}>
                   <VStack spacing={6}>
                     <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
                       <FormControl isRequired isInvalid={!!errors.firstName}>
-                        <FormLabel>First Name</FormLabel>
+                        <FormLabel fontWeight="600" color="gray.700">First Name</FormLabel>
                         <Input
                           value={formData.firstName}
                           onChange={(e) => handleInputChange('firstName', e.target.value)}
                           placeholder="Enter your first name"
+                          borderWidth="2px"
+                          borderColor="gray.200"
+                          _focus={{
+                            borderColor: 'brand.400',
+                            boxShadow: '0 0 0 1px #C2185B'
+                          }}
+                          _hover={{ borderColor: 'brand.300' }}
+                          borderRadius="xl"
+                          fontSize="md"
+                          fontWeight="500"
                         />
-                        <FormErrorMessage>{errors.firstName}</FormErrorMessage>
+                        <FormErrorMessage fontWeight="600">{errors.firstName}</FormErrorMessage>
                       </FormControl>
 
                       <FormControl isRequired isInvalid={!!errors.lastName}>
-                        <FormLabel>Last Name</FormLabel>
+                        <FormLabel fontWeight="600" color="gray.700">Last Name</FormLabel>
                         <Input
                           value={formData.lastName}
                           onChange={(e) => handleInputChange('lastName', e.target.value)}
                           placeholder="Enter your last name"
+                          borderWidth="2px"
+                          borderColor="gray.200"
+                          _focus={{
+                            borderColor: 'brand.400',
+                            boxShadow: '0 0 0 1px #C2185B'
+                          }}
+                          _hover={{ borderColor: 'brand.300' }}
+                          borderRadius="xl"
+                          fontSize="md"
+                          fontWeight="500"
                         />
-                        <FormErrorMessage>{errors.lastName}</FormErrorMessage>
+                        <FormErrorMessage fontWeight="600">{errors.lastName}</FormErrorMessage>
                       </FormControl>
                     </SimpleGrid>
-
-                    <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
-                      <FormControl isRequired isInvalid={!!errors.email}>
-                        <FormLabel>Email Address</FormLabel>
-                        <Input
-                          type="email"
-                          value={formData.email}
-                          onChange={(e) => handleInputChange('email', e.target.value)}
-                          placeholder="your.email@example.com"
-                        />
-                        <FormErrorMessage>{errors.email}</FormErrorMessage>
-                      </FormControl>
-
-                      <FormControl isRequired isInvalid={!!errors.phone}>
-                        <FormLabel>Phone Number</FormLabel>
-                        <Input
-                          type="tel"
-                          value={formData.phone}
-                          onChange={(e) => handleInputChange('phone', e.target.value)}
-                          placeholder="+234 801 234 5678"
-                        />
-                        <FormErrorMessage>{errors.phone}</FormErrorMessage>
-                      </FormControl>
-                    </SimpleGrid>
-
+                    <FormControl isRequired isInvalid={!!errors.email}>
+                      <FormLabel fontWeight="600" color="gray.700">Email</FormLabel>
+                      <Input
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        placeholder="Enter your email address"
+                        borderWidth="2px"
+                        borderColor="gray.200"
+                        _focus={{
+                          borderColor: 'brand.400',
+                          boxShadow: '0 0 0 1px #C2185B'
+                        }}
+                        _hover={{ borderColor: 'brand.300' }}
+                        borderRadius="xl"
+                        fontSize="md"
+                        fontWeight="500"
+                        type="email"
+                      />
+                      <FormErrorMessage fontWeight="600">{errors.email}</FormErrorMessage>
+                    </FormControl>
+                    <FormControl isRequired isInvalid={!!errors.phone}>
+                      <FormLabel fontWeight="600" color="gray.700">Phone</FormLabel>
+                      <Input
+                        value={formData.phone}
+                        onChange={(e) => handleInputChange('phone', e.target.value)}
+                        placeholder="Enter your phone number"
+                        borderWidth="2px"
+                        borderColor="gray.200"
+                        _focus={{
+                          borderColor: 'brand.400',
+                          boxShadow: '0 0 0 1px #C2185B'
+                        }}
+                        _hover={{ borderColor: 'brand.300' }}
+                        borderRadius="xl"
+                        fontSize="md"
+                        fontWeight="500"
+                        type="tel"
+                      />
+                      <FormErrorMessage fontWeight="600">{errors.phone}</FormErrorMessage>
+                    </FormControl>
+                    <FormControl isRequired isInvalid={!!errors.subject}>
+                      <FormLabel fontWeight="600" color="gray.700">Subject</FormLabel>
+                      <Input
+                        value={formData.subject}
+                        onChange={(e) => handleInputChange('subject', e.target.value)}
+                        placeholder="Subject of your inquiry"
+                        borderWidth="2px"
+                        borderColor="gray.200"
+                        _focus={{
+                          borderColor: 'brand.400',
+                          boxShadow: '0 0 0 1px #C2185B'
+                        }}
+                        _hover={{ borderColor: 'brand.300' }}
+                        borderRadius="xl"
+                        fontSize="md"
+                        fontWeight="500"
+                      />
+                      <FormErrorMessage fontWeight="600">{errors.subject}</FormErrorMessage>
+                    </FormControl>
                     <FormControl isRequired isInvalid={!!errors.inquiryType}>
-                      <FormLabel>Inquiry Type</FormLabel>
+                      <FormLabel fontWeight="600" color="gray.700">Inquiry Type</FormLabel>
                       <Select
                         value={formData.inquiryType}
                         onChange={(e) => handleInputChange('inquiryType', e.target.value)}
                         placeholder="Select inquiry type"
+                        borderWidth="2px"
+                        borderColor="gray.200"
+                        _focus={{
+                          borderColor: 'brand.400',
+                          boxShadow: '0 0 0 1px #C2185B'
+                        }}
+                        _hover={{ borderColor: 'brand.300' }}
+                        borderRadius="xl"
+                        fontSize="md"
+                        fontWeight="500"
                       >
-                        {inquiryTypes.map((type) => (
-                          <option key={type.value} value={type.value}>
-                            {type.label}
-                          </option>
+                        {inquiryTypes.map(type => (
+                          <option key={type.value} value={type.value}>{type.label}</option>
                         ))}
                       </Select>
-                      <FormErrorMessage>{errors.inquiryType}</FormErrorMessage>
+                      <FormErrorMessage fontWeight="600">{errors.inquiryType}</FormErrorMessage>
                     </FormControl>
-
-                    <FormControl isRequired isInvalid={!!errors.subject}>
-                      <FormLabel>Subject</FormLabel>
-                      <Input
-                        value={formData.subject}
-                        onChange={(e) => handleInputChange('subject', e.target.value)}
-                        placeholder="Brief description of your inquiry"
-                      />
-                      <FormErrorMessage>{errors.subject}</FormErrorMessage>
-                    </FormControl>
-
                     <FormControl isRequired isInvalid={!!errors.message}>
-                      <FormLabel>Message</FormLabel>
+                      <FormLabel fontWeight="600" color="gray.700">Message</FormLabel>
                       <Textarea
                         value={formData.message}
                         onChange={(e) => handleInputChange('message', e.target.value)}
                         placeholder="Please provide details about your inquiry..."
                         rows={6}
                         resize="vertical"
+                        borderWidth="2px"
+                        borderColor="gray.200"
+                        _focus={{
+                          borderColor: 'brand.400',
+                          boxShadow: '0 0 0 1px #C2185B'
+                        }}
+                        _hover={{ borderColor: 'brand.300' }}
+                        borderRadius="xl"
+                        fontSize="md"
+                        fontWeight="500"
                       />
-                      <FormErrorMessage>{errors.message}</FormErrorMessage>
+                      <FormErrorMessage fontWeight="600">{errors.message}</FormErrorMessage>
                     </FormControl>
 
                     <Button
                       type="submit"
-                      colorScheme="primary"
                       size="lg"
                       leftIcon={<FaPaperPlane />}
                       isLoading={isSubmitting}
                       loadingText="Sending..."
                       w="full"
+                      bgGradient="linear(45deg, brand.500, purple.500)"
+                      color="white"
+                      fontWeight="700"
+                      fontSize="md"
+                      borderRadius="xl"
+                      py={6}
+                      _hover={{
+                        bgGradient: "linear(45deg, brand.600, purple.600)",
+                        transform: "translateY(-2px)",
+                        shadow: "0 10px 25px rgba(194, 24, 91, 0.3)"
+                      }}
+                      _active={{
+                        transform: "translateY(0)"
+                      }}
+                      transition="all 0.2s ease-in-out"
                     >
                       Send Message
                     </Button>
@@ -613,84 +884,203 @@ const Contact: React.FC = () => {
               </CardBody>
             </Card>
 
-            {/* Contact Information */}
+            {/* Enhanced Contact Information */}
             <VStack spacing={8} align="stretch">
-              {/* Contact Details */}
-              <Card bg={cardBg} shadow="xl" borderRadius="2xl">
-                <CardHeader>
-                  <Heading size="lg" color="primary.600">Get in Touch</Heading>
+              {/* Enhanced Contact Details */}
+              <Card 
+                bg={cardBg} 
+                shadow="2xl" 
+                borderRadius="3xl"
+                border="3px solid"
+                borderColor="purple.100"
+                position="relative"
+                _before={{
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '6px',
+                  borderTopRadius: '3xl',
+                  bgGradient: 'linear(90deg, purple.500, brand.500)'
+                }}
+              >
+                <CardHeader pb={2}>
+                  <Heading 
+                    size="lg" 
+                    fontWeight="800"
+                    bgGradient="linear(45deg, purple.600, brand.600)"
+                    bgClip="text"
+                  >
+                    Get in Touch
+                  </Heading>
                 </CardHeader>
-                <CardBody>
+                <CardBody pt={2}>
                   <VStack spacing={6} align="stretch">
                     {/* Phone */}
                     <Box>
                       <HStack spacing={4} align="start">
-                        <Box bg="blue.100" p={3} borderRadius="lg">
-                          <Icon as={FaPhone} fontSize="xl" color="blue.500" />
+                        <Box 
+                          bgGradient="linear(45deg, blue.100, blue.200)"
+                          p={4} 
+                          borderRadius="2xl"
+                          position="relative"
+                          _before={{
+                            content: '""',
+                            position: 'absolute',
+                            inset: '-1px',
+                            borderRadius: '2xl',
+                            background: 'linear-gradient(45deg, blue.300, blue.500)',
+                            zIndex: -1,
+                            opacity: 0.2
+                          }}
+                        >
+                          <Icon as={FaPhone} fontSize="xl" color="blue.600" />
                         </Box>
                         <VStack spacing={2} align="start" flex={1}>
-                          <Text fontWeight="bold" color="gray.800">Phone</Text>
+                          <Text fontWeight="700" color="gray.800" fontSize="lg">Phone</Text>
                           {contactInfo?.phones.map((phone, idx) => (
-                            <Link key={idx} href={`tel:${phone}`} color="blue.600" fontSize="sm">
+                            <Link 
+                              key={idx} 
+                              href={`tel:${phone}`} 
+                              color="blue.600" 
+                              fontSize="sm"
+                              fontWeight="600"
+                              _hover={{ color: 'blue.700', textDecoration: 'none' }}
+                            >
                               {phone}
                             </Link>
                           ))}
-                          <Text fontSize="xs" color="gray.500">Call us for immediate assistance</Text>
+                          <Text fontSize="xs" color="gray.500" fontWeight="500">
+                            Call us for immediate assistance
+                          </Text>
                         </VStack>
                       </HStack>
-                      <Divider mt={4} />
+                      <Divider mt={4} borderColor="gray.200" />
                     </Box>
 
                     {/* Email */}
                     <Box>
                       <HStack spacing={4} align="start">
-                        <Box bg="purple.100" p={3} borderRadius="lg">
-                          <Icon as={FaEnvelope} fontSize="xl" color="purple.500" />
+                        <Box 
+                          bgGradient="linear(45deg, purple.100, purple.200)"
+                          p={4} 
+                          borderRadius="2xl"
+                          position="relative"
+                          _before={{
+                            content: '""',
+                            position: 'absolute',
+                            inset: '-1px',
+                            borderRadius: '2xl',
+                            background: 'linear-gradient(45deg, purple.300, purple.500)',
+                            zIndex: -1,
+                            opacity: 0.2
+                          }}
+                        >
+                          <Icon as={FaEnvelope} fontSize="xl" color="purple.600" />
                         </Box>
                         <VStack spacing={2} align="start" flex={1}>
-                          <Text fontWeight="bold" color="gray.800">Email</Text>
+                          <Text fontWeight="700" color="gray.800" fontSize="lg">Email</Text>
                           {contactInfo?.emails.map((email, idx) => (
-                            <Link key={idx} href={`mailto:${email}`} color="purple.600" fontSize="sm">
+                            <Link 
+                              key={idx} 
+                              href={`mailto:${email}`} 
+                              color="purple.600" 
+                              fontSize="sm"
+                              fontWeight="600"
+                              _hover={{ color: 'purple.700', textDecoration: 'none' }}
+                            >
                               {email}
                             </Link>
                           ))}
-                          <Text fontSize="xs" color="gray.500">Send us an email anytime</Text>
+                          <Text fontSize="xs" color="gray.500" fontWeight="500">
+                            Send us an email anytime
+                          </Text>
                         </VStack>
                       </HStack>
-                      <Divider mt={4} />
+                      <Divider mt={4} borderColor="gray.200" />
                     </Box>
 
                     {/* Address */}
                     <Box>
                       <HStack spacing={4} align="start">
-                        <Box bg="red.100" p={3} borderRadius="lg">
-                          <Icon as={FaMapMarkerAlt} fontSize="xl" color="red.500" />
+                        <Box 
+                          bgGradient="linear(45deg, red.100, red.200)"
+                          p={4} 
+                          borderRadius="2xl"
+                          position="relative"
+                          _before={{
+                            content: '""',
+                            position: 'absolute',
+                            inset: '-1px',
+                            borderRadius: '2xl',
+                            background: 'linear-gradient(45deg, red.300, red.500)',
+                            zIndex: -1,
+                            opacity: 0.2
+                          }}
+                        >
+                          <Icon as={FaMapMarkerAlt} fontSize="xl" color="red.600" />
                         </Box>
                         <VStack spacing={2} align="start" flex={1}>
-                          <Text fontWeight="bold" color="gray.800">Address</Text>
-                          <Text color="gray.600" fontSize="sm">{contactInfo?.address.street}</Text>
-                          <Text color="gray.600" fontSize="sm">
+                          <Text fontWeight="700" color="gray.800" fontSize="lg">Address</Text>
+                          <Text color="gray.600" fontSize="sm" fontWeight="500">
+                            {contactInfo?.address.street}
+                          </Text>
+                          <Text color="gray.600" fontSize="sm" fontWeight="500">
                             {contactInfo?.address.city}, {contactInfo?.address.state}
                           </Text>
-                          <Text color="gray.600" fontSize="sm">{contactInfo?.address.country}</Text>
-                          <Text fontSize="xs" color="gray.500">Visit our main office</Text>
+                          <Text color="gray.600" fontSize="sm" fontWeight="500">
+                            {contactInfo?.address.country}
+                          </Text>
+                          <Text fontSize="xs" color="gray.500" fontWeight="500">
+                            Visit our main office
+                          </Text>
                         </VStack>
                       </HStack>
-                      <Divider mt={4} />
+                      <Divider mt={4} borderColor="gray.200" />
                     </Box>
 
                     {/* Business Hours */}
                     <Box>
                       <HStack spacing={4} align="start">
-                        <Box bg="green.100" p={3} borderRadius="lg">
-                          <Icon as={FaClock} fontSize="xl" color="green.500" />
+                        <Box 
+                          bgGradient="linear(45deg, green.100, green.200)"
+                          p={4} 
+                          borderRadius="2xl"
+                          position="relative"
+                          _before={{
+                            content: '""',
+                            position: 'absolute',
+                            inset: '-1px',
+                            borderRadius: '2xl',
+                            background: 'linear-gradient(45deg, green.300, green.500)',
+                            zIndex: -1,
+                            opacity: 0.2
+                          }}
+                        >
+                          <Icon as={FaClock} fontSize="xl" color="green.600" />
                         </Box>
                         <VStack spacing={2} align="start" flex={1}>
-                          <Text fontWeight="bold" color="gray.800">Business Hours</Text>
-                          <Text color="gray.600" fontSize="sm">{contactInfo?.businessHours.weekdays}</Text>
-                          <Text color="gray.600" fontSize="sm">{contactInfo?.businessHours.saturday}</Text>
-                          <Text color="gray.600" fontSize="sm">{contactInfo?.businessHours.sunday}</Text>
-                          <Badge colorScheme="red" size="sm">{contactInfo?.businessHours.emergency}</Badge>
+                          <Text fontWeight="700" color="gray.800" fontSize="lg">Business Hours</Text>
+                          <Text color="gray.600" fontSize="sm" fontWeight="500">
+                            {contactInfo?.businessHours.weekdays}
+                          </Text>
+                          <Text color="gray.600" fontSize="sm" fontWeight="500">
+                            {contactInfo?.businessHours.saturday}
+                          </Text>
+                          <Text color="gray.600" fontSize="sm" fontWeight="500">
+                            {contactInfo?.businessHours.sunday}
+                          </Text>
+                          <Badge 
+                            colorScheme="red" 
+                            size="sm" 
+                            px={3} 
+                            py={1} 
+                            borderRadius="full" 
+                            fontWeight="600"
+                          >
+                            {contactInfo?.businessHours.emergency}
+                          </Badge>
                         </VStack>
                       </HStack>
                     </Box>
@@ -698,15 +1088,39 @@ const Contact: React.FC = () => {
                 </CardBody>
               </Card>
 
-              {/* Social Media */}
+              {/* Enhanced Social Media */}
               {socialLinks.length > 0 && (
-                <Card bg={cardBg} shadow="xl" borderRadius="2xl">
-                  <CardHeader>
-                    <Heading size="lg" color="primary.600">Follow Us</Heading>
+                <Card 
+                  bg={cardBg} 
+                  shadow="2xl" 
+                  borderRadius="3xl"
+                  border="3px solid"
+                  borderColor="brand.100"
+                  position="relative"
+                  _before={{
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '6px',
+                    borderTopRadius: '3xl',
+                    bgGradient: 'linear(90deg, brand.500, purple.500)'
+                  }}
+                >
+                  <CardHeader pb={2}>
+                    <Heading 
+                      size="lg" 
+                      fontWeight="800"
+                      bgGradient="linear(45deg, brand.600, purple.600)"
+                      bgClip="text"
+                    >
+                      Follow Us
+                    </Heading>
                   </CardHeader>
-                  <CardBody>
+                  <CardBody pt={2}>
                     <VStack spacing={4}>
-                      <Text color="gray.600" textAlign="center">
+                      <Text color="gray.600" textAlign="center" fontWeight="500">
                         Stay connected with us on social media for health tips, updates, and news.
                       </Text>
                       <HStack spacing={4} justify="center" flexWrap="wrap">
@@ -718,7 +1132,13 @@ const Contact: React.FC = () => {
                               variant="outline"
                               borderRadius="full"
                               p={4}
-                              _hover={{ bg: `${social.color}.50` }}
+                              borderWidth="2px"
+                              _hover={{ 
+                                bg: `${social.color}.50`,
+                                transform: 'translateY(-2px)',
+                                shadow: `0 8px 20px rgba(0,0,0,0.15)`
+                              }}
+                              transition="all 0.2s ease-in-out"
                             >
                               <Icon as={social.icon} fontSize="xl" />
                             </Button>
@@ -732,28 +1152,63 @@ const Contact: React.FC = () => {
             </VStack>
           </SimpleGrid>
 
-          {/* FAQs */}
+          {/* Enhanced FAQs */}
           {faqs.length > 0 && (
             <Box>
               <VStack spacing={8} textAlign="center" mb={12}>
-                <Heading size="xl" color="gray.800">Frequently Asked Questions</Heading>
-                <Text fontSize="lg" maxW="3xl" color="gray.600">
+                <Heading 
+                  size="xl" 
+                  fontWeight="800"
+                  bgGradient="linear(45deg, brand.500, purple.500)"
+                  bgClip="text"
+                >
+                  Frequently Asked Questions
+                </Heading>
+                <Text fontSize="lg" maxW="3xl" color="gray.600" fontWeight="500">
                   Answers to common questions about our services
                 </Text>
               </VStack>
 
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={8}>
                 {faqs.slice(0, 6).map((faq) => (
-                  <Card key={faq.id} bg={cardBg} shadow="lg" borderRadius="xl">
+                  <Card 
+                    key={faq.id} 
+                    bg={cardBg} 
+                    shadow="xl" 
+                    borderRadius="2xl"
+                    border="2px solid"
+                    borderColor="gray.100"
+                    _hover={{
+                      transform: 'translateY(-4px)',
+                      shadow: '0 15px 35px rgba(0,0,0,0.1)',
+                      borderColor: 'brand.200'
+                    }}
+                    transition="all 0.3s ease-in-out"
+                  >
                     <CardBody p={6}>
                       <VStack spacing={4} align="start">
-                        <Heading size="sm" color="primary.600">
+                        <Heading 
+                          size="sm" 
+                          fontWeight="700"
+                          bgGradient="linear(45deg, brand.600, purple.600)"
+                          bgClip="text"
+                        >
                           {faq.question}
                         </Heading>
-                        <Text color="gray.600" fontSize="sm" lineHeight="tall">
+                        <Text color="gray.600" fontSize="sm" lineHeight="tall" fontWeight="500">
                           {faq.answer}
                         </Text>
-                        <Badge colorScheme="blue" size="sm">{faq.category}</Badge>
+                        <Badge 
+                          bgGradient="linear(45deg, blue.100, blue.200)"
+                          color="blue.700"
+                          size="sm"
+                          px={3}
+                          py={1}
+                          borderRadius="full"
+                          fontWeight="600"
+                        >
+                          {faq.category}
+                        </Badge>
                       </VStack>
                     </CardBody>
                   </Card>
@@ -762,24 +1217,65 @@ const Contact: React.FC = () => {
             </Box>
           )}
 
-          {/* Final CTA */}
-          <Box bg="primary.600" color="white" borderRadius="3xl" p={12} textAlign="center">
-            <VStack spacing={8}>
+          {/* Enhanced Final CTA */}
+          <Box 
+            bgGradient="linear(135deg, brand.600 0%, purple.600 100%)"
+            color="white" 
+            borderRadius="3xl" 
+            p={12} 
+            textAlign="center"
+            position="relative"
+            overflow="hidden"
+          >
+            {/* Decorative Elements */}
+            <Box
+              position="absolute"
+              top="-20px"
+              left="-20px"
+              w="150px"
+              h="150px"
+              bg="whiteAlpha.100"
+              borderRadius="full"
+              filter="blur(30px)"
+            />
+            <Box
+              position="absolute"
+              bottom="-20px"
+              right="-20px"
+              w="200px"
+              h="200px"
+              bg="whiteAlpha.100"
+              borderRadius="full"
+              filter="blur(40px)"
+            />
+
+            <VStack spacing={8} position="relative">
               <VStack spacing={4}>
-                <Heading size="xl">Still Have Questions?</Heading>
-                <Text fontSize="lg" maxW="3xl" opacity={0.9}>
+                <Heading size="xl" fontWeight="900" textShadow="0 4px 12px rgba(0,0,0,0.3)">
+                  Still Have Questions?
+                </Heading>
+                <Text fontSize="lg" maxW="3xl" opacity={0.95} fontWeight="500">
                   Our friendly customer service team is here to help you with any questions 
                   or concerns you may have about our services.
                 </Text>
               </VStack>
-              <HStack spacing={6}>
+              <HStack spacing={6} flexWrap="wrap" justify="center">
                 <Button
                   size="lg"
                   bg="white"
-                  color="primary.600"
-                  _hover={{ bg: 'gray.100' }}
+                  color="brand.600"
+                  fontWeight="700"
+                  _hover={{ 
+                    bg: 'whiteAlpha.900',
+                    transform: 'translateY(-2px)',
+                    shadow: '0 10px 25px rgba(0,0,0,0.2)'
+                  }}
                   leftIcon={<FaPhone />}
                   onClick={() => window.open(`tel:${contactInfo?.phones[0] || '+2349012345678'}`)}
+                  borderRadius="xl"
+                  px={8}
+                  py={6}
+                  transition="all 0.2s ease-in-out"
                 >
                   Call Now
                 </Button>
@@ -788,13 +1284,36 @@ const Contact: React.FC = () => {
                     size="lg"
                     bg="green.500"
                     color="white"
-                    _hover={{ bg: 'green.600' }}
+                    fontWeight="700"
+                    _hover={{ 
+                      bg: 'green.600',
+                      transform: 'translateY(-2px)',
+                      shadow: '0 10px 25px rgba(34, 197, 94, 0.3)'
+                    }}
                     leftIcon={<FaWhatsapp />}
                     onClick={() => window.open(contactInfo.socialMedia.whatsapp, '_blank')}
+                    borderRadius="xl"
+                    px={8}
+                    py={6}
+                    transition="all 0.2s ease-in-out"
                   >
                     WhatsApp
                   </Button>
                 )}
+                <Badge 
+                  bg="whiteAlpha.200" 
+                  color="white" 
+                  px={4} 
+                  py={2} 
+                  fontSize="sm" 
+                  borderRadius="full"
+                  backdropFilter="blur(10px)"
+                  border="1px solid"
+                  borderColor="whiteAlpha.200"
+                  fontWeight="600"
+                >
+                  🛡️ Trusted Healthcare
+                </Badge>
               </HStack>
             </VStack>
           </Box>
