@@ -206,40 +206,145 @@ const BookingForm: React.FC<BookingFormProps> = ({ service, onSubmit, onBack }) 
     <Container maxW="4xl" py={8}>
       <VStack spacing={8} align="stretch">
         {/* Header */}
-        <VStack spacing={4} textAlign="center">
-          <Heading size="lg" color="gray.800">
-            Book Your {service.name}
-          </Heading>
-          <Text color="gray.600">
-            Schedule your professional healthcare assessment at home
-          </Text>
-        </VStack>
+        <Box
+          position="relative"
+          bg="rgba(255, 255, 255, 0.9)"
+          backdropFilter="blur(20px)"
+          borderRadius="3xl"
+          p={8}
+          border="1px solid"
+          borderColor="rgba(194, 24, 91, 0.2)"
+          boxShadow="0 8px 32px rgba(194, 24, 91, 0.15)"
+          _before={{
+            content: '""',
+            position: "absolute",
+            inset: 0,
+            borderRadius: "3xl",
+            padding: "1px",
+            background: "linear-gradient(135deg, rgba(194, 24, 91, 0.3), rgba(123, 31, 162, 0.3))",
+            mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+            maskComposite: "xor",
+            WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+            WebkitMaskComposite: "xor",
+          }}
+        >
+          <VStack spacing={6} textAlign="center">
+            <VStack spacing={3}>
+              <Heading 
+                size="xl" 
+                bgGradient="linear(45deg, brand.600, purple.600)"
+                bgClip="text"
+                sx={{
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  filter: "drop-shadow(0 2px 4px rgba(194, 24, 91, 0.2))",
+                }}
+                fontWeight="800"
+              >
+                Book Your {service.name}
+              </Heading>
+              <Text 
+                color="gray.700"
+                fontSize="lg"
+                fontWeight="500"
+                maxW="600px"
+                lineHeight="1.6"
+              >
+                Schedule your professional healthcare assessment at home with our qualified healthcare professionals
+              </Text>
+            </VStack>
+          </VStack>
+        </Box>
 
         {/* Assessment Service Summary */}
-        <Card>
-          <CardBody>
+        <Card 
+          bg="rgba(255, 255, 255, 0.85)"
+          backdropFilter="blur(15px)"
+          borderColor="rgba(194, 24, 91, 0.2)"
+          borderWidth="2px"
+          borderRadius="2xl"
+          boxShadow="0 4px 20px rgba(194, 24, 91, 0.08)"
+        >
+          <CardBody p={8}>
             <HStack justify="space-between" align="start">
-              <VStack align="start" spacing={2}>
-                <HStack spacing={2}>
-                  <Icon as={FaStethoscope} color="primary.500" />
-                  <Heading size="md" color="primary.500">
+              <HStack spacing={6} align="start">
+                <Box
+                  w="60px"
+                  h="60px"
+                  bgGradient="linear(45deg, brand.500, purple.500)"
+                  borderRadius="xl"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  boxShadow="0 4px 15px rgba(194, 24, 91, 0.3)"
+                >
+                  <Icon as={FaStethoscope} color="white" fontSize="2xl" />
+                </Box>
+                <VStack align="start" spacing={3}>
+                  <Heading 
+                    size="md" 
+                    bgGradient="linear(45deg, brand.600, purple.600)"
+                    bgClip="text"
+                    sx={{
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                    }}
+                    fontWeight="700"
+                  >
                     {service.name}
                   </Heading>
-                </HStack>
-                <Text color="gray.600" fontSize="sm">
-                  {service.description}
-                </Text>
-                <HStack spacing={4}>
-                  <Badge colorScheme="blue">{service.duration} minutes</Badge>
-                  <Badge colorScheme="green" fontSize="lg" px={3} py={1}>
-                    {formatPrice(ASSESSMENT_PRICE)}
-                  </Badge>
-                  {service.category === 'emergency' && (
-                    <Badge colorScheme="red">24/7 Available</Badge>
-                  )}
-                </HStack>
-              </VStack>
-              <Button size="sm" variant="ghost" onClick={onBack}>
+                  <Text color="gray.600" fontSize="sm" lineHeight="1.5">
+                    {service.description}
+                  </Text>
+                  <HStack spacing={4} flexWrap="wrap">
+                    <Badge 
+                      bgGradient="linear(45deg, brand.500, purple.500)"
+                      color="white"
+                      fontSize="sm"
+                      px={3}
+                      py={1}
+                      borderRadius="full"
+                    >
+                      {service.duration} minutes
+                    </Badge>
+                    <Badge 
+                      bg="green.500"
+                      color="white"
+                      fontSize="lg" 
+                      px={4} 
+                      py={1}
+                      borderRadius="full"
+                      fontWeight="600"
+                    >
+                      {formatPrice(ASSESSMENT_PRICE)}
+                    </Badge>
+                    {service.category === 'emergency' && (
+                      <Badge 
+                        bg="red.500"
+                        color="white"
+                        borderRadius="full"
+                        px={3}
+                        py={1}
+                      >
+                        24/7 Available
+                      </Badge>
+                    )}
+                  </HStack>
+                </VStack>
+              </HStack>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                onClick={onBack}
+                borderColor="rgba(194, 24, 91, 0.3)"
+                color="brand.600"
+                _hover={{
+                  borderColor: "brand.400",
+                  bg: "rgba(194, 24, 91, 0.05)"
+                }}
+              >
                 Change Assessment
               </Button>
             </HStack>
@@ -262,12 +367,44 @@ const BookingForm: React.FC<BookingFormProps> = ({ service, onSubmit, onBack }) 
         <form onSubmit={handleSubmit(onFormSubmit)}>
           <VStack spacing={8}>
             {/* Patient Information */}
-            <Card w="full">
-              <CardBody>
-                <VStack spacing={6} align="stretch">
-                  <Heading size="md" color="gray.800">
-                    Patient Information
-                  </Heading>
+            <Card 
+              w="full"
+              bg="rgba(255, 255, 255, 0.85)"
+              backdropFilter="blur(15px)"
+              borderColor="rgba(194, 24, 91, 0.2)"
+              borderWidth="2px"
+              borderRadius="2xl"
+              boxShadow="0 4px 20px rgba(194, 24, 91, 0.08)"
+            >
+              <CardBody p={8}>
+                <VStack spacing={8} align="stretch">
+                  <HStack spacing={4}>
+                    <Box
+                      w="40px"
+                      h="40px"
+                      bgGradient="linear(45deg, brand.500, purple.500)"
+                      borderRadius="lg"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      boxShadow="0 4px 15px rgba(194, 24, 91, 0.3)"
+                    >
+                      <Icon as={FaStethoscope} color="white" fontSize="lg" />
+                    </Box>
+                    <Heading 
+                      size="md"
+                      bgGradient="linear(45deg, brand.600, purple.600)"
+                      bgClip="text"
+                      sx={{
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                      fontWeight="700"
+                    >
+                      Patient Information
+                    </Heading>
+                  </HStack>
                   
                   <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
                     <FormControl isInvalid={!!errors.patientName}>
@@ -321,15 +458,44 @@ const BookingForm: React.FC<BookingFormProps> = ({ service, onSubmit, onBack }) 
             </Card>
 
             {/* Assessment Scheduling */}
-            <Card w="full">
-              <CardBody>
-                <VStack spacing={6} align="stretch">
-                  <Heading size="md" color="gray.800">
-                    <HStack>
-                      <Icon as={FaCalendarAlt} color="primary.500" />
-                      <Text>Schedule Assessment</Text>
-                    </HStack>
-                  </Heading>
+            <Card 
+              w="full"
+              bg="rgba(255, 255, 255, 0.85)"
+              backdropFilter="blur(15px)"
+              borderColor="rgba(123, 31, 162, 0.2)"
+              borderWidth="2px"
+              borderRadius="2xl"
+              boxShadow="0 4px 20px rgba(123, 31, 162, 0.08)"
+            >
+              <CardBody p={8}>
+                <VStack spacing={8} align="stretch">
+                  <HStack spacing={4}>
+                    <Box
+                      w="40px"
+                      h="40px"
+                      bgGradient="linear(45deg, purple.500, brand.500)"
+                      borderRadius="lg"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      boxShadow="0 4px 15px rgba(123, 31, 162, 0.3)"
+                    >
+                      <Icon as={FaCalendarAlt} color="white" fontSize="lg" />
+                    </Box>
+                    <Heading 
+                      size="md"
+                      bgGradient="linear(45deg, purple.600, brand.600)"
+                      bgClip="text"
+                      sx={{
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                      fontWeight="700"
+                    >
+                      Schedule Assessment
+                    </Heading>
+                  </HStack>
 
                   <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
                     <FormControl isInvalid={!!errors.date}>
@@ -387,15 +553,44 @@ const BookingForm: React.FC<BookingFormProps> = ({ service, onSubmit, onBack }) 
             </Card>
 
             {/* Location for Home Assessment */}
-            <Card w="full">
-              <CardBody>
-                <VStack spacing={6} align="stretch">
-                  <Heading size="md" color="gray.800">
-                    <HStack>
-                      <Icon as={FaMapMarkerAlt} color="primary.500" />
-                      <Text>Assessment Location</Text>
-                    </HStack>
-                  </Heading>
+            <Card 
+              w="full"
+              bg="rgba(255, 255, 255, 0.85)"
+              backdropFilter="blur(15px)"
+              borderColor="rgba(34, 197, 94, 0.2)"
+              borderWidth="2px"
+              borderRadius="2xl"
+              boxShadow="0 4px 20px rgba(34, 197, 94, 0.08)"
+            >
+              <CardBody p={8}>
+                <VStack spacing={8} align="stretch">
+                  <HStack spacing={4}>
+                    <Box
+                      w="40px"
+                      h="40px"
+                      bgGradient="linear(45deg, green.500, emerald.500)"
+                      borderRadius="lg"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      boxShadow="0 4px 15px rgba(34, 197, 94, 0.3)"
+                    >
+                      <Icon as={FaMapMarkerAlt} color="white" fontSize="lg" />
+                    </Box>
+                    <Heading 
+                      size="md"
+                      bgGradient="linear(45deg, green.600, emerald.600)"
+                      bgClip="text"
+                      sx={{
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                      fontWeight="700"
+                    >
+                      Assessment Location
+                    </Heading>
+                  </HStack>
 
                   <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
                     <FormControl isInvalid={!!errors.state}>
@@ -443,15 +638,44 @@ const BookingForm: React.FC<BookingFormProps> = ({ service, onSubmit, onBack }) 
             </Card>
 
             {/* Emergency Contact */}
-            <Card w="full">
-              <CardBody>
-                <VStack spacing={6} align="stretch">
-                  <Heading size="md" color="gray.800">
-                    <HStack>
-                      <Icon as={FaPhone} color="primary.500" />
-                      <Text>Emergency Contact</Text>
-                    </HStack>
-                  </Heading>
+            <Card 
+              w="full"
+              bg="rgba(255, 255, 255, 0.85)"
+              backdropFilter="blur(15px)"
+              borderColor="rgba(251, 146, 60, 0.2)"
+              borderWidth="2px"
+              borderRadius="2xl"
+              boxShadow="0 4px 20px rgba(251, 146, 60, 0.08)"
+            >
+              <CardBody p={8}>
+                <VStack spacing={8} align="stretch">
+                  <HStack spacing={4}>
+                    <Box
+                      w="40px"
+                      h="40px"
+                      bgGradient="linear(45deg, orange.500, yellow.500)"
+                      borderRadius="lg"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      boxShadow="0 4px 15px rgba(251, 146, 60, 0.3)"
+                    >
+                      <Icon as={FaPhone} color="white" fontSize="lg" />
+                    </Box>
+                    <Heading 
+                      size="md"
+                      bgGradient="linear(45deg, orange.600, yellow.600)"
+                      bgClip="text"
+                      sx={{
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                      fontWeight="700"
+                    >
+                      Emergency Contact
+                    </Heading>
+                  </HStack>
 
                   <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
                     <FormControl isInvalid={!!errors.emergencyContactName}>
@@ -489,12 +713,44 @@ const BookingForm: React.FC<BookingFormProps> = ({ service, onSubmit, onBack }) 
             </Card>
 
             {/* Medical Information for Assessment */}
-            <Card w="full">
-              <CardBody>
-                <VStack spacing={6} align="stretch">
-                  <Heading size="md" color="gray.800">
-                    Medical Information for Assessment
-                  </Heading>
+            <Card 
+              w="full"
+              bg="rgba(255, 255, 255, 0.85)"
+              backdropFilter="blur(15px)"
+              borderColor="rgba(220, 38, 127, 0.2)"
+              borderWidth="2px"
+              borderRadius="2xl"
+              boxShadow="0 4px 20px rgba(220, 38, 127, 0.08)"
+            >
+              <CardBody p={8}>
+                <VStack spacing={8} align="stretch">
+                  <HStack spacing={4}>
+                    <Box
+                      w="40px"
+                      h="40px"
+                      bgGradient="linear(45deg, red.500, pink.500)"
+                      borderRadius="lg"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      boxShadow="0 4px 15px rgba(220, 38, 127, 0.3)"
+                    >
+                      <Icon as={FaStethoscope} color="white" fontSize="lg" />
+                    </Box>
+                    <Heading 
+                      size="md"
+                      bgGradient="linear(45deg, red.600, pink.600)"
+                      bgClip="text"
+                      sx={{
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                      fontWeight="700"
+                    >
+                      Medical Information for Assessment
+                    </Heading>
+                  </HStack>
                   <Text fontSize="sm" color="gray.600">
                     This information helps our healthcare professionals provide a more accurate assessment
                   </Text>
@@ -541,12 +797,44 @@ const BookingForm: React.FC<BookingFormProps> = ({ service, onSubmit, onBack }) 
             </Card>
 
             {/* Assessment Preferences */}
-            <Card w="full">
-              <CardBody>
-                <VStack spacing={6} align="stretch">
-                  <Heading size="md" color="gray.800">
-                    Assessment Preferences
-                  </Heading>
+            <Card 
+              w="full"
+              bg="rgba(255, 255, 255, 0.85)"
+              backdropFilter="blur(15px)"
+              borderColor="rgba(59, 130, 246, 0.2)"
+              borderWidth="2px"
+              borderRadius="2xl"
+              boxShadow="0 4px 20px rgba(59, 130, 246, 0.08)"
+            >
+              <CardBody p={8}>
+                <VStack spacing={8} align="stretch">
+                  <HStack spacing={4}>
+                    <Box
+                      w="40px"
+                      h="40px"
+                      bgGradient="linear(45deg, blue.500, cyan.500)"
+                      borderRadius="lg"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      boxShadow="0 4px 15px rgba(59, 130, 246, 0.3)"
+                    >
+                      <Icon as={FaClock} color="white" fontSize="lg" />
+                    </Box>
+                    <Heading 
+                      size="md"
+                      bgGradient="linear(45deg, blue.600, cyan.600)"
+                      bgClip="text"
+                      sx={{
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                      fontWeight="700"
+                    >
+                      Assessment Preferences
+                    </Heading>
+                  </HStack>
 
                   <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
                     <FormControl isInvalid={!!errors.nurseGenderPreference}>
@@ -584,23 +872,56 @@ const BookingForm: React.FC<BookingFormProps> = ({ service, onSubmit, onBack }) 
             </Card>
 
             {/* Assessment Fee Summary */}
-            <Card w="full" bg="primary.50" border="2px" borderColor="primary.200">
-              <CardBody>
+            <Card 
+              w="full" 
+              bg="rgba(34, 197, 94, 0.05)" 
+              border="2px" 
+              borderColor="rgba(34, 197, 94, 0.3)"
+              borderRadius="2xl"
+              boxShadow="0 4px 20px rgba(34, 197, 94, 0.1)"
+            >
+              <CardBody p={8}>
                 <HStack justify="space-between" align="center">
-                  <VStack align="start" spacing={1}>
-                    <Text fontWeight="bold" color="gray.800">
-                      Assessment Fee
-                    </Text>
-                    <Text fontSize="sm" color="gray.600">
-                      {service.name} - {service.duration} minute assessment
-                    </Text>
-                    <Text fontSize="xs" color="gray.500">
-                      Fixed price for all healthcare assessments
-                    </Text>
-                  </VStack>
-                  <Text fontSize="2xl" fontWeight="bold" color="primary.500">
+                  <HStack spacing={4}>
+                    <Box
+                      w="50px"
+                      h="50px"
+                      bgGradient="linear(45deg, green.500, emerald.500)"
+                      borderRadius="xl"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      boxShadow="0 4px 15px rgba(34, 197, 94, 0.3)"
+                    >
+                      <Icon as={FaStethoscope} color="white" fontSize="xl" />
+                    </Box>
+                    <VStack align="start" spacing={1}>
+                      <Text 
+                        fontWeight="bold" 
+                        color="gray.800"
+                        fontSize="lg"
+                      >
+                        Assessment Fee
+                      </Text>
+                      <Text fontSize="sm" color="gray.600">
+                        {service.name} - {service.duration} minute assessment
+                      </Text>
+                      <Text fontSize="xs" color="gray.500">
+                        Fixed price for all healthcare assessments
+                      </Text>
+                    </VStack>
+                  </HStack>
+                  <Badge
+                    bgGradient="linear(45deg, green.500, emerald.500)"
+                    color="white"
+                    fontSize="2xl" 
+                    fontWeight="bold"
+                    px={6}
+                    py={3}
+                    borderRadius="full"
+                  >
                     {formatPrice(ASSESSMENT_PRICE)}
-                  </Text>
+                  </Badge>
                 </HStack>
               </CardBody>
             </Card>
@@ -612,18 +933,47 @@ const BookingForm: React.FC<BookingFormProps> = ({ service, onSubmit, onBack }) 
                 onClick={onBack}
                 size="lg"
                 px={8}
+                py={6}
+                borderColor="rgba(194, 24, 91, 0.3)"
+                color="brand.600"
+                borderRadius="xl"
+                _hover={{
+                  borderColor: "brand.400",
+                  bg: "rgba(194, 24, 91, 0.05)",
+                  transform: "translateY(-1px)"
+                }}
+                transition="all 0.2s ease-in-out"
               >
                 Back to Assessments
               </Button>
 
               <Button
                 type="submit"
-                colorScheme="primary"
+                bgGradient="linear(45deg, brand.500, purple.500)"
+                color="white"
                 size="lg"
                 px={8}
+                py={8}
+                borderRadius="2xl"
+                fontSize="lg"
+                fontWeight="700"
+                boxShadow="0 8px 25px rgba(194, 24, 91, 0.25)"
                 isLoading={isSubmitting}
                 loadingText="Booking Assessment..."
-                className="hover-lift"
+                _hover={{
+                  bgGradient: "linear(45deg, brand.600, purple.600)",
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 12px 35px rgba(194, 24, 91, 0.35)"
+                }}
+                _active={{
+                  transform: "translateY(0)",
+                  boxShadow: "0 6px 20px rgba(194, 24, 91, 0.3)"
+                }}
+                _loading={{
+                  bgGradient: "linear(45deg, brand.400, purple.400)",
+                  _hover: { bgGradient: "linear(45deg, brand.400, purple.400)" }
+                }}
+                transition="all 0.2s ease-in-out"
               >
                 Book Assessment - {formatPrice(ASSESSMENT_PRICE)}
               </Button>

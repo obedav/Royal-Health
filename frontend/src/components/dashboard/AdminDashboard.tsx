@@ -33,6 +33,20 @@ import {
   AlertTitle,
   AlertDescription,
   useToast,
+  Stack,
+  useBreakpointValue,
+  CircularProgress,
+  CircularProgressLabel,
+  Progress,
+  Tooltip,
+  Flex,
+  Avatar,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  Divider,
 } from '@chakra-ui/react';
 import {
   FaUsers,
@@ -44,6 +58,25 @@ import {
   FaEye,
   FaEdit,
   FaExclamationTriangle,
+  FaUserShield,
+  FaCrown,
+  FaChartLine,
+  FaHeartbeat,
+  FaHospital,
+  FaClipboardCheck,
+  FaBell,
+  FaCog,
+  FaDatabase,
+  FaShieldAlt,
+  FaUsers as FaUsersGroup,
+  FaChartBar,
+  FaTachometerAlt,
+  FaGlobeAmericas,
+  FaAward,
+  FaRocket,
+  FaBuilding,
+  FaLock,
+  FaUserTie,
 } from 'react-icons/fa';
 import { useAuth } from '../../hooks/useAuth';
 import { Navigate } from 'react-router-dom';
@@ -324,55 +357,456 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
+  const isMobile = useBreakpointValue({ base: true, md: false });
+
   if (loading) {
     return (
-      <Center h="100vh">
-        <VStack spacing={4}>
-          <Spinner size="xl" color="purple.500" thickness="4px" />
-          <Text>Loading admin dashboard...</Text>
-        </VStack>
-      </Center>
+      <Box 
+        bg="gray.50" 
+        minH="100vh"
+        bgGradient="linear(135deg, purple.25, blue.25)"
+        position="relative"
+        overflow="hidden"
+      >
+        {/* Executive Background Elements */}
+        <Box
+          position="absolute"
+          top="8%"
+          left="3%"
+          w="120px"
+          h="120px"
+          borderRadius="full"
+          bgGradient="linear(45deg, purple.300, blue.300)"
+          opacity="0.1"
+          animation="float-executive 8s ease-in-out infinite"
+          sx={{
+            '@keyframes float-executive': {
+              '0%, 100%': { transform: 'translateY(0px) rotate(0deg) scale(1)' },
+              '33%': { transform: 'translateY(-15px) rotate(120deg) scale(1.05)' },
+              '66%': { transform: 'translateY(-5px) rotate(240deg) scale(0.95)' },
+            },
+          }}
+        />
+        <Box
+          position="absolute"
+          top="70%"
+          right="5%"
+          w="80px"
+          h="80px"
+          borderRadius="full"
+          bgGradient="linear(135deg, purple.200, indigo.200)"
+          opacity="0.08"
+          animation="float-executive 10s ease-in-out infinite reverse"
+        />
+        <Box
+          position="absolute"
+          bottom="10%"
+          left="15%"
+          w="100px"
+          h="100px"
+          borderRadius="full"
+          bgGradient="linear(90deg, indigo.200, purple.200)"
+          opacity="0.06"
+          animation="pulse-glow-executive 6s ease-in-out infinite"
+          sx={{
+            '@keyframes pulse-glow-executive': {
+              '0%, 100%': { opacity: 0.06, transform: 'scale(1)' },
+              '50%': { opacity: 0.12, transform: 'scale(1.2)' },
+            },
+          }}
+        />
+        
+        <Center h="100vh">
+          <VStack spacing={10}>
+            {/* Executive Loading Indicator */}
+            <Box
+              w="32"
+              h="32"
+              position="relative"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            >
+              {/* Outer Ring */}
+              <Box
+                position="absolute"
+                w="full"
+                h="full"
+                borderRadius="full"
+                bgGradient="linear(45deg, purple.400, blue.400)"
+                opacity="0.2"
+                animation="pulse-glow-executive 3s ease-in-out infinite"
+              />
+              {/* Middle Ring */}
+              <Box
+                position="absolute"
+                w="28"
+                h="28"
+                borderRadius="full"
+                border="3px solid"
+                borderColor="purple.300"
+                opacity="0.4"
+                animation="rotate-slow 8s linear infinite"
+                sx={{
+                  '@keyframes rotate-slow': {
+                    '0%': { transform: 'rotate(0deg)' },
+                    '100%': { transform: 'rotate(360deg)' },
+                  },
+                }}
+              />
+              {/* Circular Progress */}
+              <CircularProgress 
+                size="24" 
+                isIndeterminate 
+                color="purple.500"
+                thickness="3px"
+                sx={{
+                  circle: {
+                    strokeLinecap: 'round',
+                  }
+                }}
+              />
+              {/* Center Icon */}
+              <Box
+                position="absolute"
+                w="16"
+                h="16"
+                borderRadius="full"
+                bgGradient="linear(45deg, purple.600, indigo.600)"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                boxShadow="0 8px 25px rgba(147, 51, 234, 0.3)"
+              >
+                <Icon as={FaCrown} color="white" fontSize="2xl" />
+              </Box>
+            </Box>
+            
+            {/* Executive Loading Text */}
+            <VStack spacing={4}>
+              <Text 
+                fontSize="3xl" 
+                fontWeight="900" 
+                bgGradient="linear(45deg, purple.600, indigo.600)"
+                bgClip="text"
+                sx={{
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+                textAlign="center"
+                letterSpacing="tight"
+              >
+                Executive Command Center
+              </Text>
+              <Text 
+                fontSize="lg" 
+                color="gray.600" 
+                fontWeight="600"
+                textAlign="center"
+                maxW="500px"
+                lineHeight="1.6"
+              >
+                Initializing administrative dashboard with real-time healthcare analytics and system management tools
+              </Text>
+              
+              {/* Executive Progress Indicators */}
+              <VStack spacing={3} pt={6} w="400px">
+                <Progress
+                  value={85}
+                  size="sm"
+                  colorScheme="purple"
+                  borderRadius="full"
+                  bg="purple.100"
+                  isAnimated
+                  hasStripe
+                />
+                <HStack justify="space-between" w="full" fontSize="sm" color="gray.500">
+                  <Text>Loading system metrics...</Text>
+                  <Text fontWeight="600">85%</Text>
+                </HStack>
+              </VStack>
+              
+              {/* Animated Status Dots */}
+              <HStack spacing={3} pt={4}>
+                {[0, 1, 2, 3].map((index) => (
+                  <Box
+                    key={index}
+                    w="4"
+                    h="4"
+                    borderRadius="full"
+                    bg="purple.500"
+                    animation={`bounce-executive 1.6s ease-in-out ${index * 0.2}s infinite both`}
+                    sx={{
+                      '@keyframes bounce-executive': {
+                        '0%, 80%, 100%': { 
+                          transform: 'scale(0.6)',
+                          opacity: 0.4,
+                        },
+                        '40%': { 
+                          transform: 'scale(1.2)',
+                          opacity: 1,
+                        },
+                      },
+                    }}
+                  />
+                ))}
+              </HStack>
+            </VStack>
+          </VStack>
+        </Center>
+      </Box>
     );
   }
 
   return (
-    <Box bg={bg} minH="100vh" py={8}>
-      <Container maxW="7xl">
-        <VStack spacing={8} align="stretch">
-          {/* Header */}
-          <HStack justify="space-between" align="center">
-            <VStack align="start" spacing={2}>
-              <Heading size="xl" color="purple.600">
-                Admin Dashboard
-              </Heading>
-              <Text color="gray.600">
-                Welcome back, {user?.firstName} {user?.lastName}
-              </Text>
-              <Badge colorScheme="green">Role: {user?.role}</Badge>
-            </VStack>
-            
-            <HStack spacing={4}>
-              <Badge colorScheme="green" px={3} py={1}>
-                Live Data
-              </Badge>
-              <Button
-                leftIcon={<FaFileExport />}
-                colorScheme="purple"
-                variant="outline"
-                onClick={() => toast({
-                  title: 'Export Started',
-                  description: 'Report will be ready shortly',
-                  status: 'info',
-                  duration: 3000,
-                })}
+    <Box bg="gray.50" minH="100vh" position="relative" overflow="hidden">
+      {/* Executive Background Elements */}
+      <Box
+        position="absolute"
+        top="3%"
+        right="8%"
+        w="250px"
+        h="250px"
+        borderRadius="full"
+        bgGradient="linear(45deg, purple.100, indigo.100)"
+        opacity="0.3"
+        filter="blur(80px)"
+        zIndex={0}
+      />
+      <Box
+        position="absolute"
+        bottom="10%"
+        left="5%"
+        w="200px"
+        h="200px"
+        borderRadius="full"
+        bgGradient="linear(135deg, purple.200, blue.200)"
+        opacity="0.2"
+        filter="blur(60px)"
+        zIndex={0}
+      />
+      
+      <Container maxW="7xl" position="relative" zIndex={1} py={{ base: 4, md: 8 }}>
+        <VStack spacing={{ base: 6, md: 8 }} align="stretch">
+          {/* Executive Command Header */}
+          <Card 
+            bg={cardBg} 
+            borderRadius={{ base: "xl", md: "2xl" }}
+            boxShadow="0 12px 50px rgba(147, 51, 234, 0.15)"
+            border="3px solid"
+            borderColor="purple.100"
+            position="relative"
+            overflow="hidden"
+            _before={{
+              content: '""',
+              position: 'absolute',
+              top: '0',
+              left: '0',
+              right: '0',
+              height: '8px',
+              bgGradient: 'linear(90deg, purple.500, indigo.500, blue.500)',
+            }}
+          >
+            <CardBody p={{ base: 6, md: 10 }}>
+              <Stack
+                direction={{ base: "column", lg: "row" }} 
+                justify="space-between" 
+                align={{ base: "start", lg: "center" }}
+                spacing={8}
               >
-                Export Report
-              </Button>
-              <Button variant="outline" onClick={logout}>
-                Logout
-              </Button>
-            </HStack>
-          </HStack>
+                {/* Executive Info Section */}
+                <VStack spacing={6} align="start" flex={1}>
+                  <HStack spacing={6}>
+                    <Box
+                      p={5}
+                      borderRadius="full"
+                      bgGradient="linear(45deg, purple.600, indigo.600)"
+                      color="white"
+                      boxShadow="0 8px 30px rgba(147, 51, 234, 0.4)"
+                      position="relative"
+                      _before={{
+                        content: '""',
+                        position: 'absolute',
+                        top: '-3px',
+                        left: '-3px',
+                        right: '-3px',
+                        bottom: '-3px',
+                        borderRadius: 'full',
+                        bgGradient: 'linear(45deg, purple.400, indigo.400)',
+                        zIndex: -1,
+                        opacity: 0.3,
+                      }}
+                    >
+                      <Icon as={FaCrown} fontSize="3xl" />
+                    </Box>
+                    <VStack align="start" spacing={2}>
+                      <Heading 
+                        size={{ base: "lg", md: "2xl" }} 
+                        bgGradient="linear(45deg, purple.700, indigo.700)"
+                        bgClip="text"
+                        sx={{
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                        }}
+                        letterSpacing="tight"
+                      >
+                        Executive Command Center
+                      </Heading>
+                      <HStack spacing={4}>
+                        <Text color="gray.600" fontSize={{ base: "md", md: "lg" }} fontWeight="600">
+                          Welcome back, {user?.firstName} {user?.lastName}
+                        </Text>
+                        <Badge
+                          colorScheme="purple"
+                          fontSize="sm"
+                          px={4}
+                          py={2}
+                          borderRadius="full"
+                          fontWeight="700"
+                          textTransform="uppercase"
+                          letterSpacing="wide"
+                        >
+                          <HStack spacing={2}>
+                            <Icon as={FaUserShield} />
+                            <Text>Administrator</Text>
+                          </HStack>
+                        </Badge>
+                      </HStack>
+                    </VStack>
+                  </HStack>
+                  
+                  <Text color="gray.700" fontSize={{ base: "sm", md: "md" }} maxW="700px" lineHeight="1.7" fontWeight="500">
+                    <Text as="span" fontWeight="800" color="purple.700">Royal Health Command Suite:</Text>
+                    {" "}Comprehensive healthcare system administration with real-time analytics, user management, 
+                    and operational oversight for optimal patient care delivery.
+                  </Text>
+                  
+                  {/* Quick Status Indicators */}
+                  {!isMobile && (
+                    <HStack spacing={8} pt={2}>
+                      <VStack spacing={1}>
+                        <HStack spacing={2}>
+                          <Box w="3" h="3" borderRadius="full" bg="green.500" animation="pulse 2s ease-in-out infinite" />
+                          <Text fontSize="sm" color="green.700" fontWeight="700">System Online</Text>
+                        </HStack>
+                        <Text fontSize="xs" color="gray.500">All services operational</Text>
+                      </VStack>
+                      <Divider orientation="vertical" h="40px" />
+                      <VStack spacing={1}>
+                        <HStack spacing={2}>
+                          <Box w="3" h="3" borderRadius="full" bg="blue.500" animation="pulse 2s ease-in-out infinite 0.5s" />
+                          <Text fontSize="sm" color="blue.700" fontWeight="700">Live Data</Text>
+                        </HStack>
+                        <Text fontSize="xs" color="gray.500">Real-time updates</Text>
+                      </VStack>
+                      <Divider orientation="vertical" h="40px" />
+                      <VStack spacing={1}>
+                        <HStack spacing={2}>
+                          <Box w="3" h="3" borderRadius="full" bg="purple.500" animation="pulse 2s ease-in-out infinite 1s" />
+                          <Text fontSize="sm" color="purple.700" fontWeight="700">Secure Access</Text>
+                        </HStack>
+                        <Text fontSize="xs" color="gray.500">End-to-end encryption</Text>
+                      </VStack>
+                    </HStack>
+                  )}
+                </VStack>
+                
+                {/* Executive Actions Panel */}
+                <VStack spacing={6} align={{ base: "start", lg: "end" }}>
+                  {/* Admin Avatar & Info */}
+                  <Card 
+                    bg="white"
+                    borderRadius="xl"
+                    p={6}
+                    border="2px solid"
+                    borderColor="purple.100"
+                    boxShadow="0 8px 25px rgba(147, 51, 234, 0.1)"
+                  >
+                    <VStack spacing={4}>
+                      <Avatar
+                        size="xl"
+                        name={`${user?.firstName} ${user?.lastName}`}
+                        bgGradient="linear(45deg, purple.600, indigo.600)"
+                        color="white"
+                        border="4px solid white"
+                        boxShadow="0 8px 25px rgba(147, 51, 234, 0.2)"
+                      />
+                      <VStack spacing={2}>
+                        <Text fontWeight="800" fontSize="lg" color="gray.800" textAlign="center">
+                          {user?.firstName} {user?.lastName}
+                        </Text>
+                        <Badge
+                          colorScheme="purple"
+                          fontSize="xs"
+                          px={3}
+                          py={1}
+                          borderRadius="full"
+                          textTransform="uppercase"
+                          letterSpacing="wide"
+                        >
+                          Chief Administrator
+                        </Badge>
+                        <Text fontSize="sm" color="gray.600" textAlign="center">
+                          Royal Health Systems
+                        </Text>
+                      </VStack>
+                    </VStack>
+                  </Card>
+                  
+                  {/* Executive Actions */}
+                  <HStack spacing={4}>
+                    <Tooltip label="Export comprehensive system reports" hasArrow>
+                      <Button
+                        leftIcon={<FaFileExport />}
+                        bgGradient="linear(45deg, purple.500, purple.600)"
+                        color="white"
+                        size="lg"
+                        borderRadius="xl"
+                        fontWeight="700"
+                        boxShadow="0 6px 20px rgba(147, 51, 234, 0.3)"
+                        _hover={{
+                          bgGradient: "linear(45deg, purple.600, purple.700)",
+                          transform: "translateY(-2px)",
+                          boxShadow: "0 8px 30px rgba(147, 51, 234, 0.4)"
+                        }}
+                        transition="all 0.2s ease-in-out"
+                        onClick={() => toast({
+                          title: 'Executive Report Export',
+                          description: 'Comprehensive analytics report generation initiated',
+                          status: 'info',
+                          duration: 4000,
+                        })}
+                      >
+                        Export Analytics
+                      </Button>
+                    </Tooltip>
+                    
+                    <Tooltip label="System configuration and settings" hasArrow>
+                      <Button
+                        leftIcon={<FaCog />}
+                        variant="outline"
+                        borderColor="purple.500"
+                        color="purple.600"
+                        size="lg"
+                        borderRadius="xl"
+                        fontWeight="700"
+                        borderWidth="2px"
+                        _hover={{
+                          bg: "purple.50",
+                          color: "purple.700",
+                          transform: "translateY(-2px)",
+                          borderColor: "purple.600"
+                        }}
+                        transition="all 0.2s ease-in-out"
+                      >
+                        Settings
+                      </Button>
+                    </Tooltip>
+                  </HStack>
+                </VStack>
+              </Stack>
+            </CardBody>
+          </Card>
 
           {/* Error Alert */}
           {error && (
@@ -385,93 +819,316 @@ const AdminDashboard: React.FC = () => {
             </Alert>
           )}
 
-          {/* Stats Cards */}
+          {/* Executive Healthcare Analytics Grid */}
           <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6}>
-            {/* Total Patients */}
-            <Card bg={cardBg} shadow="lg" borderRadius="xl">
-              <CardBody>
-                <Stat>
-                  <HStack justify="space-between">
-                    <VStack align="start" spacing={1}>
-                      <StatLabel color="gray.600" fontSize="sm">
-                        Total Patients
-                      </StatLabel>
-                      <StatNumber fontSize="3xl" color="blue.600">
-                        {totalPatients}
-                      </StatNumber>
-                      <StatLabel color="blue.500" fontSize="sm">
-                        Registered users
-                      </StatLabel>
-                    </VStack>
-                    <Icon as={FaUsers} fontSize="3xl" color="blue.500" />
+            {/* Total Patient Network */}
+            <Card 
+              bg={cardBg}
+              borderRadius="2xl"
+              border="3px solid"
+              borderColor="blue.100" 
+              position="relative"
+              overflow="hidden"
+              boxShadow="0 10px 40px rgba(59, 130, 246, 0.15)"
+              _hover={{
+                transform: "translateY(-6px)",
+                boxShadow: "0 16px 50px rgba(59, 130, 246, 0.25)",
+                borderColor: "blue.300"
+              }}
+              transition="all 0.3s ease-in-out"
+              cursor="pointer"
+              _before={{
+                content: '""',
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                right: '0',
+                height: '5px',
+                bgGradient: 'linear(90deg, blue.400, blue.600)',
+              }}
+            >
+              <CardBody p={8}>
+                <VStack spacing={6} align="start">
+                  <HStack justify="space-between" w="full">
+                    <Box
+                      p={4}
+                      borderRadius="xl"
+                      bgGradient="linear(45deg, blue.500, blue.600)"
+                      color="white"
+                      boxShadow="0 6px 20px rgba(59, 130, 246, 0.3)"
+                    >
+                      <Icon as={FaHospital} fontSize="2xl" />
+                    </Box>
+                    <Badge
+                      colorScheme="blue"
+                      fontSize="xs"
+                      px={3}
+                      py={1}
+                      borderRadius="full"
+                      fontWeight="700"
+                    >
+                      Active Network
+                    </Badge>
                   </HStack>
-                </Stat>
+                  
+                  <VStack align="start" spacing={3} w="full">
+                    <Text fontSize="sm" fontWeight="600" color="blue.600" textTransform="uppercase" letterSpacing="wide">
+                      Patient Network
+                    </Text>
+                    <Text fontSize="4xl" fontWeight="900" color="blue.700" lineHeight="1">
+                      {totalPatients}
+                    </Text>
+                    <Text fontSize="sm" color="gray.600" fontWeight="500">
+                      Registered healthcare members
+                    </Text>
+                    
+                    {/* Growth Indicator */}
+                    <HStack spacing={2} pt={2}>
+                      <Icon as={FaChartLine} color="green.500" fontSize="sm" />
+                      <Text fontSize="xs" color="green.600" fontWeight="600">
+                        +12% growth this month
+                      </Text>
+                    </HStack>
+                  </VStack>
+                </VStack>
               </CardBody>
             </Card>
 
-            {/* Active Nurses */}
-            <Card bg={cardBg} shadow="lg" borderRadius="xl">
-              <CardBody>
-                <Stat>
-                  <HStack justify="space-between">
-                    <VStack align="start" spacing={1}>
-                      <StatLabel color="gray.600" fontSize="sm">
-                        Healthcare Professionals
-                      </StatLabel>
-                      <StatNumber fontSize="3xl" color="green.600">
-                        {totalNurses}
-                      </StatNumber>
-                      <StatLabel color="green.500" fontSize="sm">
-                        Active staff
-                      </StatLabel>
-                    </VStack>
-                    <Icon as={FaUserMd} fontSize="3xl" color="green.500" />
+            {/* Healthcare Professionals */}
+            <Card 
+              bg={cardBg}
+              borderRadius="2xl"
+              border="3px solid"
+              borderColor="green.100"
+              position="relative"
+              overflow="hidden"
+              boxShadow="0 10px 40px rgba(34, 197, 94, 0.15)"
+              _hover={{
+                transform: "translateY(-6px)",
+                boxShadow: "0 16px 50px rgba(34, 197, 94, 0.25)",
+                borderColor: "green.300"
+              }}
+              transition="all 0.3s ease-in-out"
+              cursor="pointer"
+              _before={{
+                content: '""',
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                right: '0',
+                height: '5px',
+                bgGradient: 'linear(90deg, green.400, green.600)',
+              }}
+            >
+              <CardBody p={8}>
+                <VStack spacing={6} align="start">
+                  <HStack justify="space-between" w="full">
+                    <Box
+                      p={4}
+                      borderRadius="xl"
+                      bgGradient="linear(45deg, green.500, green.600)"
+                      color="white"
+                      boxShadow="0 6px 20px rgba(34, 197, 94, 0.3)"
+                    >
+                      <Icon as={FaUserMd} fontSize="2xl" />
+                    </Box>
+                    <Badge
+                      colorScheme="green"
+                      fontSize="xs"
+                      px={3}
+                      py={1}
+                      borderRadius="full"
+                      fontWeight="700"
+                    >
+                      On Duty
+                    </Badge>
                   </HStack>
-                </Stat>
+                  
+                  <VStack align="start" spacing={3} w="full">
+                    <Text fontSize="sm" fontWeight="600" color="green.600" textTransform="uppercase" letterSpacing="wide">
+                      Medical Staff
+                    </Text>
+                    <Text fontSize="4xl" fontWeight="900" color="green.700" lineHeight="1">
+                      {totalNurses}
+                    </Text>
+                    <Text fontSize="sm" color="gray.600" fontWeight="500">
+                      Healthcare professionals active
+                    </Text>
+                    
+                    {/* Staff Utilization */}
+                    <Box w="full" pt={2}>
+                      <HStack justify="space-between" mb={1}>
+                        <Text fontSize="xs" color="gray.500">Staff Utilization</Text>
+                        <Text fontSize="xs" color="green.600" fontWeight="600">92%</Text>
+                      </HStack>
+                      <Progress 
+                        value={92} 
+                        colorScheme="green" 
+                        size="sm" 
+                        borderRadius="full"
+                        bg="green.50"
+                      />
+                    </Box>
+                  </VStack>
+                </VStack>
               </CardBody>
             </Card>
 
-            {/* Today's Appointments */}
-            <Card bg={cardBg} shadow="lg" borderRadius="xl">
-              <CardBody>
-                <Stat>
-                  <HStack justify="space-between">
-                    <VStack align="start" spacing={1}>
-                      <StatLabel color="gray.600" fontSize="sm">
-                        Today's Appointments
-                      </StatLabel>
-                      <StatNumber fontSize="3xl" color="orange.600">
-                        {todayBookings}
-                      </StatNumber>
-                      <StatLabel color="orange.500" fontSize="sm">
-                        Scheduled for today
-                      </StatLabel>
-                    </VStack>
-                    <Icon as={FaCalendarAlt} fontSize="3xl" color="orange.500" />
+            {/* Daily Operations */}
+            <Card 
+              bg={cardBg}
+              borderRadius="2xl"
+              border="3px solid"
+              borderColor="orange.100"
+              position="relative"
+              overflow="hidden"
+              boxShadow="0 10px 40px rgba(251, 146, 60, 0.15)"
+              _hover={{
+                transform: "translateY(-6px)",
+                boxShadow: "0 16px 50px rgba(251, 146, 60, 0.25)",
+                borderColor: "orange.300"
+              }}
+              transition="all 0.3s ease-in-out"
+              cursor="pointer"
+              _before={{
+                content: '""',
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                right: '0',
+                height: '5px',
+                bgGradient: 'linear(90deg, orange.400, orange.600)',
+              }}
+            >
+              <CardBody p={8}>
+                <VStack spacing={6} align="start">
+                  <HStack justify="space-between" w="full">
+                    <Box
+                      p={4}
+                      borderRadius="xl"
+                      bgGradient="linear(45deg, orange.500, orange.600)"
+                      color="white"
+                      boxShadow="0 6px 20px rgba(251, 146, 60, 0.3)"
+                    >
+                      <Icon as={FaCalendarAlt} fontSize="2xl" />
+                    </Box>
+                    <Badge
+                      colorScheme="orange"
+                      fontSize="xs"
+                      px={3}
+                      py={1}
+                      borderRadius="full"
+                      fontWeight="700"
+                    >
+                      Today
+                    </Badge>
                   </HStack>
-                </Stat>
+                  
+                  <VStack align="start" spacing={3} w="full">
+                    <Text fontSize="sm" fontWeight="600" color="orange.600" textTransform="uppercase" letterSpacing="wide">
+                      Daily Operations
+                    </Text>
+                    <Text fontSize="4xl" fontWeight="900" color="orange.700" lineHeight="1">
+                      {todayBookings}
+                    </Text>
+                    <Text fontSize="sm" color="gray.600" fontWeight="500">
+                      Appointments scheduled today
+                    </Text>
+                    
+                    {/* Operational Efficiency */}
+                    <HStack spacing={2} pt={2}>
+                      <CircularProgress
+                        value={88}
+                        size="20px"
+                        color="orange.500"
+                        thickness="8px"
+                      />
+                      <Text fontSize="xs" color="orange.600" fontWeight="600">
+                        88% efficiency rate
+                      </Text>
+                    </HStack>
+                  </VStack>
+                </VStack>
               </CardBody>
             </Card>
 
-            {/* Total Revenue */}
-            <Card bg={cardBg} shadow="lg" borderRadius="xl">
-              <CardBody>
-                <Stat>
-                  <HStack justify="space-between">
-                    <VStack align="start" spacing={1}>
-                      <StatLabel color="gray.600" fontSize="sm">
-                        Total Revenue
-                      </StatLabel>
-                      <StatNumber fontSize="3xl" color="purple.600">
-                        {formatCurrency(stats?.revenue || 0)}
-                      </StatNumber>
-                      <StatLabel color="purple.500" fontSize="sm">
-                        From bookings
-                      </StatLabel>
-                    </VStack>
-                    <Icon as={FaMoneyBillWave} fontSize="3xl" color="purple.500" />
+            {/* Revenue Analytics */}
+            <Card 
+              bg={cardBg}
+              borderRadius="2xl"
+              border="3px solid"
+              borderColor="purple.100"
+              position="relative"
+              overflow="hidden"
+              boxShadow="0 10px 40px rgba(147, 51, 234, 0.15)"
+              _hover={{
+                transform: "translateY(-6px)",
+                boxShadow: "0 16px 50px rgba(147, 51, 234, 0.25)",
+                borderColor: "purple.300"
+              }}
+              transition="all 0.3s ease-in-out"
+              cursor="pointer"
+              _before={{
+                content: '""',
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                right: '0',
+                height: '5px',
+                bgGradient: 'linear(90deg, purple.400, purple.600)',
+              }}
+            >
+              <CardBody p={8}>
+                <VStack spacing={6} align="start">
+                  <HStack justify="space-between" w="full">
+                    <Box
+                      p={4}
+                      borderRadius="xl"
+                      bgGradient="linear(45deg, purple.500, purple.600)"
+                      color="white"
+                      boxShadow="0 6px 20px rgba(147, 51, 234, 0.3)"
+                    >
+                      <Icon as={FaChartBar} fontSize="2xl" />
+                    </Box>
+                    <Badge
+                      colorScheme="purple"
+                      fontSize="xs"
+                      px={3}
+                      py={1}
+                      borderRadius="full"
+                      fontWeight="700"
+                    >
+                      Growth
+                    </Badge>
                   </HStack>
-                </Stat>
+                  
+                  <VStack align="start" spacing={3} w="full">
+                    <Text fontSize="sm" fontWeight="600" color="purple.600" textTransform="uppercase" letterSpacing="wide">
+                      Revenue Analytics
+                    </Text>
+                    <Text fontSize="3xl" fontWeight="900" color="purple.700" lineHeight="1">
+                      {formatCurrency(stats?.revenue || 0)}
+                    </Text>
+                    <Text fontSize="sm" color="gray.600" fontWeight="500">
+                      Total healthcare revenue
+                    </Text>
+                    
+                    {/* Revenue Trend */}
+                    <Box w="full" pt={2}>
+                      <HStack justify="space-between" mb={1}>
+                        <Text fontSize="xs" color="gray.500">Monthly Target</Text>
+                        <Text fontSize="xs" color="purple.600" fontWeight="600">95%</Text>
+                      </HStack>
+                      <Progress 
+                        value={95} 
+                        colorScheme="purple" 
+                        size="sm" 
+                        borderRadius="full"
+                        bg="purple.50"
+                      />
+                    </Box>
+                  </VStack>
+                </VStack>
               </CardBody>
             </Card>
           </SimpleGrid>

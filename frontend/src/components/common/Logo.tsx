@@ -1,38 +1,38 @@
-import { Box, Image, Text, HStack, VStack } from '@chakra-ui/react'
-import { useState } from 'react'
+import { Box, Image, Text, HStack, VStack } from "@chakra-ui/react";
+import { useState } from "react";
 
 interface LogoProps {
-  size?: 'sm' | 'md' | 'lg' | 'xl'
-  showText?: boolean
-  variant?: 'horizontal' | 'vertical'
-  onClick?: () => void
-  imageSrc?: string 
+  size?: "sm" | "md" | "lg" | "xl";
+  showText?: boolean;
+  variant?: "horizontal" | "vertical";
+  onClick?: () => void;
+  imageSrc?: string;
 }
 
-const Logo: React.FC<LogoProps> = ({ 
-  size = 'md', 
-  showText = true, 
-  variant = 'horizontal',
+const Logo: React.FC<LogoProps> = ({
+  size = "md",
+  showText = true,
+  variant = "horizontal",
   onClick,
-  imageSrc = '/logo-img.jpg' 
+  imageSrc = "/logo-img.jpg",
 }) => {
   const sizeMap = {
-    sm: { icon: '104px', text: 'sm' },
-    md: { icon: '124px', text: 'lg' },
-    lg: { icon: '144px', text: 'xl' },
-    xl: { icon: '140px', text: '2xl' }
-  }
+    sm: { icon: "104px", text: "sm" },
+    md: { icon: "124px", text: "lg" },
+    lg: { icon: "144px", text: "xl" },
+    xl: { icon: "140px", text: "2xl" },
+  };
 
-  const dimensions = sizeMap[size]
+  const dimensions = sizeMap[size];
 
-  const [imageError, setImageError] = useState(false)
+  const [imageError, setImageError] = useState(false);
 
   const LogoIcon = () => (
     <Box
       width={dimensions.icon}
       height={dimensions.icon}
       position="relative"
-      cursor={onClick ? 'pointer' : 'default'}
+      cursor={onClick ? "pointer" : "default"}
     >
       {!imageError ? (
         <Image
@@ -41,7 +41,7 @@ const Logo: React.FC<LogoProps> = ({
           width="100%"
           height="100%"
           objectFit="contain"
-          onError={() => setImageError(true)} 
+          onError={() => setImageError(true)}
         />
       ) : (
         // fallback SVG
@@ -70,46 +70,64 @@ const Logo: React.FC<LogoProps> = ({
         </Box>
       )}
     </Box>
-  )
+  );
 
-const LogoText = () => (
-  <VStack spacing={0} align={variant === 'horizontal' ? 'flex-start' : 'center'}>
-    <Text
-      fontSize={dimensions.text}
-      fontWeight="800"
-      letterSpacing="tight"
-      variant="brandGradient"  
-      lineHeight="1"
+  const LogoText = () => (
+    <VStack
+      spacing={0}
+      align={variant === "horizontal" ? "flex-start" : "center"}
     >
-      ROYAL HEALTH
-    </Text>
-    <Text
-      fontSize={size === 'sm' ? 'xs' : size === 'md' ? 'sm' : 'md'}
-      fontWeight="600"
-      color="primary.500"   
-      letterSpacing="wide"
-      lineHeight="1"
-    >
-      CONSULT
-    </Text>
-  </VStack>
-)
+      <Text
+        fontSize={dimensions.text}
+        fontWeight="800"
+        letterSpacing="tight"
+        bgGradient="linear(45deg, purple.700, purple.900)"
+        bgClip="text"
+        sx={{
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+        }}
+        lineHeight="1"
+      >
+        ROYAL HEALTH
+      </Text>
+      <Text
+        fontSize={size === "sm" ? "xs" : size === "md" ? "sm" : "md"}
+        fontWeight="600"
+        color="purple.800"
+        letterSpacing="wide"
+        lineHeight="1"
+      >
+        CONSULT
+      </Text>
+    </VStack>
+  );
 
-  if (variant === 'vertical') {
+  if (variant === "vertical") {
     return (
-      <VStack spacing={3} align="center" onClick={onClick} cursor={onClick ? 'pointer' : 'default'}>
+      <VStack
+        spacing={3}
+        align="center"
+        onClick={onClick}
+        cursor={onClick ? "pointer" : "default"}
+      >
         <LogoIcon />
         {showText && <LogoText />}
       </VStack>
-    )
+    );
   }
 
   return (
-    <HStack spacing={3} align="center" onClick={onClick} cursor={onClick ? 'pointer' : 'default'}>
+    <HStack
+      spacing={3}
+      align="center"
+      onClick={onClick}
+      cursor={onClick ? "pointer" : "default"}
+    >
       <LogoIcon />
       {showText && <LogoText />}
     </HStack>
-  )
-}
+  );
+};
 
-export default Logo
+export default Logo;

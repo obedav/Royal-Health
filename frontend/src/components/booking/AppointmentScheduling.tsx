@@ -204,47 +204,148 @@ const AppointmentScheduling: React.FC<SchedulingProps> = ({
     <Container maxW="6xl" py={8}>
       <VStack spacing={8} align="stretch">
         {/* Header */}
-        <VStack spacing={4} textAlign="center">
-          <Heading size="lg" color="gray.800">
-            Schedule Your {selectedService.name}
-          </Heading>
-          <Text color="gray.600">
-            Book a professional healthcare assessment in the comfort of your home
-          </Text>
+        <Box
+          position="relative"
+          bg="rgba(255, 255, 255, 0.9)"
+          backdropFilter="blur(15px)"
+          borderRadius="3xl"
+          p={8}
+          border="1px solid"
+          borderColor="rgba(194, 24, 91, 0.2)"
+          boxShadow="0 8px 32px rgba(194, 24, 91, 0.15)"
+        >
+          <VStack spacing={6} textAlign="center">
+            <VStack spacing={3}>
+              <Heading 
+                size="xl" 
+                bgGradient="linear(45deg, brand.600, purple.600)"
+                bgClip="text"
+                sx={{
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+                fontWeight="800"
+              >
+                Schedule Your {selectedService.name}
+              </Heading>
+              <Text 
+                color="gray.700" 
+                fontSize="lg"
+                fontWeight="500"
+                maxW="600px"
+                lineHeight="1.6"
+              >
+                Book a professional healthcare assessment in the comfort of your home with our qualified healthcare professionals
+              </Text>
+            </VStack>
           
           {/* Assessment Service Summary */}
-          <Box bg="primary.50" borderRadius="lg" p={4} w="full" maxW="600px">
-            <HStack spacing={4}>
-              <Icon as={FaStethoscope} color="primary.500" fontSize="2xl" />
-              <VStack align="start" spacing={1}>
-                <Text fontWeight="600" color="primary.700">{selectedService.name}</Text>
-                <HStack spacing={4}>
-                  <Badge colorScheme="blue">{selectedService.duration} minutes</Badge>
-                  <Badge colorScheme="green" fontSize="md" px={3} py={1}>
+          <Box 
+            bg="rgba(194, 24, 91, 0.05)" 
+            borderRadius="2xl" 
+            p={6} 
+            w="full" 
+            maxW="700px"
+            border="2px solid"
+            borderColor="rgba(194, 24, 91, 0.1)"
+            boxShadow="0 4px 20px rgba(194, 24, 91, 0.08)"
+          >
+            <HStack spacing={6} align="start">
+              <Box
+                w="60px"
+                h="60px"
+                bgGradient="linear(45deg, brand.500, purple.500)"
+                borderRadius="xl"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                boxShadow="0 4px 15px rgba(194, 24, 91, 0.3)"
+              >
+                <Icon as={FaStethoscope} color="white" fontSize="2xl" />
+              </Box>
+              <VStack align="start" spacing={3} flex="1">
+                <Text 
+                  fontWeight="700" 
+                  color="gray.800"
+                  fontSize="lg"
+                >
+                  {selectedService.name}
+                </Text>
+                <HStack spacing={4} flexWrap="wrap">
+                  <Badge 
+                    bgGradient="linear(45deg, brand.500, purple.500)"
+                    color="white"
+                    fontSize="sm"
+                    px={3}
+                    py={1}
+                    borderRadius="full"
+                  >
+                    {selectedService.duration} minutes
+                  </Badge>
+                  <Badge 
+                    bg="green.500"
+                    color="white"
+                    fontSize="md" 
+                    px={4} 
+                    py={1}
+                    borderRadius="full"
+                    fontWeight="600"
+                  >
                     {formatPrice(ASSESSMENT_PRICE)}
                   </Badge>
                   {selectedService.category === 'emergency' && (
-                    <Badge colorScheme="red">24/7 Available</Badge>
+                    <Badge 
+                      bg="red.500"
+                      color="white"
+                      borderRadius="full"
+                      px={3}
+                      py={1}
+                    >
+                      24/7 Available
+                    </Badge>
                   )}
                 </HStack>
-                <Text fontSize="sm" color="gray.600">
-                  Professional health assessment • A qualified healthcare professional will be assigned
+                <Text fontSize="sm" color="gray.600" lineHeight="1.5">
+                  Professional health assessment • A qualified healthcare professional will be assigned based on your location
                 </Text>
               </VStack>
             </HStack>
           </Box>
-        </VStack>
+          </VStack>
+        </Box>
 
         {/* Professional Assignment Notice */}
-        <Card bg="blue.50" borderColor="blue.200" borderWidth="1px">
-          <CardBody p={4}>
-            <HStack spacing={3}>
-              <Icon as={FaUserMd} color="blue.500" fontSize="xl" />
-              <VStack align="start" spacing={1}>
-                <Text fontWeight="600" color="blue.700" fontSize="sm">
+        <Card 
+          bg="rgba(123, 31, 162, 0.05)" 
+          borderColor="rgba(123, 31, 162, 0.2)" 
+          borderWidth="2px"
+          borderRadius="2xl"
+          boxShadow="0 4px 20px rgba(123, 31, 162, 0.08)"
+        >
+          <CardBody p={6}>
+            <HStack spacing={4} align="start">
+              <Box
+                w="50px"
+                h="50px"
+                bgGradient="linear(45deg, purple.500, brand.500)"
+                borderRadius="xl"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                boxShadow="0 4px 15px rgba(123, 31, 162, 0.3)"
+              >
+                <Icon as={FaUserMd} color="white" fontSize="xl" />
+              </Box>
+              <VStack align="start" spacing={2} flex="1">
+                <Text 
+                  fontWeight="700" 
+                  color="gray.800" 
+                  fontSize="md"
+                >
                   Qualified Healthcare Professional Assignment
                 </Text>
-                <Text fontSize="sm" color="blue.600">
+                <Text fontSize="sm" color="gray.600" lineHeight="1.6">
                   A qualified healthcare professional will be automatically assigned to your assessment 
                   based on your location, assessment type, and availability. All our professionals are 
                   licensed, experienced, and specialized in health assessments.
@@ -255,12 +356,42 @@ const AppointmentScheduling: React.FC<SchedulingProps> = ({
         </Card>
 
         {/* Step 1: Select Date */}
-        <Card bg={cardBg} borderColor={borderColor}>
-          <CardBody p={6}>
-            <VStack spacing={4} align="start">
-              <HStack spacing={2}>
-                <Icon as={FaCalendarAlt} color="primary.500" />
-                <Heading size="md">1. Select Assessment Date</Heading>
+        <Card 
+          bg="rgba(255, 255, 255, 0.9)"
+          borderColor="rgba(194, 24, 91, 0.2)"
+          borderWidth="2px"
+          borderRadius="2xl"
+          boxShadow="0 4px 20px rgba(194, 24, 91, 0.08)"
+          backdropFilter="blur(10px)"
+        >
+          <CardBody p={8}>
+            <VStack spacing={6} align="start">
+              <HStack spacing={4}>
+                <Box
+                  w="40px"
+                  h="40px"
+                  bgGradient="linear(45deg, brand.500, purple.500)"
+                  borderRadius="lg"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  boxShadow="0 4px 15px rgba(194, 24, 91, 0.3)"
+                >
+                  <Icon as={FaCalendarAlt} color="white" fontSize="lg" />
+                </Box>
+                <Heading 
+                  size="md"
+                  bgGradient="linear(45deg, brand.600, purple.600)"
+                  bgClip="text"
+                  sx={{
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
+                  fontWeight="700"
+                >
+                  1. Select Assessment Date
+                </Heading>
               </HStack>
               
               <SimpleGrid columns={{ base: 2, md: 4, lg: 7 }} spacing={3} w="full">
@@ -268,13 +399,28 @@ const AppointmentScheduling: React.FC<SchedulingProps> = ({
                   <Button
                     key={date.value}
                     variant={selectedDate === date.value ? 'solid' : 'outline'}
-                    colorScheme={selectedDate === date.value ? 'primary' : 'gray'}
-                    size="sm"
+                    bg={selectedDate === date.value ? 'linear-gradient(45deg, #c2185b, #7b1fa2)' : 'transparent'}
+                    color={selectedDate === date.value ? 'white' : 'gray.700'}
+                    borderColor={selectedDate === date.value ? 'transparent' : 'rgba(194, 24, 91, 0.3)'}
+                    borderWidth="2px"
+                    size="md"
                     onClick={() => setSelectedDate(date.value)}
                     flexDirection="column"
                     h="auto"
-                    py={3}
+                    py={4}
+                    px={3}
+                    borderRadius="xl"
                     isDisabled={date.isWeekend && selectedService.category !== 'emergency'}
+                    _hover={{
+                      borderColor: 'brand.400',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 4px 12px rgba(194, 24, 91, 0.25)',
+                    }}
+                    _disabled={{
+                      opacity: 0.5,
+                      cursor: 'not-allowed',
+                    }}
+                    transition="all 0.2s ease-in-out"
                   >
                     <Text fontSize="xs" opacity={date.isToday ? 1 : 0.7}>
                       {date.isToday ? 'Today' : date.label.split(' ')[0]}
@@ -300,12 +446,42 @@ const AppointmentScheduling: React.FC<SchedulingProps> = ({
 
         {/* Step 2: Select Time */}
         {selectedDate && (
-          <Card bg={cardBg} borderColor={borderColor}>
-            <CardBody p={6}>
-              <VStack spacing={4} align="start">
-                <HStack spacing={2}>
-                  <Icon as={FaClock} color="primary.500" />
-                  <Heading size="md">2. Select Assessment Time</Heading>
+          <Card 
+            bg="rgba(255, 255, 255, 0.9)"
+            borderColor="rgba(123, 31, 162, 0.2)"
+            borderWidth="2px"
+            borderRadius="2xl"
+            boxShadow="0 4px 20px rgba(123, 31, 162, 0.08)"
+            backdropFilter="blur(10px)"
+          >
+            <CardBody p={8}>
+              <VStack spacing={6} align="start">
+                <HStack spacing={4}>
+                  <Box
+                    w="40px"
+                    h="40px"
+                    bgGradient="linear(45deg, purple.500, brand.500)"
+                    borderRadius="lg"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    boxShadow="0 4px 15px rgba(123, 31, 162, 0.3)"
+                  >
+                    <Icon as={FaClock} color="white" fontSize="lg" />
+                  </Box>
+                  <Heading 
+                    size="md"
+                    bgGradient="linear(45deg, purple.600, brand.600)"
+                    bgClip="text"
+                    sx={{
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                    }}
+                    fontWeight="700"
+                  >
+                    2. Select Assessment Time
+                  </Heading>
                 </HStack>
                 
                 <SimpleGrid columns={{ base: 2, md: 3, lg: 4 }} spacing={3} w="full">
@@ -313,13 +489,28 @@ const AppointmentScheduling: React.FC<SchedulingProps> = ({
                     <Button
                       key={slot.id}
                       variant={selectedTimeSlot?.id === slot.id ? 'solid' : 'outline'}
-                      colorScheme={selectedTimeSlot?.id === slot.id ? 'primary' : 'gray'}
+                      bg={selectedTimeSlot?.id === slot.id ? 'linear-gradient(45deg, #7b1fa2, #c2185b)' : 'transparent'}
+                      color={selectedTimeSlot?.id === slot.id ? 'white' : 'gray.700'}
+                      borderColor={selectedTimeSlot?.id === slot.id ? 'transparent' : 'rgba(123, 31, 162, 0.3)'}
+                      borderWidth="2px"
                       size="md"
                       onClick={() => setSelectedTimeSlot(slot)}
                       isDisabled={!slot.available}
                       flexDirection="column"
                       h="auto"
-                      py={3}
+                      py={4}
+                      px={3}
+                      borderRadius="xl"
+                      _hover={{
+                        borderColor: 'purple.400',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 4px 12px rgba(123, 31, 162, 0.25)',
+                      }}
+                      _disabled={{
+                        opacity: 0.5,
+                        cursor: 'not-allowed',
+                      }}
+                      transition="all 0.2s ease-in-out"
                     >
                       <Text fontWeight="bold">{slot.time}</Text>
                       <Text fontSize="xs">

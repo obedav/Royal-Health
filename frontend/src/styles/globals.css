@@ -1,7 +1,7 @@
 /* Global Styles for Royal Health Consult - Enhanced Colors */
 
 /* Import Inter font from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
 
 /* Reset and base styles */
 * {
@@ -16,11 +16,12 @@ html {
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #FAFAFA;
+  background-color: #fafafa;
   width: 100%;
   margin: 0;
   padding: 0;
@@ -75,6 +76,31 @@ body {
   }
 }
 
+.video-container {
+  position: fixed; /* stays in place while scrolling */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: -1; /* keep it behind everything */
+  overflow: hidden;
+}
+
+.video-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* covers the whole screen */
+}
+
+.video-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4); /* dark overlay for readability */
+}
+
 /* Center content wrapper */
 .content-wrapper {
   width: 100%;
@@ -88,7 +114,7 @@ body {
 
 /* Enhanced Royal Health brand gradient - Darker Pink & Sharp Purple */
 .brand-gradient {
-  background: linear-gradient(45deg, #C2185B, #7B1FA2);
+  background: linear-gradient(45deg, #c2185b, #7b1fa2);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -97,7 +123,7 @@ body {
 
 /* Alternative gradient for variety */
 .brand-gradient-alt {
-  background: linear-gradient(135deg, #AD1457, #6A1B9A);
+  background: linear-gradient(135deg, #ad1457, #6a1b9a);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -106,13 +132,13 @@ body {
 
 /* Enhanced brand colors as CSS variables */
 :root {
-  --brand-pink-dark: #C2185B;
-  --brand-pink-darker: #AD1457;
-  --brand-purple-sharp: #7B1FA2;
-  --brand-purple-darker: #6A1B9A;
-  --brand-gradient: linear-gradient(45deg, #C2185B, #7B1FA2);
-  --brand-gradient-alt: linear-gradient(135deg, #AD1457, #6A1B9A);
-  --brand-gradient-radial: radial-gradient(circle, #C2185B, #7B1FA2);
+  --brand-pink-dark: #c2185b;
+  --brand-pink-darker: #ad1457;
+  --brand-purple-sharp: #7b1fa2;
+  --brand-purple-darker: #6a1b9a;
+  --brand-gradient: linear-gradient(45deg, #c2185b, #7b1fa2);
+  --brand-gradient-alt: linear-gradient(135deg, #ad1457, #6a1b9a);
+  --brand-gradient-radial: radial-gradient(circle, #c2185b, #7b1fa2);
 }
 
 /* Button hover animations with enhanced colors */
@@ -257,7 +283,7 @@ body {
   .mobile-only {
     display: none;
   }
-  
+
   .desktop-only {
     display: block;
   }
@@ -273,12 +299,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(45deg, #C2185B, #7B1FA2);
+  background: linear-gradient(45deg, #c2185b, #7b1fa2);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(45deg, #AD1457, #6A1B9A);
+  background: linear-gradient(45deg, #ad1457, #6a1b9a);
 }
 
 /* Enhanced focus styles for accessibility */
@@ -287,7 +313,7 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 a:focus-visible {
-  outline: 2px solid #C2185B;
+  outline: 2px solid #c2185b;
   outline-offset: 2px;
 }
 
@@ -296,7 +322,7 @@ a:focus-visible {
   .no-print {
     display: none !important;
   }
-  
+
   .app {
     background: white !important;
   }
@@ -305,8 +331,8 @@ a:focus-visible {
 /* High contrast mode support with enhanced colors */
 @media (prefers-contrast: high) {
   .brand-gradient {
-    -webkit-text-fill-color: #C2185B;
-    color: #C2185B;
+    -webkit-text-fill-color: #c2185b;
+    color: #c2185b;
   }
 }
 
@@ -328,7 +354,7 @@ a:focus-visible {
 }
 
 .nigeria-flag-white {
-  background-color: #FFFFFF;
+  background-color: #ffffff;
 }
 
 /* Fix for Chakra UI containers */
@@ -351,32 +377,32 @@ a:focus-visible {
 
 /* Additional utility classes for the enhanced colors */
 .bg-brand-pink {
-  background-color: #C2185B;
+  background-color: #c2185b;
 }
 
 .bg-brand-purple {
-  background-color: #7B1FA2;
+  background-color: #7b1fa2;
 }
 
 .text-brand-pink {
-  color: #C2185B;
+  color: #c2185b;
 }
 
 .text-brand-purple {
-  color: #7B1FA2;
+  color: #7b1fa2;
 }
 
 .border-brand-pink {
-  border-color: #C2185B;
+  border-color: #c2185b;
 }
 
 .border-brand-purple {
-  border-color: #7B1FA2;
+  border-color: #7b1fa2;
 }
 
 /* Button styles with enhanced colors */
 .btn-brand {
-  background: linear-gradient(45deg, #C2185B, #7B1FA2);
+  background: linear-gradient(45deg, #c2185b, #7b1fa2);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -386,7 +412,7 @@ a:focus-visible {
 }
 
 .btn-brand:hover {
-  background: linear-gradient(45deg, #AD1457, #6A1B9A);
+  background: linear-gradient(45deg, #ad1457, #6a1b9a);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(194, 24, 91, 0.3);
 }

@@ -1,36 +1,66 @@
-import { NestFactory } from '@nestjs/core';
-import { ExpressAdapter } from '@nestjs/platform-express';
-import express from 'express';
-import { AppModule } from '../backend/src/app.module';
+// backend/src/main.ts
+import { NestFactory } from "@nestjs/core";
+import { AppModule } from "./app.module";
+import { ValidationPipe } from "@nestjs/common";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
-let app: any;
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
 
-export default async function handler(req: any, res: any) {
-  if (!app) {
-    const expressApp = express();
-    const nestApp = await NestFactory.create(
-      AppModule, 
-      new ExpressAdapter(expressApp)
-    );
-    
-    // CORS configuration for your frontend
-    nestApp.enableCors({
+  // Global validation pipe
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    })
+  );
+
+  // CORS Configuration
+  app.enableCors({
     origin: [
-        process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000',
-        'https://royal-health-testing.vercel.app', // ← Add your actual domain
-        'http://localhost:3000'
+      "https://royal-health-testing.vercel.app",
+      "https://royal-health-testing-git-main-david-m-gs-projects.vercel.app",
+      "https://royal-health-testing-q1fpjru6e-david-m-gs-projects.vercel.app",
+      /^https:\/\/royal-health-testing-.*\.vercel\.app$/,
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "http://localhost:4173",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: [
+      "Origin",
+      "X-Requested-With",
+      "Content-Type",
+      "Accept",
+      "Authorization",
+      "Cache-Control",
     ],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    });
-    
-    // Set API prefix (same as your current setup)
-    nestApp.setGlobalPrefix('api/v1');
-    
-    await nestApp.init();
-    app = nestApp.getHttpAdapter().getInstance();
-  }
-  
-  return app(req, res);
+    optionsSuccessStatus: 200,
+  });
+
+  // Global prefix
+  app.setGlobalPrefix("api/v1");
+
+  // 🔹 Swagger Setup
+  const config = new DocumentBuilder()
+    .setTitle("Royal Health API")
+    .setDescription("API documentation for Royal Health system")
+    .setVersion("1.0")
+    .addBearerAuth()
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup("api/docs", app, document);
+
+  const port = process.env.PORT || 3001;
+  await app.listen(port);
+
+  console.log(`🚀 Royal Health API server running on port ${port}`);
+  console.log(`🏥 Environment: ${process.env.NODE_ENV || "development"}`);
+  console.log(`🔗 Health check: http://localhost:${port}/health`);
+  console.log(`📖 Swagger docs: http://localhost:${port}/api/docs`);
 }
+
+bootstrap();

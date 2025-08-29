@@ -1,6 +1,5 @@
-
 // src/pages/Contact.tsx - Enhanced with vibrant colors and premium styling
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -31,7 +30,7 @@ import {
   Link,
   Spinner,
   Center,
-} from '@chakra-ui/react';
+} from "@chakra-ui/react";
 import {
   FaPhone,
   FaEnvelope,
@@ -47,7 +46,7 @@ import {
   FaAmbulance,
   FaQuestionCircle,
   FaUserTie,
-} from 'react-icons/fa';
+} from "react-icons/fa";
 
 // Types for real data
 interface ContactInfo {
@@ -95,102 +94,108 @@ interface FAQ {
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState<ContactForm>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    subject: '',
-    inquiryType: '',
-    message: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    subject: "",
+    inquiryType: "",
+    message: "",
   });
-  
+
   const [errors, setErrors] = useState<Partial<ContactForm>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [validFields, setValidFields] = useState<Partial<ContactForm>>({});
+  const [touchedFields, setTouchedFields] = useState<Partial<ContactForm>>({});
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  const bg = useColorModeValue('gray.50', 'gray.900');
-  const cardBg = useColorModeValue('white', 'gray.800');
+
+  const bg = useColorModeValue("gray.50", "gray.900");
+  const cardBg = useColorModeValue("white", "gray.800");
   const toast = useToast();
-  
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api/v1';
+
+  const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api/v1";
 
   // Default contact info fallback
   const getDefaultContactInfo = (): ContactInfo => ({
-    phones: ['+234 706 332 5184', '+234 808 374 7339', '+234 803 404 7213'],
-    emails: ['info@royalhealthconsult.ng', 'support@royalhealthconsult.ng'],
+    phones: ["+234 706 332 5184", "+234 808 374 7339", "+234 803 404 7213"],
+    emails: ["care@royalhealthconsult.com", "rcs@royalhealthconsult.com"],
     address: {
-      street: '4 Barthlomew Ezeogu Street',
-      city: 'Oke Alfa, Isolo',
-      state: 'Lagos',
-      country: 'Nigeria',
-      postalCode: '101241'
+      street: "4 Barthlomew Ezeogu Street",
+      city: "Oke Alfa, Isolo",
+      state: "Lagos",
+      country: "Nigeria",
+      postalCode: "101241",
     },
     businessHours: {
-      weekdays: 'Mon - Fri: 8:00 AM - 6:00 PM',
-      saturday: 'Sat: 9:00 AM - 4:00 PM',
-      sunday: 'Sun: Emergency Services Only',
-      emergency: '24/7 Emergency Available'
+      weekdays: "Mon - Fri: 8:00 AM - 6:00 PM",
+      saturday: "Sat: 9:00 AM - 4:00 PM",
+      sunday: "Sun: Emergency Services Only",
+      emergency: "24/7 Emergency Available",
     },
     socialMedia: {
-      facebook: 'https://facebook.com/royalhealthconsult',
-      twitter: 'https://twitter.com/royalhealthng',
-      instagram: 'https://instagram.com/royalhealthconsult',
-      linkedin: 'https://linkedin.com/company/royal-health-consult',
-      whatsapp: 'https://wa.me/2349012345678'
-    }
+      facebook: "https://facebook.com/royalhealthconsult",
+      twitter: "https://twitter.com/royalhealthng",
+      instagram: "https://instagram.com/royalhealthconsult",
+      linkedin: "https://linkedin.com/company/royal-health-consult",
+      whatsapp: "https://wa.me/2349012345678",
+    },
   });
 
   // Fetch real contact data from backend with fallback
   const fetchContactData = async () => {
     setLoading(true);
-    
+
     try {
       // Try to fetch contact information
       try {
-        console.log('🔄 Trying to fetch contact info...');
-        const contactResponse = await fetch(`${API_BASE_URL}/company/contact-info`);
-        
+        console.log("🔄 Trying to fetch contact info...");
+        const contactResponse = await fetch(
+          `${API_BASE_URL}/company/contact-info`
+        );
+
         if (contactResponse.ok) {
           const contactData = await contactResponse.json();
-          console.log('✅ Contact info loaded from API:', contactData);
+          console.log("✅ Contact info loaded from API:", contactData);
           setContactInfo(contactData);
         } else if (contactResponse.status === 404) {
-          console.warn('⚠️ Contact info API not available (404), using fallback data');
+          console.warn(
+            "⚠️ Contact info API not available (404), using fallback data"
+          );
           setContactInfo(getDefaultContactInfo());
         } else {
           throw new Error(`Contact API returned ${contactResponse.status}`);
         }
       } catch (contactError) {
-        console.warn('⚠️ Contact info API failed:', contactError);
-        console.log('🔄 Using fallback contact info');
+        console.warn("⚠️ Contact info API failed:", contactError);
+        console.log("🔄 Using fallback contact info");
         setContactInfo(getDefaultContactInfo());
       }
 
       // Try to fetch FAQs
       try {
-        console.log('🔄 Trying to fetch FAQs...');
+        console.log("🔄 Trying to fetch FAQs...");
         const faqResponse = await fetch(`${API_BASE_URL}/support/faqs`);
-        
+
         if (faqResponse.ok) {
           const faqData = await faqResponse.json();
-          console.log('✅ FAQs loaded from API:', faqData);
+          console.log("✅ FAQs loaded from API:", faqData);
           setFaqs(faqData.filter((faq: FAQ) => faq.isActive));
         } else if (faqResponse.status === 404) {
-          console.warn('⚠️ FAQ API not available (404), using default FAQs');
+          console.warn("⚠️ FAQ API not available (404), using default FAQs");
           setFaqs(getDefaultFAQs());
         } else {
           throw new Error(`FAQ API returned ${faqResponse.status}`);
         }
       } catch (faqError) {
-        console.warn('⚠️ FAQ API failed:', faqError);
-        console.log('🔄 Using default FAQs');
+        console.warn("⚠️ FAQ API failed:", faqError);
+        console.log("🔄 Using default FAQs");
         setFaqs(getDefaultFAQs());
       }
-
     } catch (err) {
-      console.error('❌ Error fetching contact data:', err);
+      console.error("❌ Error fetching contact data:", err);
       // Use default data if everything fails
       setContactInfo(getDefaultContactInfo());
       setFaqs(getDefaultFAQs());
@@ -202,33 +207,37 @@ const Contact: React.FC = () => {
   // Default FAQs fallback
   const getDefaultFAQs = (): FAQ[] => [
     {
-      id: '1',
-      question: 'How do I book an appointment?',
-      answer: 'You can book an appointment through our website, mobile app, or by calling our booking hotline. Online booking is available 24/7.',
-      category: 'Booking',
-      isActive: true
+      id: "1",
+      question: "How do I book an appointment?",
+      answer:
+        "You can book an appointment through our website, mobile app, or by calling our booking hotline. Online booking is available 24/7.",
+      category: "Booking",
+      isActive: true,
     },
     {
-      id: '2',
-      question: 'What services do you offer?',
-      answer: 'We offer comprehensive home healthcare services including nursing care, medical consultations, health screenings, and emergency medical assistance.',
-      category: 'Services',
-      isActive: true
+      id: "2",
+      question: "What services do you offer?",
+      answer:
+        "We offer comprehensive home healthcare services including nursing care, medical consultations, health screenings, and emergency medical assistance.",
+      category: "Services",
+      isActive: true,
     },
     {
-      id: '3',
-      question: 'Do you accept insurance?',
-      answer: 'Yes, we accept most major health insurance plans. Please contact us to verify if your specific insurance plan is accepted.',
-      category: 'Insurance',
-      isActive: true
+      id: "3",
+      question: "Do you accept insurance?",
+      answer:
+        "Yes, we accept most major health insurance plans. Please contact us to verify if your specific insurance plan is accepted.",
+      category: "Insurance",
+      isActive: true,
     },
     {
-      id: '4',
-      question: 'What are your emergency response times?',
-      answer: 'For emergency calls within Lagos, our response time is typically 15-30 minutes. For non-emergency services, we can usually schedule same-day or next-day appointments.',
-      category: 'Emergency',
-      isActive: true
-    }
+      id: "4",
+      question: "What are your emergency response times?",
+      answer:
+        "For emergency calls within Lagos, our response time is typically 15-30 minutes. For non-emergency services, we can usually schedule same-day or next-day appointments.",
+      category: "Emergency",
+      isActive: true,
+    },
   ];
 
   useEffect(() => {
@@ -236,71 +245,99 @@ const Contact: React.FC = () => {
   }, []);
 
   const inquiryTypes = [
-    { value: 'general', label: 'General Inquiry' },
-    { value: 'booking', label: 'Booking & Appointments' },
-    { value: 'medical', label: 'Medical Consultation' },
-    { value: 'emergency', label: 'Emergency Services' },
-    { value: 'partnership', label: 'Partnership Opportunities' },
-    { value: 'careers', label: 'Careers & Employment' },
-    { value: 'technical', label: 'Technical Support' },
-    { value: 'feedback', label: 'Feedback & Complaints' },
+    { value: "general", label: "General Inquiry" },
+    { value: "booking", label: "Booking & Appointments" },
+    { value: "medical", label: "Medical Consultation" },
+    { value: "emergency", label: "Emergency Services" },
+    { value: "partnership", label: "Partnership Opportunities" },
+    { value: "careers", label: "Careers & Employment" },
+    { value: "technical", label: "Technical Support" },
+    { value: "feedback", label: "Feedback & Complaints" },
   ];
 
   // Enhanced quickServices array with brand colors
   const quickServices = [
     {
       icon: FaAmbulance,
-      title: 'Emergency Services',
-      description: 'Immediate medical assistance',
-      phone: contactInfo?.phones[0] || '+234 808 374 7339',
-      available: '24/7',
-      color: 'red',
+      title: "Emergency Services",
+      description: "Immediate medical assistance",
+      phone: contactInfo?.phones[0] || "+234 808 374 7339",
+      available: "24/7",
+      color: "red",
     },
     {
       icon: FaHeadset,
-      title: 'Customer Support',
-      description: 'General inquiries and support',
-      phone: contactInfo?.phones[0] || '+234 808 374 7339',
-      available: 'Mon-Fri 8AM-6PM',
-      color: 'brand', // Using our enhanced brand color
+      title: "Customer Support",
+      description: "General inquiries and support",
+      phone: contactInfo?.phones[0] || "+234 808 374 7339",
+      available: "Mon-Fri 8AM-6PM",
+      color: "brand", // Using our enhanced brand color
     },
     {
       icon: FaQuestionCircle,
-      title: 'Booking Assistance',
-      description: 'Help with appointments',
-      phone: contactInfo?.phones[1] || '+234 706 332 5184',
-      available: 'Mon-Fri 8AM-8PM',
-      color: 'green',
+      title: "Booking Assistance",
+      description: "Help with appointments",
+      phone: contactInfo?.phones[1] || "+234 706 332 5184",
+      available: "Mon-Fri 8AM-8PM",
+      color: "green",
     },
     {
       icon: FaUserTie,
-      title: 'Partnership Inquiries',
-      description: 'Partnerships and collaborations',
-      phone: contactInfo?.phones[2] || '+234 803 404 7213',
-      available: 'Mon-Fri 9AM-5PM',
-      color: 'purple' // Using our enhanced purple
+      title: "Partnership Inquiries",
+      description: "Partnerships and collaborations",
+      phone: contactInfo?.phones[2] || "+234 803 404 7213",
+      available: "Mon-Fri 9AM-5PM",
+      color: "purple", // Using our enhanced purple
     },
   ];
 
   const socialLinks = [
-    { icon: FaFacebook, url: contactInfo?.socialMedia.facebook, color: 'facebook' },
-    { icon: FaTwitter, url: contactInfo?.socialMedia.twitter, color: 'twitter' },
-    { icon: FaInstagram, url: contactInfo?.socialMedia.instagram, color: 'pink' },
-    { icon: FaLinkedin, url: contactInfo?.socialMedia.linkedin, color: 'linkedin' },
-    { icon: FaWhatsapp, url: contactInfo?.socialMedia.whatsapp, color: 'whatsapp' },
-  ].filter(link => link.url); // Only show links that exist
+    {
+      icon: FaFacebook,
+      url: contactInfo?.socialMedia.facebook,
+      color: "facebook",
+    },
+    {
+      icon: FaTwitter,
+      url: contactInfo?.socialMedia.twitter,
+      color: "twitter",
+    },
+    {
+      icon: FaInstagram,
+      url: contactInfo?.socialMedia.instagram,
+      color: "pink",
+    },
+    {
+      icon: FaLinkedin,
+      url: contactInfo?.socialMedia.linkedin,
+      color: "linkedin",
+    },
+    {
+      icon: FaWhatsapp,
+      url: contactInfo?.socialMedia.whatsapp,
+      color: "whatsapp",
+      customColors: {
+        bg: "#25D366",
+        hover: "#128C7E",
+        border: "#25D366"
+      }
+    },
+  ].filter((link) => link.url); // Only show links that exist
 
   const validateForm = (): boolean => {
     const newErrors: Partial<ContactForm> = {};
 
-    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
-    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
-    if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
-    if (!formData.subject.trim()) newErrors.subject = 'Subject is required';
-    if (!formData.inquiryType) newErrors.inquiryType = 'Please select inquiry type';
-    if (!formData.message.trim()) newErrors.message = 'Message is required';
+    if (!formData.firstName.trim())
+      newErrors.firstName = "First name is required";
+    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "Email is invalid";
+    if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
+    if (!formData.subject.trim()) newErrors.subject = "Subject is required";
+    if (!formData.inquiryType)
+      newErrors.inquiryType = "Please select inquiry type";
+    if (!formData.message.trim()) newErrors.message = "Message is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -308,92 +345,99 @@ const Contact: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setIsSubmitting(true);
-    
+
     try {
-      console.log('🔄 Trying to submit contact form...');
-      
+      console.log("🔄 Trying to submit contact form...");
+
       // Try to send contact form to real backend
       const response = await fetch(`${API_BASE_URL}/contact/submit`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ...formData,
           submittedAt: new Date().toISOString(),
-          source: 'website_contact_form'
+          source: "website_contact_form",
         }),
       });
 
       if (response.ok) {
         const result = await response.json();
-        console.log('✅ Contact form submitted successfully:', result);
-        
+        console.log("✅ Contact form submitted successfully:", result);
+
         toast({
-          title: 'Message Sent Successfully!',
-          description: `Thank you for contacting us. We'll get back to you within 24 hours. Reference ID: ${result.id || 'N/A'}`,
-          status: 'success',
+          title: "Message Sent Successfully!",
+          description: `Thank you for contacting us. We'll get back to you within 24 hours. Reference ID: ${
+            result.id || "N/A"
+          }`,
+          status: "success",
           duration: 7000,
           isClosable: true,
         });
 
         // Reset form on success
         setFormData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          phone: '',
-          subject: '',
-          inquiryType: '',
-          message: '',
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          subject: "",
+          inquiryType: "",
+          message: "",
         });
       } else if (response.status === 404) {
         // API endpoint doesn't exist yet
-        console.warn('⚠️ Contact submission API not available (404)');
-        
+        console.warn("⚠️ Contact submission API not available (404)");
+
         toast({
-          title: 'Message Received!',
-          description: 'Thank you for your message. Since our contact API is not yet available, please call us directly or send an email.',
-          status: 'info',
+          title: "Message Received!",
+          description:
+            "Thank you for your message. Since our contact API is not yet available, please call us directly or send an email.",
+          status: "info",
           duration: 7000,
           isClosable: true,
         });
 
         // Still reset form to show it "worked"
         setFormData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          phone: '',
-          subject: '',
-          inquiryType: '',
-          message: '',
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          subject: "",
+          inquiryType: "",
+          message: "",
         });
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to send message');
+        throw new Error(errorData.message || "Failed to send message");
       }
     } catch (error) {
-      console.error('❌ Contact form submission error:', error);
-      
+      console.error("❌ Contact form submission error:", error);
+
       // Check if it's a network error (API not available)
-      if (error instanceof TypeError && error.message.includes('fetch')) {
+      if (error instanceof TypeError && error.message.includes("fetch")) {
         toast({
-          title: 'Contact Form Offline',
-          description: 'Our contact form is temporarily unavailable. Please call us directly or send an email.',
-          status: 'warning',
+          title: "Contact Form Offline",
+          description:
+            "Our contact form is temporarily unavailable. Please call us directly or send an email.",
+          status: "warning",
           duration: 7000,
           isClosable: true,
         });
       } else {
         toast({
-          title: 'Error Sending Message',
-          description: error instanceof Error ? error.message : 'Please try again or contact us directly.',
-          status: 'error',
+          title: "Error Sending Message",
+          description:
+            error instanceof Error
+              ? error.message
+              : "Please try again or contact us directly.",
+          status: "error",
           duration: 5000,
           isClosable: true,
         });
@@ -403,12 +447,51 @@ const Contact: React.FC = () => {
     }
   };
 
-  const handleInputChange = (field: keyof ContactForm, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+  const validateField = (field: keyof ContactForm, value: string): string | undefined => {
+    switch (field) {
+      case 'firstName':
+        return !value.trim() ? 'First name is required' : undefined;
+      case 'lastName':
+        return !value.trim() ? 'Last name is required' : undefined;
+      case 'email':
+        if (!value.trim()) return 'Email is required';
+        if (!/\S+@\S+\.\S+/.test(value)) return 'Please enter a valid email address';
+        return undefined;
+      case 'phone':
+        if (!value.trim()) return 'Phone number is required';
+        if (!/^[\+]?[1-9][\d]{0,15}$/.test(value.replace(/\s/g, ''))) return 'Please enter a valid phone number';
+        return undefined;
+      case 'subject':
+        return !value.trim() ? 'Subject is required' : undefined;
+      case 'inquiryType':
+        return !value ? 'Please select inquiry type' : undefined;
+      case 'message':
+        if (!value.trim()) return 'Message is required';
+        if (value.trim().length < 10) return 'Message must be at least 10 characters';
+        return undefined;
+      default:
+        return undefined;
     }
+  };
+
+  const handleInputChange = (field: keyof ContactForm, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    
+    // Mark field as touched
+    setTouchedFields((prev) => ({ ...prev, [field]: true }));
+    
+    // Real-time validation
+    const error = validateField(field, value);
+    setErrors((prev) => ({ ...prev, [field]: error }));
+    setValidFields((prev) => ({ ...prev, [field]: !error }));
+  };
+
+  const handleBlur = (field: keyof ContactForm) => {
+    setTouchedFields((prev) => ({ ...prev, [field]: true }));
+    const value = formData[field];
+    const error = validateField(field, value);
+    setErrors((prev) => ({ ...prev, [field]: error }));
+    setValidFields((prev) => ({ ...prev, [field]: !error }));
   };
 
   if (loading) {
@@ -442,30 +525,56 @@ const Contact: React.FC = () => {
           opacity={0.1}
           blur="30px"
         />
-        
+
+        {/* CSS for floating animation */}
+        <style>
+          {`
+            @keyframes float {
+              0%, 100% { transform: translateY(0px); }
+              50% { transform: translateY(-20px); }
+            }
+            @keyframes pulse-glow {
+              0%, 100% { box-shadow: 0 0 20px rgba(194, 24, 91, 0.3); }
+              50% { box-shadow: 0 0 40px rgba(194, 24, 91, 0.6); }
+            }
+          `}
+        </style>
+
         <Center h="100vh">
-          <VStack spacing={6}>
-            <Spinner
-              size="xl"
-              thickness="4px"
-              speed="0.65s"
-              emptyColor="gray.200"
-              sx={{
-                background: "linear-gradient(45deg, #C2185B, #7B1FA2)",
-                borderRadius: "50px",
-                '& > circle': {
-                  stroke: 'white'
-                }
-              }}
-            />
-            <Text 
-              fontSize="lg" 
-              fontWeight="600"
-              bgGradient="linear(45deg, brand.500, purple.500)"
-              bgClip="text"
+          <VStack spacing={8}>
+            <Box
+              position="relative"
+              p={8}
+              borderRadius="2xl"
+              bg="white"
+              boxShadow="0 20px 60px rgba(194, 24, 91, 0.2)"
+              animation="float 3s ease-in-out infinite, pulse-glow 2s ease-in-out infinite"
             >
-              Loading contact information...
-            </Text>
+              <Spinner
+                size="xl"
+                thickness="4px"
+                speed="0.65s"
+                emptyColor="gray.200"
+                color="brand.500"
+              />
+            </Box>
+            <VStack spacing={2} textAlign="center">
+              <Text
+                fontSize="xl"
+                fontWeight="700"
+                bgGradient="linear(45deg, brand.500, purple.500)"
+                bgClip="text"
+                sx={{
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                Loading Contact Information
+              </Text>
+              <Text fontSize="md" color="gray.600" fontWeight="500">
+                Please wait while we prepare everything for you...
+              </Text>
+            </VStack>
           </VStack>
         </Center>
       </Box>
@@ -475,9 +584,9 @@ const Contact: React.FC = () => {
   return (
     <Box bg={bg} minH="100vh">
       {/* Enhanced Hero Section */}
-      <Box 
+      <Box
         bgGradient="linear(135deg, brand.600 0%, purple.600 100%)"
-        color="white" 
+        color="white"
         py={20}
         position="relative"
         overflow="hidden"
@@ -506,27 +615,27 @@ const Contact: React.FC = () => {
 
         <Container maxW="6xl" position="relative">
           <VStack spacing={6} textAlign="center">
-            <Heading 
-              size="2xl" 
+            <Heading
+              size="2xl"
               fontWeight="900"
               textShadow="0 4px 12px rgba(0,0,0,0.3)"
             >
-              Contact{' '}
+              Contact{" "}
               <Text as="span" color="whiteAlpha.900">
                 Royal Health Consult
               </Text>
             </Heading>
             <Text fontSize="xl" maxW="3xl" opacity={0.95} fontWeight="500">
-              We're here to help you with all your healthcare needs. 
-              Reach out to us anytime for professional medical assistance.
+              We're here to help you with all your healthcare needs. Reach out
+              to us anytime for professional medical assistance.
             </Text>
             <HStack spacing={4} flexWrap="wrap" justify="center">
-              <Badge 
-                bg="whiteAlpha.200" 
-                color="white" 
-                px={6} 
-                py={3} 
-                fontSize="md" 
+              <Badge
+                bg="whiteAlpha.200"
+                color="white"
+                px={6}
+                py={3}
+                fontSize="md"
                 borderRadius="full"
                 backdropFilter="blur(10px)"
                 border="1px solid"
@@ -535,12 +644,12 @@ const Contact: React.FC = () => {
               >
                 24/7 Emergency Support
               </Badge>
-              <Badge 
-                bg="whiteAlpha.200" 
-                color="white" 
-                px={6} 
-                py={3} 
-                fontSize="md" 
+              <Badge
+                bg="whiteAlpha.200"
+                color="white"
+                px={6}
+                py={3}
+                fontSize="md"
                 borderRadius="full"
                 backdropFilter="blur(10px)"
                 border="1px solid"
@@ -554,12 +663,12 @@ const Contact: React.FC = () => {
         </Container>
       </Box>
 
-      <Container maxW="6xl" py={16}>
-        <VStack spacing={16} align="stretch">
+      <Container maxW="6xl" py={{ base: 8, md: 12, lg: 16 }} px={{ base: 4, md: 6 }}>
+        <VStack spacing={{ base: 12, md: 14, lg: 16 }} align="stretch">
           {/* Enhanced Emergency Alert */}
-          <Alert 
-            status="error" 
-            borderRadius="2xl" 
+          <Alert
+            status="error"
+            borderRadius="2xl"
             p={6}
             border="2px solid"
             borderColor="red.200"
@@ -572,10 +681,11 @@ const Contact: React.FC = () => {
                 Medical Emergency?
               </AlertTitle>
               <AlertDescription color="red.600" fontWeight="500">
-                For life-threatening emergencies, go to the nearest hospital immediately. 
-                For urgent but non-life-threatening situations, call our emergency line: {' '}
+                For life-threatening emergencies, go to the nearest hospital
+                immediately. For urgent but non-life-threatening situations,
+                call our emergency line:{" "}
                 <Text as="span" fontWeight="700" color="red.800">
-                  {contactInfo?.phones[0] || '+234 808 374 7339'}
+                  {contactInfo?.phones[0] || "+234 808 374 7339"}
                 </Text>
               </AlertDescription>
             </Box>
@@ -584,8 +694,8 @@ const Contact: React.FC = () => {
           {/* Enhanced Quick Contact Services */}
           <Box>
             <VStack spacing={8} textAlign="center" mb={12}>
-              <Heading 
-                size="xl" 
+              <Heading
+                size="xl"
                 fontWeight="800"
                 bgGradient="linear(45deg, brand.500, purple.500)"
                 bgClip="text"
@@ -597,63 +707,96 @@ const Contact: React.FC = () => {
               </Text>
             </VStack>
 
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6}>
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={{ base: 4, md: 6, lg: 8 }}>
               {quickServices.map((service, index) => (
-                <Card 
-                  key={index} 
-                  bg={cardBg} 
-                  shadow="xl" 
+                <Card
+                  key={index}
+                  bg={cardBg}
+                  shadow="xl"
                   borderRadius="2xl"
                   border="2px solid"
-                  borderColor={service.color === 'brand' ? 'brand.100' : `${service.color}.100`}
-                  _hover={{ 
-                    transform: 'translateY(-8px)', 
-                    shadow: `0 20px 40px rgba(${service.color === 'brand' ? '194, 24, 91' : service.color === 'purple' ? '123, 31, 162' : '0, 0, 0'}, 0.15)`,
-                    borderColor: service.color === 'brand' ? 'brand.200' : `${service.color}.200`
-                  }} 
+                  borderColor={
+                    service.color === "brand"
+                      ? "brand.100"
+                      : `${service.color}.100`
+                  }
+                  _hover={{
+                    transform: "translateY(-8px)",
+                    shadow: `0 20px 40px rgba(${
+                      service.color === "brand"
+                        ? "194, 24, 91"
+                        : service.color === "purple"
+                        ? "123, 31, 162"
+                        : "0, 0, 0"
+                    }, 0.15)`,
+                    borderColor:
+                      service.color === "brand"
+                        ? "brand.200"
+                        : `${service.color}.200`,
+                  }}
                   transition="all 0.3s ease-in-out"
                 >
                   <CardBody p={8} textAlign="center">
                     <VStack spacing={5}>
-                      <Box 
-                        bg={service.color === 'brand' ? 'brand.100' : `${service.color}.100`}
-                        p={5} 
+                      <Box
+                        bg={
+                          service.color === "brand"
+                            ? "brand.100"
+                            : `${service.color}.100`
+                        }
+                        p={5}
                         borderRadius="2xl"
                         position="relative"
                         _before={{
                           content: '""',
-                          position: 'absolute',
-                          inset: '-2px',
-                          borderRadius: '2xl',
-                          background: service.color === 'brand' 
-                            ? 'linear-gradient(45deg, #C2185B, #7B1FA2)'
-                            : `linear-gradient(45deg, ${service.color}.400, ${service.color}.600)`,
+                          position: "absolute",
+                          inset: "-2px",
+                          borderRadius: "2xl",
+                          background:
+                            service.color === "brand"
+                              ? "linear-gradient(45deg, #C2185B, #7B1FA2)"
+                              : `linear-gradient(45deg, ${service.color}.400, ${service.color}.600)`,
                           zIndex: -1,
-                          opacity: 0.1
+                          opacity: 0.1,
                         }}
                       >
-                        <Icon 
-                          as={service.icon} 
-                          fontSize="3xl" 
-                          color={service.color === 'brand' ? 'brand.600' : `${service.color}.600`} 
+                        <Icon
+                          as={service.icon}
+                          fontSize="3xl"
+                          color={
+                            service.color === "brand"
+                              ? "brand.600"
+                              : `${service.color}.600`
+                          }
                         />
                       </Box>
                       <VStack spacing={3}>
-                        <Heading 
-                          size="md" 
-                          color={service.color === 'brand' ? 'brand.600' : `${service.color}.600`}
+                        <Heading
+                          size="md"
+                          color={
+                            service.color === "brand"
+                              ? "brand.600"
+                              : `${service.color}.600`
+                          }
                           fontWeight="700"
                         >
                           {service.title}
                         </Heading>
-                        <Text fontSize="sm" color="gray.600" textAlign="center" fontWeight="500">
+                        <Text
+                          fontSize="sm"
+                          color="gray.600"
+                          textAlign="center"
+                          fontWeight="500"
+                        >
                           {service.description}
                         </Text>
                         <Text fontWeight="bold" color="gray.800" fontSize="sm">
                           {service.phone}
                         </Text>
-                        <Badge 
-                          colorScheme={service.color === 'brand' ? 'pink' : service.color} 
+                        <Badge
+                          colorScheme={
+                            service.color === "brand" ? "pink" : service.color
+                          }
                           size="sm"
                           px={3}
                           py={1}
@@ -671,30 +814,30 @@ const Contact: React.FC = () => {
           </Box>
 
           {/* Enhanced Main Content */}
-          <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={16}>
+          <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={{ base: 8, md: 12, lg: 16 }}>
             {/* Enhanced Contact Form */}
-            <Card 
-              bg={cardBg} 
-              shadow="2xl" 
+            <Card
+              bg={cardBg}
+              shadow="2xl"
               borderRadius="3xl"
               border="3px solid"
               borderColor="brand.100"
               position="relative"
               _before={{
                 content: '""',
-                position: 'absolute',
+                position: "absolute",
                 top: 0,
                 left: 0,
                 right: 0,
-                height: '6px',
-                borderTopRadius: '3xl',
-                bgGradient: 'linear(90deg, brand.500, purple.500)'
+                height: "6px",
+                borderTopRadius: "3xl",
+                bgGradient: "linear(90deg, brand.500, purple.500)",
               }}
             >
               <CardHeader pb={2}>
                 <VStack spacing={3} align="start">
-                  <Heading 
-                    size="lg" 
+                  <Heading
+                    size="lg"
                     fontWeight="800"
                     bgGradient="linear(45deg, brand.600, purple.600)"
                     bgClip="text"
@@ -702,156 +845,241 @@ const Contact: React.FC = () => {
                     Send Us a Message
                   </Heading>
                   <Text color="gray.600" fontWeight="500">
-                    Fill out the form below and we'll get back to you as soon as possible.
+                    Fill out the form below and we'll get back to you as soon as
+                    possible.
                   </Text>
                 </VStack>
               </CardHeader>
-              <CardBody pt={2}>
+              <CardBody pt={2} px={{ base: 6, md: 8 }} pb={{ base: 6, md: 8 }}>
                 <form onSubmit={handleSubmit}>
-                  <VStack spacing={6}>
-                    <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
-                      <FormControl isRequired isInvalid={!!errors.firstName}>
-                        <FormLabel fontWeight="600" color="gray.700">First Name</FormLabel>
+                  <VStack spacing={{ base: 5, md: 6 }}>
+                    <SimpleGrid
+                      columns={{ base: 1, md: 2 }}
+                      spacing={4}
+                      w="full"
+                    >
+                      <FormControl 
+                        isRequired 
+                        isInvalid={touchedFields.firstName && !!errors.firstName}
+                      >
+                        <FormLabel fontWeight="600" color="gray.700">
+                          First Name {validFields.firstName && touchedFields.firstName && (
+                            <Text as="span" color="green.500" fontSize="sm">✓</Text>
+                          )}
+                        </FormLabel>
                         <Input
                           value={formData.firstName}
-                          onChange={(e) => handleInputChange('firstName', e.target.value)}
+                          onChange={(e) =>
+                            handleInputChange("firstName", e.target.value)
+                          }
+                          onBlur={() => handleBlur("firstName")}
                           placeholder="Enter your first name"
                           borderWidth="2px"
-                          borderColor="gray.200"
+                          borderColor={
+                            touchedFields.firstName 
+                              ? (validFields.firstName ? "green.300" : (errors.firstName ? "red.300" : "gray.200"))
+                              : "gray.200"
+                          }
                           _focus={{
-                            borderColor: 'brand.400',
-                            boxShadow: '0 0 0 1px #C2185B'
+                            borderColor: touchedFields.firstName 
+                              ? (validFields.firstName ? "green.400" : "brand.400")
+                              : "brand.400",
+                            boxShadow: touchedFields.firstName 
+                              ? (validFields.firstName ? "0 0 0 1px #68D391" : "0 0 0 1px #C2185B")
+                              : "0 0 0 1px #C2185B",
                           }}
-                          _hover={{ borderColor: 'brand.300' }}
+                          _hover={{ 
+                            borderColor: touchedFields.firstName 
+                              ? (validFields.firstName ? "green.400" : "brand.300")
+                              : "brand.300"
+                          }}
                           borderRadius="xl"
                           fontSize="md"
                           fontWeight="500"
                         />
-                        <FormErrorMessage fontWeight="600">{errors.firstName}</FormErrorMessage>
+                        <FormErrorMessage fontWeight="600" color="red.500">
+                          {errors.firstName}
+                        </FormErrorMessage>
                       </FormControl>
 
                       <FormControl isRequired isInvalid={!!errors.lastName}>
-                        <FormLabel fontWeight="600" color="gray.700">Last Name</FormLabel>
+                        <FormLabel fontWeight="600" color="gray.700">
+                          Last Name
+                        </FormLabel>
                         <Input
                           value={formData.lastName}
-                          onChange={(e) => handleInputChange('lastName', e.target.value)}
+                          onChange={(e) =>
+                            handleInputChange("lastName", e.target.value)
+                          }
                           placeholder="Enter your last name"
                           borderWidth="2px"
                           borderColor="gray.200"
                           _focus={{
-                            borderColor: 'brand.400',
-                            boxShadow: '0 0 0 1px #C2185B'
+                            borderColor: "brand.400",
+                            boxShadow: "0 0 0 1px #C2185B",
                           }}
-                          _hover={{ borderColor: 'brand.300' }}
+                          _hover={{ borderColor: "brand.300" }}
                           borderRadius="xl"
                           fontSize="md"
                           fontWeight="500"
                         />
-                        <FormErrorMessage fontWeight="600">{errors.lastName}</FormErrorMessage>
+                        <FormErrorMessage fontWeight="600">
+                          {errors.lastName}
+                        </FormErrorMessage>
                       </FormControl>
                     </SimpleGrid>
-                    <FormControl isRequired isInvalid={!!errors.email}>
-                      <FormLabel fontWeight="600" color="gray.700">Email</FormLabel>
+                    <FormControl 
+                      isRequired 
+                      isInvalid={touchedFields.email && !!errors.email}
+                    >
+                      <FormLabel fontWeight="600" color="gray.700">
+                        Email {validFields.email && touchedFields.email && (
+                          <Text as="span" color="green.500" fontSize="sm">✓</Text>
+                        )}
+                      </FormLabel>
                       <Input
                         value={formData.email}
-                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("email", e.target.value)
+                        }
+                        onBlur={() => handleBlur("email")}
                         placeholder="Enter your email address"
                         borderWidth="2px"
-                        borderColor="gray.200"
+                        borderColor={
+                          touchedFields.email 
+                            ? (validFields.email ? "green.300" : (errors.email ? "red.300" : "gray.200"))
+                            : "gray.200"
+                        }
                         _focus={{
-                          borderColor: 'brand.400',
-                          boxShadow: '0 0 0 1px #C2185B'
+                          borderColor: touchedFields.email 
+                            ? (validFields.email ? "green.400" : "brand.400")
+                            : "brand.400",
+                          boxShadow: touchedFields.email 
+                            ? (validFields.email ? "0 0 0 1px #68D391" : "0 0 0 1px #C2185B")
+                            : "0 0 0 1px #C2185B",
                         }}
-                        _hover={{ borderColor: 'brand.300' }}
+                        _hover={{ 
+                          borderColor: touchedFields.email 
+                            ? (validFields.email ? "green.400" : "brand.300")
+                            : "brand.300"
+                        }}
                         borderRadius="xl"
                         fontSize="md"
                         fontWeight="500"
                         type="email"
                       />
-                      <FormErrorMessage fontWeight="600">{errors.email}</FormErrorMessage>
+                      <FormErrorMessage fontWeight="600" color="red.500">
+                        {errors.email}
+                      </FormErrorMessage>
                     </FormControl>
                     <FormControl isRequired isInvalid={!!errors.phone}>
-                      <FormLabel fontWeight="600" color="gray.700">Phone</FormLabel>
+                      <FormLabel fontWeight="600" color="gray.700">
+                        Phone
+                      </FormLabel>
                       <Input
                         value={formData.phone}
-                        onChange={(e) => handleInputChange('phone', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("phone", e.target.value)
+                        }
                         placeholder="Enter your phone number"
                         borderWidth="2px"
                         borderColor="gray.200"
                         _focus={{
-                          borderColor: 'brand.400',
-                          boxShadow: '0 0 0 1px #C2185B'
+                          borderColor: "brand.400",
+                          boxShadow: "0 0 0 1px #C2185B",
                         }}
-                        _hover={{ borderColor: 'brand.300' }}
+                        _hover={{ borderColor: "brand.300" }}
                         borderRadius="xl"
                         fontSize="md"
                         fontWeight="500"
                         type="tel"
                       />
-                      <FormErrorMessage fontWeight="600">{errors.phone}</FormErrorMessage>
+                      <FormErrorMessage fontWeight="600">
+                        {errors.phone}
+                      </FormErrorMessage>
                     </FormControl>
                     <FormControl isRequired isInvalid={!!errors.subject}>
-                      <FormLabel fontWeight="600" color="gray.700">Subject</FormLabel>
+                      <FormLabel fontWeight="600" color="gray.700">
+                        Subject
+                      </FormLabel>
                       <Input
                         value={formData.subject}
-                        onChange={(e) => handleInputChange('subject', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("subject", e.target.value)
+                        }
                         placeholder="Subject of your inquiry"
                         borderWidth="2px"
                         borderColor="gray.200"
                         _focus={{
-                          borderColor: 'brand.400',
-                          boxShadow: '0 0 0 1px #C2185B'
+                          borderColor: "brand.400",
+                          boxShadow: "0 0 0 1px #C2185B",
                         }}
-                        _hover={{ borderColor: 'brand.300' }}
+                        _hover={{ borderColor: "brand.300" }}
                         borderRadius="xl"
                         fontSize="md"
                         fontWeight="500"
                       />
-                      <FormErrorMessage fontWeight="600">{errors.subject}</FormErrorMessage>
+                      <FormErrorMessage fontWeight="600">
+                        {errors.subject}
+                      </FormErrorMessage>
                     </FormControl>
                     <FormControl isRequired isInvalid={!!errors.inquiryType}>
-                      <FormLabel fontWeight="600" color="gray.700">Inquiry Type</FormLabel>
+                      <FormLabel fontWeight="600" color="gray.700">
+                        Inquiry Type
+                      </FormLabel>
                       <Select
                         value={formData.inquiryType}
-                        onChange={(e) => handleInputChange('inquiryType', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("inquiryType", e.target.value)
+                        }
                         placeholder="Select inquiry type"
                         borderWidth="2px"
                         borderColor="gray.200"
                         _focus={{
-                          borderColor: 'brand.400',
-                          boxShadow: '0 0 0 1px #C2185B'
+                          borderColor: "brand.400",
+                          boxShadow: "0 0 0 1px #C2185B",
                         }}
-                        _hover={{ borderColor: 'brand.300' }}
+                        _hover={{ borderColor: "brand.300" }}
                         borderRadius="xl"
                         fontSize="md"
                         fontWeight="500"
                       >
-                        {inquiryTypes.map(type => (
-                          <option key={type.value} value={type.value}>{type.label}</option>
+                        {inquiryTypes.map((type) => (
+                          <option key={type.value} value={type.value}>
+                            {type.label}
+                          </option>
                         ))}
                       </Select>
-                      <FormErrorMessage fontWeight="600">{errors.inquiryType}</FormErrorMessage>
+                      <FormErrorMessage fontWeight="600">
+                        {errors.inquiryType}
+                      </FormErrorMessage>
                     </FormControl>
                     <FormControl isRequired isInvalid={!!errors.message}>
-                      <FormLabel fontWeight="600" color="gray.700">Message</FormLabel>
+                      <FormLabel fontWeight="600" color="gray.700">
+                        Message
+                      </FormLabel>
                       <Textarea
                         value={formData.message}
-                        onChange={(e) => handleInputChange('message', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("message", e.target.value)
+                        }
                         placeholder="Please provide details about your inquiry..."
                         rows={6}
                         resize="vertical"
                         borderWidth="2px"
                         borderColor="gray.200"
                         _focus={{
-                          borderColor: 'brand.400',
-                          boxShadow: '0 0 0 1px #C2185B'
+                          borderColor: "brand.400",
+                          boxShadow: "0 0 0 1px #C2185B",
                         }}
-                        _hover={{ borderColor: 'brand.300' }}
+                        _hover={{ borderColor: "brand.300" }}
                         borderRadius="xl"
                         fontSize="md"
                         fontWeight="500"
                       />
-                      <FormErrorMessage fontWeight="600">{errors.message}</FormErrorMessage>
+                      <FormErrorMessage fontWeight="600">
+                        {errors.message}
+                      </FormErrorMessage>
                     </FormControl>
 
                     <Button
@@ -870,10 +1098,10 @@ const Contact: React.FC = () => {
                       _hover={{
                         bgGradient: "linear(45deg, brand.600, purple.600)",
                         transform: "translateY(-2px)",
-                        shadow: "0 10px 25px rgba(194, 24, 91, 0.3)"
+                        shadow: "0 10px 25px rgba(194, 24, 91, 0.3)",
                       }}
                       _active={{
-                        transform: "translateY(0)"
+                        transform: "translateY(0)",
                       }}
                       transition="all 0.2s ease-in-out"
                     >
@@ -887,27 +1115,27 @@ const Contact: React.FC = () => {
             {/* Enhanced Contact Information */}
             <VStack spacing={8} align="stretch">
               {/* Enhanced Contact Details */}
-              <Card 
-                bg={cardBg} 
-                shadow="2xl" 
+              <Card
+                bg={cardBg}
+                shadow="2xl"
                 borderRadius="3xl"
                 border="3px solid"
                 borderColor="purple.100"
                 position="relative"
                 _before={{
                   content: '""',
-                  position: 'absolute',
+                  position: "absolute",
                   top: 0,
                   left: 0,
                   right: 0,
-                  height: '6px',
-                  borderTopRadius: '3xl',
-                  bgGradient: 'linear(90deg, purple.500, brand.500)'
+                  height: "6px",
+                  borderTopRadius: "3xl",
+                  bgGradient: "linear(90deg, purple.500, brand.500)",
                 }}
               >
                 <CardHeader pb={2}>
-                  <Heading 
-                    size="lg" 
+                  <Heading
+                    size="lg"
                     fontWeight="800"
                     bgGradient="linear(45deg, purple.600, brand.600)"
                     bgClip="text"
@@ -920,33 +1148,39 @@ const Contact: React.FC = () => {
                     {/* Phone */}
                     <Box>
                       <HStack spacing={4} align="start">
-                        <Box 
+                        <Box
                           bgGradient="linear(45deg, blue.100, blue.200)"
-                          p={4} 
+                          p={4}
                           borderRadius="2xl"
                           position="relative"
                           _before={{
                             content: '""',
-                            position: 'absolute',
-                            inset: '-1px',
-                            borderRadius: '2xl',
-                            background: 'linear-gradient(45deg, blue.300, blue.500)',
+                            position: "absolute",
+                            inset: "-1px",
+                            borderRadius: "2xl",
+                            background:
+                              "linear-gradient(45deg, blue.300, blue.500)",
                             zIndex: -1,
-                            opacity: 0.2
+                            opacity: 0.2,
                           }}
                         >
                           <Icon as={FaPhone} fontSize="xl" color="blue.600" />
                         </Box>
                         <VStack spacing={2} align="start" flex={1}>
-                          <Text fontWeight="700" color="gray.800" fontSize="lg">Phone</Text>
+                          <Text fontWeight="700" color="gray.800" fontSize="lg">
+                            Phone
+                          </Text>
                           {contactInfo?.phones.map((phone, idx) => (
-                            <Link 
-                              key={idx} 
-                              href={`tel:${phone}`} 
-                              color="blue.600" 
+                            <Link
+                              key={idx}
+                              href={`tel:${phone}`}
+                              color="blue.600"
                               fontSize="sm"
                               fontWeight="600"
-                              _hover={{ color: 'blue.700', textDecoration: 'none' }}
+                              _hover={{
+                                color: "blue.700",
+                                textDecoration: "none",
+                              }}
                             >
                               {phone}
                             </Link>
@@ -962,33 +1196,43 @@ const Contact: React.FC = () => {
                     {/* Email */}
                     <Box>
                       <HStack spacing={4} align="start">
-                        <Box 
+                        <Box
                           bgGradient="linear(45deg, purple.100, purple.200)"
-                          p={4} 
+                          p={4}
                           borderRadius="2xl"
                           position="relative"
                           _before={{
                             content: '""',
-                            position: 'absolute',
-                            inset: '-1px',
-                            borderRadius: '2xl',
-                            background: 'linear-gradient(45deg, purple.300, purple.500)',
+                            position: "absolute",
+                            inset: "-1px",
+                            borderRadius: "2xl",
+                            background:
+                              "linear-gradient(45deg, purple.300, purple.500)",
                             zIndex: -1,
-                            opacity: 0.2
+                            opacity: 0.2,
                           }}
                         >
-                          <Icon as={FaEnvelope} fontSize="xl" color="purple.600" />
+                          <Icon
+                            as={FaEnvelope}
+                            fontSize="xl"
+                            color="purple.600"
+                          />
                         </Box>
                         <VStack spacing={2} align="start" flex={1}>
-                          <Text fontWeight="700" color="gray.800" fontSize="lg">Email</Text>
+                          <Text fontWeight="700" color="gray.800" fontSize="lg">
+                            Email
+                          </Text>
                           {contactInfo?.emails.map((email, idx) => (
-                            <Link 
-                              key={idx} 
-                              href={`mailto:${email}`} 
-                              color="purple.600" 
+                            <Link
+                              key={idx}
+                              href={`mailto:${email}`}
+                              color="purple.600"
                               fontSize="sm"
                               fontWeight="600"
-                              _hover={{ color: 'purple.700', textDecoration: 'none' }}
+                              _hover={{
+                                color: "purple.700",
+                                textDecoration: "none",
+                              }}
                             >
                               {email}
                             </Link>
@@ -1004,30 +1248,38 @@ const Contact: React.FC = () => {
                     {/* Address */}
                     <Box>
                       <HStack spacing={4} align="start">
-                        <Box 
+                        <Box
                           bgGradient="linear(45deg, red.100, red.200)"
-                          p={4} 
+                          p={4}
                           borderRadius="2xl"
                           position="relative"
                           _before={{
                             content: '""',
-                            position: 'absolute',
-                            inset: '-1px',
-                            borderRadius: '2xl',
-                            background: 'linear-gradient(45deg, red.300, red.500)',
+                            position: "absolute",
+                            inset: "-1px",
+                            borderRadius: "2xl",
+                            background:
+                              "linear-gradient(45deg, red.300, red.500)",
                             zIndex: -1,
-                            opacity: 0.2
+                            opacity: 0.2,
                           }}
                         >
-                          <Icon as={FaMapMarkerAlt} fontSize="xl" color="red.600" />
+                          <Icon
+                            as={FaMapMarkerAlt}
+                            fontSize="xl"
+                            color="red.600"
+                          />
                         </Box>
                         <VStack spacing={2} align="start" flex={1}>
-                          <Text fontWeight="700" color="gray.800" fontSize="lg">Address</Text>
+                          <Text fontWeight="700" color="gray.800" fontSize="lg">
+                            Address
+                          </Text>
                           <Text color="gray.600" fontSize="sm" fontWeight="500">
                             {contactInfo?.address.street}
                           </Text>
                           <Text color="gray.600" fontSize="sm" fontWeight="500">
-                            {contactInfo?.address.city}, {contactInfo?.address.state}
+                            {contactInfo?.address.city},{" "}
+                            {contactInfo?.address.state}
                           </Text>
                           <Text color="gray.600" fontSize="sm" fontWeight="500">
                             {contactInfo?.address.country}
@@ -1043,25 +1295,28 @@ const Contact: React.FC = () => {
                     {/* Business Hours */}
                     <Box>
                       <HStack spacing={4} align="start">
-                        <Box 
+                        <Box
                           bgGradient="linear(45deg, green.100, green.200)"
-                          p={4} 
+                          p={4}
                           borderRadius="2xl"
                           position="relative"
                           _before={{
                             content: '""',
-                            position: 'absolute',
-                            inset: '-1px',
-                            borderRadius: '2xl',
-                            background: 'linear-gradient(45deg, green.300, green.500)',
+                            position: "absolute",
+                            inset: "-1px",
+                            borderRadius: "2xl",
+                            background:
+                              "linear-gradient(45deg, green.300, green.500)",
                             zIndex: -1,
-                            opacity: 0.2
+                            opacity: 0.2,
                           }}
                         >
                           <Icon as={FaClock} fontSize="xl" color="green.600" />
                         </Box>
                         <VStack spacing={2} align="start" flex={1}>
-                          <Text fontWeight="700" color="gray.800" fontSize="lg">Business Hours</Text>
+                          <Text fontWeight="700" color="gray.800" fontSize="lg">
+                            Business Hours
+                          </Text>
                           <Text color="gray.600" fontSize="sm" fontWeight="500">
                             {contactInfo?.businessHours.weekdays}
                           </Text>
@@ -1071,12 +1326,12 @@ const Contact: React.FC = () => {
                           <Text color="gray.600" fontSize="sm" fontWeight="500">
                             {contactInfo?.businessHours.sunday}
                           </Text>
-                          <Badge 
-                            colorScheme="red" 
-                            size="sm" 
-                            px={3} 
-                            py={1} 
-                            borderRadius="full" 
+                          <Badge
+                            colorScheme="red"
+                            size="sm"
+                            px={3}
+                            py={1}
+                            borderRadius="full"
                             fontWeight="600"
                           >
                             {contactInfo?.businessHours.emergency}
@@ -1090,27 +1345,27 @@ const Contact: React.FC = () => {
 
               {/* Enhanced Social Media */}
               {socialLinks.length > 0 && (
-                <Card 
-                  bg={cardBg} 
-                  shadow="2xl" 
+                <Card
+                  bg={cardBg}
+                  shadow="2xl"
                   borderRadius="3xl"
                   border="3px solid"
                   borderColor="brand.100"
                   position="relative"
                   _before={{
                     content: '""',
-                    position: 'absolute',
+                    position: "absolute",
                     top: 0,
                     left: 0,
                     right: 0,
-                    height: '6px',
-                    borderTopRadius: '3xl',
-                    bgGradient: 'linear(90deg, brand.500, purple.500)'
+                    height: "6px",
+                    borderTopRadius: "3xl",
+                    bgGradient: "linear(90deg, brand.500, purple.500)",
                   }}
                 >
                   <CardHeader pb={2}>
-                    <Heading 
-                      size="lg" 
+                    <Heading
+                      size="lg"
                       fontWeight="800"
                       bgGradient="linear(45deg, brand.600, purple.600)"
                       bgClip="text"
@@ -1120,23 +1375,31 @@ const Contact: React.FC = () => {
                   </CardHeader>
                   <CardBody pt={2}>
                     <VStack spacing={4}>
-                      <Text color="gray.600" textAlign="center" fontWeight="500">
-                        Stay connected with us on social media for health tips, updates, and news.
+                      <Text
+                        color="gray.600"
+                        textAlign="center"
+                        fontWeight="500"
+                      >
+                        Stay connected with us on social media for health tips,
+                        updates, and news.
                       </Text>
                       <HStack spacing={4} justify="center" flexWrap="wrap">
                         {socialLinks.map((social, index) => (
                           <Link key={index} href={social.url} isExternal>
                             <Button
                               size="lg"
-                              colorScheme={social.color}
-                              variant="outline"
+                              colorScheme={social.icon === FaWhatsapp ? undefined : social.color}
+                              bg={social.icon === FaWhatsapp ? "#25D366" : undefined}
+                              color={social.icon === FaWhatsapp ? "white" : undefined}
+                              borderColor={social.icon === FaWhatsapp ? "#25D366" : undefined}
+                              variant={social.icon === FaWhatsapp ? "solid" : "outline"}
                               borderRadius="full"
                               p={4}
                               borderWidth="2px"
-                              _hover={{ 
-                                bg: `${social.color}.50`,
-                                transform: 'translateY(-2px)',
-                                shadow: `0 8px 20px rgba(0,0,0,0.15)`
+                              _hover={{
+                                bg: social.icon === FaWhatsapp ? "#128C7E" : `${social.color}.50`,
+                                transform: "translateY(-2px)",
+                                shadow: `0 8px 20px rgba(${social.icon === FaWhatsapp ? "37, 211, 102" : "0,0,0"},0.15)`,
                               }}
                               transition="all 0.2s ease-in-out"
                             >
@@ -1156,49 +1419,59 @@ const Contact: React.FC = () => {
           {faqs.length > 0 && (
             <Box>
               <VStack spacing={8} textAlign="center" mb={12}>
-                <Heading 
-                  size="xl" 
+                <Heading
+                  size="xl"
                   fontWeight="800"
                   bgGradient="linear(45deg, brand.500, purple.500)"
                   bgClip="text"
                 >
                   Frequently Asked Questions
                 </Heading>
-                <Text fontSize="lg" maxW="3xl" color="gray.600" fontWeight="500">
+                <Text
+                  fontSize="lg"
+                  maxW="3xl"
+                  color="gray.600"
+                  fontWeight="500"
+                >
                   Answers to common questions about our services
                 </Text>
               </VStack>
 
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={8}>
                 {faqs.slice(0, 6).map((faq) => (
-                  <Card 
-                    key={faq.id} 
-                    bg={cardBg} 
-                    shadow="xl" 
+                  <Card
+                    key={faq.id}
+                    bg={cardBg}
+                    shadow="xl"
                     borderRadius="2xl"
                     border="2px solid"
                     borderColor="gray.100"
                     _hover={{
-                      transform: 'translateY(-4px)',
-                      shadow: '0 15px 35px rgba(0,0,0,0.1)',
-                      borderColor: 'brand.200'
+                      transform: "translateY(-4px)",
+                      shadow: "0 15px 35px rgba(0,0,0,0.1)",
+                      borderColor: "brand.200",
                     }}
                     transition="all 0.3s ease-in-out"
                   >
                     <CardBody p={6}>
                       <VStack spacing={4} align="start">
-                        <Heading 
-                          size="sm" 
+                        <Heading
+                          size="sm"
                           fontWeight="700"
                           bgGradient="linear(45deg, brand.600, purple.600)"
                           bgClip="text"
                         >
                           {faq.question}
                         </Heading>
-                        <Text color="gray.600" fontSize="sm" lineHeight="tall" fontWeight="500">
+                        <Text
+                          color="gray.600"
+                          fontSize="sm"
+                          lineHeight="tall"
+                          fontWeight="500"
+                        >
                           {faq.answer}
                         </Text>
-                        <Badge 
+                        <Badge
                           bgGradient="linear(45deg, blue.100, blue.200)"
                           color="blue.700"
                           size="sm"
@@ -1218,11 +1491,11 @@ const Contact: React.FC = () => {
           )}
 
           {/* Enhanced Final CTA */}
-          <Box 
+          <Box
             bgGradient="linear(135deg, brand.600 0%, purple.600 100%)"
-            color="white" 
-            borderRadius="3xl" 
-            p={12} 
+            color="white"
+            borderRadius="3xl"
+            p={12}
             textAlign="center"
             position="relative"
             overflow="hidden"
@@ -1251,12 +1524,16 @@ const Contact: React.FC = () => {
 
             <VStack spacing={8} position="relative">
               <VStack spacing={4}>
-                <Heading size="xl" fontWeight="900" textShadow="0 4px 12px rgba(0,0,0,0.3)">
+                <Heading
+                  size="xl"
+                  fontWeight="900"
+                  textShadow="0 4px 12px rgba(0,0,0,0.3)"
+                >
                   Still Have Questions?
                 </Heading>
                 <Text fontSize="lg" maxW="3xl" opacity={0.95} fontWeight="500">
-                  Our friendly customer service team is here to help you with any questions 
-                  or concerns you may have about our services.
+                  Our friendly customer service team is here to help you with
+                  any questions or concerns you may have about our services.
                 </Text>
               </VStack>
               <HStack spacing={6} flexWrap="wrap" justify="center">
@@ -1265,13 +1542,17 @@ const Contact: React.FC = () => {
                   bg="white"
                   color="brand.600"
                   fontWeight="700"
-                  _hover={{ 
-                    bg: 'whiteAlpha.900',
-                    transform: 'translateY(-2px)',
-                    shadow: '0 10px 25px rgba(0,0,0,0.2)'
+                  _hover={{
+                    bg: "whiteAlpha.900",
+                    transform: "translateY(-2px)",
+                    shadow: "0 10px 25px rgba(0,0,0,0.2)",
                   }}
                   leftIcon={<FaPhone />}
-                  onClick={() => window.open(`tel:${contactInfo?.phones[0] || '+2349012345678'}`)}
+                  onClick={() =>
+                    window.open(
+                      `tel:${contactInfo?.phones[0] || "+2349012345678"}`
+                    )
+                  }
                   borderRadius="xl"
                   px={8}
                   py={6}
@@ -1282,16 +1563,18 @@ const Contact: React.FC = () => {
                 {contactInfo?.socialMedia.whatsapp && (
                   <Button
                     size="lg"
-                    bg="green.500"
+                    bg="#25D366"
                     color="white"
                     fontWeight="700"
-                    _hover={{ 
-                      bg: 'green.600',
-                      transform: 'translateY(-2px)',
-                      shadow: '0 10px 25px rgba(34, 197, 94, 0.3)'
+                    _hover={{
+                      bg: "#128C7E",
+                      transform: "translateY(-2px)",
+                      shadow: "0 10px 25px rgba(37, 211, 102, 0.4)",
                     }}
                     leftIcon={<FaWhatsapp />}
-                    onClick={() => window.open(contactInfo.socialMedia.whatsapp, '_blank')}
+                    onClick={() =>
+                      window.open(contactInfo.socialMedia.whatsapp, "_blank")
+                    }
                     borderRadius="xl"
                     px={8}
                     py={6}
@@ -1300,12 +1583,12 @@ const Contact: React.FC = () => {
                     WhatsApp
                   </Button>
                 )}
-                <Badge 
-                  bg="whiteAlpha.200" 
-                  color="white" 
-                  px={4} 
-                  py={2} 
-                  fontSize="sm" 
+                <Badge
+                  bg="whiteAlpha.200"
+                  color="white"
+                  px={4}
+                  py={2}
+                  fontSize="sm"
                   borderRadius="full"
                   backdropFilter="blur(10px)"
                   border="1px solid"

@@ -1,5 +1,5 @@
 // src/pages/Dashboard.tsx
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
 import {
   Box,
   Container,
@@ -18,117 +18,128 @@ import {
   useColorModeValue,
   Badge,
   Avatar,
-} from '@chakra-ui/react'
-import { FaUser, FaUserMd, FaUserShield, FaSignOutAlt, FaDashcube, FaHome } from 'react-icons/fa'
-import { useNavigate } from 'react-router-dom'
+} from "@chakra-ui/react";
+import {
+  FaUser,
+  FaUserMd,
+  FaUserShield,
+  FaSignOutAlt,
+  FaDashcube,
+  FaHome,
+} from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 // Import all dashboard components
-import PatientDashboard from '../components/dashboard/PatientDashboard'
-import AdminDashboard from '../components/dashboard/AdminDashboard'
-import NurseDashboard from '../components/dashboard/NurseDashboard'
-import { useAuth } from '../hooks/useAuth'
+import PatientDashboard from "../components/dashboard/PatientDashboard";
+import AdminDashboard from "../components/dashboard/AdminDashboard";
+import NurseDashboard from "../components/dashboard/NurseDashboard";
+import { useAuth } from "../hooks/useAuth";
 
-type UserRole = 'client' | 'nurse' | 'admin'
+type UserRole = "client" | "nurse" | "admin";
 
 interface DashboardUser {
-  id: string
-  name: string
-  email: string
-  role: UserRole
-  avatar?: string
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  avatar?: string;
 }
 
 const Dashboard: React.FC = () => {
-  const navigate = useNavigate()
-  const { user, logout, isAuthenticated } = useAuth()
-  const [isLoading, setIsLoading] = useState(true)
-  const [dashboardUser, setDashboardUser] = useState<DashboardUser | null>(null)
+  const navigate = useNavigate();
+  const { user, logout, isAuthenticated } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
+  const [dashboardUser, setDashboardUser] = useState<DashboardUser | null>(
+    null
+  );
 
   useEffect(() => {
     // Simulate loading user data
     const loadUserData = async () => {
       try {
         // In a real app, this would fetch user data from your API
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
         if (isAuthenticated && user) {
           // Mock user data based on auth state
           const mockUser: DashboardUser = {
-            id: user.id || '1',
-            name: `${user.firstName || 'John'} ${user.lastName || 'Doe'}`,
-            email: user.email || 'user@example.com',
-            role: user.role as UserRole || 'client',
-            avatar: undefined
-          }
-          setDashboardUser(mockUser)
+            id: user.id || "1",
+            name: `${user.firstName || "John"} ${user.lastName || "Doe"}`,
+            email: user.email || "user@example.com",
+            role: (user.role as UserRole) || "client",
+            avatar: undefined,
+          };
+          setDashboardUser(mockUser);
         } else {
           // Redirect to login if not authenticated
-          navigate('/login')
+          navigate("/login");
         }
       } catch (error) {
-        console.error('Error loading user data:', error)
-        navigate('/login')
+        console.error("Error loading user data:", error);
+        navigate("/login");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    loadUserData()
-  }, [isAuthenticated, user, navigate])
+    loadUserData();
+  }, [isAuthenticated, user, navigate]);
 
   const handleLogout = () => {
-    logout()
-    navigate('/')
-  }
+    logout();
+    navigate("/");
+  };
 
   const handleRoleSwitch = (role: UserRole) => {
     // For demo purposes, allow role switching
     if (dashboardUser) {
       setDashboardUser({
         ...dashboardUser,
-        role
-      })
+        role,
+      });
     }
-  }
+  };
 
   // Get role-specific styling
   const getRoleConfig = (role: UserRole) => {
     switch (role) {
-      case 'admin':
+      case "admin":
         return {
-          color: 'purple',
-          bgGradient: 'linear(135deg, purple.500, purple.600)',
+          color: "purple",
+          bgGradient: "linear(135deg, purple.500, purple.600)",
           icon: FaUserShield,
-          title: 'Admin Panel',
-          description: 'Manage system and oversee operations'
-        }
-      case 'nurse':
+          title: "Admin Panel",
+          description: "Manage system and oversee operations",
+        };
+      case "nurse":
         return {
-          color: 'green',
-          bgGradient: 'linear(135deg, green.500, green.600)',
+          color: "green",
+          bgGradient: "linear(135deg, green.500, green.600)",
           icon: FaUserMd,
-          title: 'Nurse Portal',
-          description: 'Manage appointments and patient care'
-        }
-      case 'client':
+          title: "Nurse Portal",
+          description: "Manage appointments and patient care",
+        };
+      case "client":
       default:
         return {
-          color: 'brand',
-          bgGradient: 'linear(135deg, brand.500, brand.600)',
+          color: "brand",
+          bgGradient: "linear(135deg, brand.500, brand.600)",
           icon: FaUser,
-          title: 'Patient Portal',
-          description: 'Manage your health and appointments'
-        }
+          title: "Patient Portal",
+          description: "Manage your health and appointments",
+        };
     }
-  }
+  };
 
-  const currentRoleConfig = dashboardUser ? getRoleConfig(dashboardUser.role) : getRoleConfig('client')
+  const currentRoleConfig = dashboardUser
+    ? getRoleConfig(dashboardUser.role)
+    : getRoleConfig("client");
 
   // Loading state - Enhanced
   if (isLoading) {
     return (
-      <Box 
-        bg="gray.50" 
+      <Box
+        bg="gray.50"
         minH="100vh"
         bgGradient="linear(135deg, brand.25, purple.25)"
       >
@@ -145,13 +156,13 @@ const Dashboard: React.FC = () => {
               position="relative"
               _before={{
                 content: '""',
-                position: 'absolute',
-                top: '-4px',
-                left: '-4px',
-                right: '-4px',
-                bottom: '-4px',
-                bgGradient: 'linear(45deg, brand.400, purple.400)',
-                borderRadius: 'full',
+                position: "absolute",
+                top: "-4px",
+                left: "-4px",
+                right: "-4px",
+                bottom: "-4px",
+                bgGradient: "linear(45deg, brand.400, purple.400)",
+                borderRadius: "full",
                 zIndex: -1,
                 opacity: 0.3,
               }}
@@ -169,23 +180,23 @@ const Dashboard: React.FC = () => {
           </VStack>
         </Center>
       </Box>
-    )
+    );
   }
 
   // Not authenticated or no user data - Enhanced
   if (!dashboardUser) {
     return (
-      <Box 
-        bg="gray.50" 
-        minH="100vh" 
+      <Box
+        bg="gray.50"
+        minH="100vh"
         py={8}
         bgGradient="linear(135deg, red.25, red.50)"
       >
         <Container maxW="4xl">
           <Center minH="80vh">
             <VStack spacing={8}>
-              <Alert 
-                status="error" 
+              <Alert
+                status="error"
                 borderRadius="2xl"
                 p={8}
                 maxW="md"
@@ -207,11 +218,11 @@ const Dashboard: React.FC = () => {
                 </Box>
               </Alert>
               <VStack spacing={4}>
-                <Button 
+                <Button
                   bgGradient="linear(45deg, brand.500, purple.500)"
                   color="white"
                   size="lg"
-                  onClick={() => navigate('/login')}
+                  onClick={() => navigate("/login")}
                   borderRadius="xl"
                   px={8}
                   py={6}
@@ -221,18 +232,18 @@ const Dashboard: React.FC = () => {
                   _hover={{
                     bgGradient: "linear(45deg, brand.600, purple.600)",
                     transform: "translateY(-2px)",
-                    boxShadow: "0 12px 35px rgba(194, 24, 91, 0.35)"
+                    boxShadow: "0 12px 35px rgba(194, 24, 91, 0.35)",
                   }}
                   transition="all 0.2s ease-in-out"
                 >
                   Go to Login
                 </Button>
-                <Button 
+                <Button
                   variant="outline"
                   borderColor="brand.500"
                   color="brand.500"
                   size="lg"
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate("/")}
                   borderRadius="xl"
                   px={8}
                   py={6}
@@ -255,44 +266,44 @@ const Dashboard: React.FC = () => {
           </Center>
         </Container>
       </Box>
-    )
+    );
   }
 
   // Role-based dashboard rendering
   const renderDashboard = () => {
-    console.log('🎯 Rendering dashboard for role:', dashboardUser.role) // Debug log
-    
+    console.log("🎯 Rendering dashboard for role:", dashboardUser.role); // Debug log
+
     switch (dashboardUser.role) {
-      case 'admin':
-        console.log('📊 Loading AdminDashboard component')
-        return <AdminDashboard />
-      case 'nurse':
-        console.log('🏥 Loading NurseDashboard component')
-        return <NurseDashboard />
-      case 'client':
+      case "admin":
+        console.log("📊 Loading AdminDashboard component");
+        return <AdminDashboard />;
+      case "nurse":
+        console.log("🏥 Loading NurseDashboard component");
+        return <NurseDashboard />;
+      case "client":
       default:
-        console.log('👤 Loading PatientDashboard component')
-        return <PatientDashboard />
+        console.log("👤 Loading PatientDashboard component");
+        return <PatientDashboard />;
     }
-  }
+  };
 
   return (
     <Box bg="gray.50" minH="100vh">
       {/* Dashboard Header - Enhanced */}
-      <Box 
-        bg="white" 
-        borderBottom="3px solid" 
+      <Box
+        bg="white"
+        borderBottom="3px solid"
         borderColor="brand.200"
         py={6}
         position="relative"
         _before={{
           content: '""',
-          position: 'absolute',
-          top: '0',
-          left: '0',
-          right: '0',
-          height: '4px',
-          bgGradient: 'linear(90deg, brand.500, purple.500)',
+          position: "absolute",
+          top: "0",
+          left: "0",
+          right: "0",
+          height: "4px",
+          bgGradient: "linear(90deg, brand.500, purple.500)",
         }}
         boxShadow="0 4px 20px rgba(194, 24, 91, 0.08)"
       >
@@ -310,7 +321,7 @@ const Dashboard: React.FC = () => {
                 borderColor="white"
                 boxShadow="0 4px 15px rgba(194, 24, 91, 0.2)"
               />
-              
+
               <VStack spacing={1} align="start">
                 <HStack spacing={3} align="center">
                   <Heading size="lg" color="gray.800" fontWeight="800">
@@ -346,82 +357,109 @@ const Dashboard: React.FC = () => {
             <HStack spacing={6}>
               {/* Demo Role Switcher - Enhanced */}
               <VStack spacing={3}>
-                <Text fontSize="xs" color="gray.500" fontWeight="700" textTransform="uppercase" letterSpacing="wide">
+                {/*   <Text fontSize="xs" color="gray.500" fontWeight="700" textTransform="uppercase" letterSpacing="wide">
                   Demo: Switch Role
-                </Text>
+                </Text> */}
                 <HStack spacing={3}>
                   <Button
                     size="md"
-                    variant={dashboardUser.role === 'client' ? 'solid' : 'outline'}
-                    bgGradient={dashboardUser.role === 'client' ? "linear(45deg, brand.500, brand.600)" : undefined}
-                    color={dashboardUser.role === 'client' ? "white" : "brand.600"}
+                    variant={
+                      dashboardUser.role === "client" ? "solid" : "outline"
+                    }
+                    bgGradient={
+                      dashboardUser.role === "client"
+                        ? "linear(45deg, brand.500, brand.600)"
+                        : undefined
+                    }
+                    color={
+                      dashboardUser.role === "client" ? "white" : "brand.600"
+                    }
                     borderColor="brand.500"
                     borderWidth="2px"
                     leftIcon={<FaUser />}
-                    onClick={() => handleRoleSwitch('client')}
+                    onClick={() => handleRoleSwitch("client")}
                     borderRadius="xl"
                     fontWeight="700"
                     _hover={{
                       transform: "translateY(-2px)",
-                      boxShadow: dashboardUser.role === 'client' 
-                        ? "0 6px 20px rgba(194, 24, 91, 0.3)" 
-                        : "0 4px 12px rgba(194, 24, 91, 0.15)",
-                      ...(dashboardUser.role !== 'client' && {
+                      boxShadow:
+                        dashboardUser.role === "client"
+                          ? "0 6px 20px rgba(194, 24, 91, 0.3)"
+                          : "0 4px 12px rgba(194, 24, 91, 0.15)",
+                      ...(dashboardUser.role !== "client" && {
                         bg: "brand.50",
-                        color: "brand.700"
-                      })
+                        color: "brand.700",
+                      }),
                     }}
                     transition="all 0.2s ease-in-out"
                   >
                     Patient
                   </Button>
-                  
+
                   <Button
                     size="md"
-                    variant={dashboardUser.role === 'nurse' ? 'solid' : 'outline'}
-                    bgGradient={dashboardUser.role === 'nurse' ? "linear(45deg, green.500, green.600)" : undefined}
-                    color={dashboardUser.role === 'nurse' ? "white" : "green.600"}
+                    variant={
+                      dashboardUser.role === "nurse" ? "solid" : "outline"
+                    }
+                    bgGradient={
+                      dashboardUser.role === "nurse"
+                        ? "linear(45deg, green.500, green.600)"
+                        : undefined
+                    }
+                    color={
+                      dashboardUser.role === "nurse" ? "white" : "green.600"
+                    }
                     borderColor="green.500"
                     borderWidth="2px"
                     leftIcon={<FaUserMd />}
-                    onClick={() => handleRoleSwitch('nurse')}
+                    onClick={() => handleRoleSwitch("nurse")}
                     borderRadius="xl"
                     fontWeight="700"
                     _hover={{
                       transform: "translateY(-2px)",
-                      boxShadow: dashboardUser.role === 'nurse' 
-                        ? "0 6px 20px rgba(34, 197, 94, 0.3)" 
-                        : "0 4px 12px rgba(34, 197, 94, 0.15)",
-                      ...(dashboardUser.role !== 'nurse' && {
+                      boxShadow:
+                        dashboardUser.role === "nurse"
+                          ? "0 6px 20px rgba(34, 197, 94, 0.3)"
+                          : "0 4px 12px rgba(34, 197, 94, 0.15)",
+                      ...(dashboardUser.role !== "nurse" && {
                         bg: "green.50",
-                        color: "green.700"
-                      })
+                        color: "green.700",
+                      }),
                     }}
                     transition="all 0.2s ease-in-out"
                   >
                     Nurse
                   </Button>
-                  
+
                   <Button
                     size="md"
-                    variant={dashboardUser.role === 'admin' ? 'solid' : 'outline'}
-                    bgGradient={dashboardUser.role === 'admin' ? "linear(45deg, purple.500, purple.600)" : undefined}
-                    color={dashboardUser.role === 'admin' ? "white" : "purple.600"}
+                    variant={
+                      dashboardUser.role === "admin" ? "solid" : "outline"
+                    }
+                    bgGradient={
+                      dashboardUser.role === "admin"
+                        ? "linear(45deg, purple.500, purple.600)"
+                        : undefined
+                    }
+                    color={
+                      dashboardUser.role === "admin" ? "white" : "purple.600"
+                    }
                     borderColor="purple.500"
                     borderWidth="2px"
                     leftIcon={<FaUserShield />}
-                    onClick={() => handleRoleSwitch('admin')}
+                    onClick={() => handleRoleSwitch("admin")}
                     borderRadius="xl"
                     fontWeight="700"
                     _hover={{
                       transform: "translateY(-2px)",
-                      boxShadow: dashboardUser.role === 'admin' 
-                        ? "0 6px 20px rgba(147, 51, 234, 0.3)" 
-                        : "0 4px 12px rgba(147, 51, 234, 0.15)",
-                      ...(dashboardUser.role !== 'admin' && {
+                      boxShadow:
+                        dashboardUser.role === "admin"
+                          ? "0 6px 20px rgba(147, 51, 234, 0.3)"
+                          : "0 4px 12px rgba(147, 51, 234, 0.15)",
+                      ...(dashboardUser.role !== "admin" && {
                         bg: "purple.50",
-                        color: "purple.700"
-                      })
+                        color: "purple.700",
+                      }),
                     }}
                     transition="all 0.2s ease-in-out"
                   >
@@ -446,7 +484,7 @@ const Dashboard: React.FC = () => {
                   color: "red.700",
                   borderColor: "red.600",
                   transform: "translateY(-2px)",
-                  boxShadow: "0 4px 12px rgba(239, 68, 68, 0.15)"
+                  boxShadow: "0 4px 12px rgba(239, 68, 68, 0.15)",
                 }}
                 transition="all 0.2s ease-in-out"
               >
@@ -484,14 +522,14 @@ const Dashboard: React.FC = () => {
           filter="blur(60px)"
           zIndex={0}
         />
-        
+
         {/* Dashboard Content */}
         <Box position="relative" zIndex={1}>
           {renderDashboard()}
         </Box>
       </Box>
     </Box>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;

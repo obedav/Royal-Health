@@ -293,58 +293,178 @@ Email: support@royalhealthconsult.ng
     <Container maxW="4xl" py={8}>
       <VStack spacing={8} align="stretch">
         {/* Success Header */}
-        <VStack spacing={6} textAlign="center">
-          <Box
-            w={20}
-            h={20}
-            bg="green.50"
-            borderRadius="full"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <Icon as={FaCheckCircle} color="green.500" fontSize="3xl" />
-          </Box>
-          
-          <VStack spacing={2}>
-            <Heading size="xl" color="gray.800">
-              {paymentResult.method === 'cash' ? 'Assessment Scheduled!' : 'Assessment Confirmed!'}
-            </Heading>
-            <Text color="gray.600" fontSize="lg">
-              {paymentResult.method === 'cash' 
-                ? 'Your health assessment is scheduled. Payment will be collected after the assessment.'
-                : 'Your payment has been processed and assessment appointment is confirmed.'
-              }
-            </Text>
-          </VStack>
+        <Box
+          position="relative"
+          bg="rgba(255, 255, 255, 0.9)"
+          backdropFilter="blur(20px)"
+          borderRadius="3xl"
+          p={10}
+          border="1px solid"
+          borderColor="rgba(34, 197, 94, 0.2)"
+          boxShadow="0 8px 32px rgba(34, 197, 94, 0.15)"
+          _before={{
+            content: '""',
+            position: "absolute",
+            inset: 0,
+            borderRadius: "3xl",
+            padding: "1px",
+            background: "linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(16, 185, 129, 0.3))",
+            mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+            maskComposite: "xor",
+            WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+            WebkitMaskComposite: "xor",
+          }}
+        >
+          <VStack spacing={8} textAlign="center">
+            <Box
+              w={24}
+              h={24}
+              bgGradient="linear(45deg, green.500, emerald.500)"
+              borderRadius="full"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              boxShadow="0 8px 25px rgba(34, 197, 94, 0.4)"
+              position="relative"
+              _before={{
+                content: '""',
+                position: "absolute",
+                w: 28,
+                h: 28,
+                bgGradient: "linear(45deg, green.300, emerald.300)",
+                borderRadius: "full",
+                opacity: 0.3,
+                zIndex: -1,
+              }}
+            >
+              <Icon as={FaCheckCircle} color="white" fontSize="4xl" />
+            </Box>
+            
+            <VStack spacing={4}>
+              <Heading 
+                size="2xl" 
+                bgGradient="linear(45deg, green.600, emerald.600)"
+                bgClip="text"
+                sx={{
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  filter: "drop-shadow(0 2px 4px rgba(34, 197, 94, 0.2))",
+                }}
+                fontWeight="900"
+              >
+                {paymentResult.method === 'cash' ? 'Assessment Scheduled!' : 'Assessment Confirmed!'}
+              </Heading>
+              <Text 
+                color="gray.700" 
+                fontSize="lg"
+                fontWeight="500"
+                maxW="600px"
+                lineHeight="1.6"
+              >
+                {paymentResult.method === 'cash' 
+                  ? 'Your health assessment is scheduled with our qualified healthcare professionals. Payment will be collected after the assessment.'
+                  : 'Your payment has been processed successfully and your assessment appointment is confirmed with our qualified healthcare professionals.'
+                }
+              </Text>
+            </VStack>
 
-          {/* Confirmation Code */}
-          <Card bg="primary.50" borderColor="primary.200" borderWidth="2px">
-            <CardBody p={6} textAlign="center">
-              <VStack spacing={2}>
-                <Text fontSize="sm" color="primary.600" fontWeight="600">
-                  ASSESSMENT CONFIRMATION CODE
-                </Text>
-                <Text fontSize="2xl" fontWeight="bold" color="primary.700" letterSpacing="wider">
-                  {assessmentDetails.confirmationCode}
-                </Text>
-                <Text fontSize="xs" color="gray.600">
-                  Please save this code for your records
-                </Text>
-              </VStack>
-            </CardBody>
-          </Card>
-        </VStack>
+            {/* Enhanced Confirmation Code */}
+            <Card 
+              bg="rgba(34, 197, 94, 0.08)" 
+              borderColor="rgba(34, 197, 94, 0.3)" 
+              borderWidth="2px"
+              borderRadius="2xl"
+              boxShadow="0 4px 20px rgba(34, 197, 94, 0.1)"
+            >
+              <CardBody p={8} textAlign="center">
+                <VStack spacing={4}>
+                  <HStack spacing={3}>
+                    <Box
+                      w="30px"
+                      h="30px"
+                      bgGradient="linear(45deg, green.500, emerald.500)"
+                      borderRadius="lg"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                    >
+                      <Icon as={FaReceipt} color="white" fontSize="sm" />
+                    </Box>
+                    <Text 
+                      fontSize="sm" 
+                      bgGradient="linear(45deg, green.600, emerald.600)"
+                      bgClip="text"
+                      sx={{
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                      fontWeight="700"
+                    >
+                      ASSESSMENT CONFIRMATION CODE
+                    </Text>
+                  </HStack>
+                  <Badge
+                    bgGradient="linear(45deg, green.500, emerald.500)"
+                    color="white"
+                    fontSize="2xl" 
+                    fontWeight="bold"
+                    letterSpacing="wider"
+                    px={6}
+                    py={3}
+                    borderRadius="xl"
+                  >
+                    {assessmentDetails.confirmationCode}
+                  </Badge>
+                  <Text fontSize="xs" color="gray.600" fontWeight="500">
+                    Please save this code for your records and reference
+                  </Text>
+                </VStack>
+              </CardBody>
+            </Card>
+          </VStack>
+        </Box>
 
         <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={8}>
           {/* Assessment Details */}
           <VStack spacing={6} align="stretch">
-            <Card bg={cardBg} borderColor={borderColor}>
-              <CardBody p={6}>
-                <VStack spacing={6} align="start">
-                  <HStack spacing={2}>
-                    <Icon as={FaStethoscope} color="primary.500" />
-                    <Heading size="md">Assessment Details</Heading>
+            <Card 
+              bg="rgba(255, 255, 255, 0.85)"
+              backdropFilter="blur(15px)"
+              borderColor="rgba(194, 24, 91, 0.2)"
+              borderWidth="2px"
+              borderRadius="2xl"
+              boxShadow="0 4px 20px rgba(194, 24, 91, 0.08)"
+            >
+              <CardBody p={8}>
+                <VStack spacing={8} align="start">
+                  <HStack spacing={4}>
+                    <Box
+                      w="40px"
+                      h="40px"
+                      bgGradient="linear(45deg, brand.500, purple.500)"
+                      borderRadius="lg"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      boxShadow="0 4px 15px rgba(194, 24, 91, 0.3)"
+                    >
+                      <Icon as={FaStethoscope} color="white" fontSize="lg" />
+                    </Box>
+                    <Heading 
+                      size="md"
+                      bgGradient="linear(45deg, brand.600, purple.600)"
+                      bgClip="text"
+                      sx={{
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                      fontWeight="700"
+                    >
+                      Assessment Details
+                    </Heading>
                   </HStack>
                   
                   <VStack spacing={4} w="full">
@@ -443,12 +563,42 @@ Email: support@royalhealthconsult.ng
             </Card>
 
             {/* Payment Summary */}
-            <Card bg={cardBg} borderColor={borderColor}>
-              <CardBody p={6}>
-                <VStack spacing={4} align="start">
-                  <HStack spacing={2}>
-                    <Icon as={FaReceipt} color="green.500" />
-                    <Heading size="md">Payment Summary</Heading>
+            <Card 
+              bg="rgba(255, 255, 255, 0.85)"
+              backdropFilter="blur(15px)"
+              borderColor="rgba(34, 197, 94, 0.2)"
+              borderWidth="2px"
+              borderRadius="2xl"
+              boxShadow="0 4px 20px rgba(34, 197, 94, 0.08)"
+            >
+              <CardBody p={8}>
+                <VStack spacing={6} align="start">
+                  <HStack spacing={4}>
+                    <Box
+                      w="40px"
+                      h="40px"
+                      bgGradient="linear(45deg, green.500, emerald.500)"
+                      borderRadius="lg"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      boxShadow="0 4px 15px rgba(34, 197, 94, 0.3)"
+                    >
+                      <Icon as={FaReceipt} color="white" fontSize="lg" />
+                    </Box>
+                    <Heading 
+                      size="md"
+                      bgGradient="linear(45deg, green.600, emerald.600)"
+                      bgClip="text"
+                      sx={{
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                      fontWeight="700"
+                    >
+                      Payment Summary
+                    </Heading>
                   </HStack>
                   
                   <VStack spacing={2} w="full">
@@ -496,22 +646,44 @@ Email: support@royalhealthconsult.ng
                     </Alert>
                   </VStack>
 
-                  <HStack spacing={2} w="full">
+                  <HStack spacing={3} w="full">
                     <Button
                       leftIcon={<FaPrint />}
                       size="sm"
-                      variant="outline"
+                      bgGradient="linear(45deg, green.500, emerald.500)"
+                      color="white"
                       onClick={handlePrintReceipt}
                       flex={1}
+                      _hover={{
+                        bgGradient: "linear(45deg, green.600, emerald.600)",
+                        transform: "translateY(-1px)",
+                        boxShadow: "0 4px 12px rgba(34, 197, 94, 0.3)"
+                      }}
+                      _active={{
+                        transform: "translateY(0px)"
+                      }}
+                      transition="all 0.2s"
+                      borderRadius="lg"
                     >
                       Print
                     </Button>
                     <Button
                       leftIcon={<FaDownload />}
                       size="sm"
-                      variant="outline"
+                      bgGradient="linear(45deg, green.500, emerald.500)"
+                      color="white"
                       onClick={handleDownloadReceipt}
                       flex={1}
+                      _hover={{
+                        bgGradient: "linear(45deg, green.600, emerald.600)",
+                        transform: "translateY(-1px)",
+                        boxShadow: "0 4px 12px rgba(34, 197, 94, 0.3)"
+                      }}
+                      _active={{
+                        transform: "translateY(0px)"
+                      }}
+                      transition="all 0.2s"
+                      borderRadius="lg"
                     >
                       Download
                     </Button>
@@ -524,23 +696,57 @@ Email: support@royalhealthconsult.ng
           {/* Instructions & Next Steps */}
           <VStack spacing={6} align="stretch">
             {/* Preparation Instructions */}
-            <Card bg={cardBg} borderColor={borderColor}>
-              <CardBody p={6}>
-                <VStack spacing={4} align="start">
-                  <Heading size="md">Assessment Preparation</Heading>
+            <Card 
+              bg="rgba(255, 255, 255, 0.85)"
+              backdropFilter="blur(15px)"
+              borderColor="rgba(194, 24, 91, 0.2)"
+              borderWidth="2px"
+              borderRadius="2xl"
+              boxShadow="0 4px 20px rgba(194, 24, 91, 0.08)"
+            >
+              <CardBody p={8}>
+                <VStack spacing={6} align="start">
+                  <HStack spacing={4}>
+                    <Box
+                      w="40px"
+                      h="40px"
+                      bgGradient="linear(45deg, brand.500, purple.500)"
+                      borderRadius="lg"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      boxShadow="0 4px 15px rgba(194, 24, 91, 0.3)"
+                    >
+                      <Icon as={FaClipboardList} color="white" fontSize="lg" />
+                    </Box>
+                    <Heading 
+                      size="md"
+                      bgGradient="linear(45deg, brand.600, purple.600)"
+                      bgClip="text"
+                      sx={{
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                      fontWeight="700"
+                    >
+                      Assessment Preparation
+                    </Heading>
+                  </HStack>
                   
-                  <VStack spacing={2} align="start" w="full">
+                  <VStack spacing={3} align="start" w="full">
                     {assessmentDetails.assessmentInstructions.map((instruction, index) => (
-                      <HStack key={index} spacing={3} align="start">
+                      <HStack key={index} spacing={4} align="start">
                         <Box
-                          w={2}
-                          h={2}
-                          bg="primary.500"
+                          w="6px"
+                          h="6px"
+                          bgGradient="linear(45deg, brand.500, purple.500)"
                           borderRadius="full"
                           mt={2}
                           flexShrink={0}
+                          boxShadow="0 2px 4px rgba(194, 24, 91, 0.3)"
                         />
-                        <Text fontSize="sm" color="gray.700">
+                        <Text fontSize="sm" color="gray.700" lineHeight="1.6">
                           {instruction}
                         </Text>
                       </HStack>
@@ -551,31 +757,94 @@ Email: support@royalhealthconsult.ng
             </Card>
 
             {/* Contact Information */}
-            <Card bg={cardBg} borderColor={borderColor}>
-              <CardBody p={6}>
-                <VStack spacing={4} align="start">
-                  <Heading size="md">Contact & Support</Heading>
+            <Card 
+              bg="rgba(255, 255, 255, 0.85)"
+              backdropFilter="blur(15px)"
+              borderColor="rgba(34, 197, 94, 0.2)"
+              borderWidth="2px"
+              borderRadius="2xl"
+              boxShadow="0 4px 20px rgba(34, 197, 94, 0.08)"
+            >
+              <CardBody p={8}>
+                <VStack spacing={6} align="start">
+                  <HStack spacing={4}>
+                    <Box
+                      w="40px"
+                      h="40px"
+                      bgGradient="linear(45deg, blue.500, purple.500)"
+                      borderRadius="lg"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      boxShadow="0 4px 15px rgba(59, 130, 246, 0.3)"
+                    >
+                      <Icon as={FaPhone} color="white" fontSize="lg" />
+                    </Box>
+                    <Heading 
+                      size="md"
+                      bgGradient="linear(45deg, blue.600, purple.600)"
+                      bgClip="text"
+                      sx={{
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                      fontWeight="700"
+                    >
+                      Contact & Support
+                    </Heading>
+                  </HStack>
                   
-                  <VStack spacing={3} w="full">
-                    <HStack spacing={3} w="full">
-                      <Icon as={FaPhone} color="blue.500" />
-                      <VStack spacing={0} align="start" flex={1}>
+                  <VStack spacing={4} w="full">
+                    <HStack spacing={4} w="full">
+                      <Box
+                        w="30px"
+                        h="30px"
+                        bgGradient="linear(45deg, blue.500, blue.600)"
+                        borderRadius="lg"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                      >
+                        <Icon as={FaPhone} color="white" fontSize="sm" />
+                      </Box>
+                      <VStack spacing={1} align="start" flex={1}>
                         <Text fontWeight="600" fontSize="sm">Emergency Hotline</Text>
                         <Text fontSize="sm" color="gray.600">{assessmentDetails.emergencyContact}</Text>
                       </VStack>
                     </HStack>
                     
-                    <HStack spacing={3} w="full">
-                      <Icon as={FaWhatsapp} color="green.500" />
-                      <VStack spacing={0} align="start" flex={1}>
+                    <HStack spacing={4} w="full">
+                      <Box
+                        w="30px"
+                        h="30px"
+                        bgGradient="linear(45deg, green.500, green.600)"
+                        borderRadius="lg"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                      >
+                        <Icon as={FaWhatsapp} color="white" fontSize="sm" />
+                      </Box>
+                      <VStack spacing={1} align="start" flex={1}>
                         <Text fontWeight="600" fontSize="sm">WhatsApp Support</Text>
                         <Text fontSize="sm" color="gray.600">+234 901 234 5678</Text>
                       </VStack>
                     </HStack>
                     
-                    <HStack spacing={3} w="full">
-                      <Icon as={FaEnvelope} color="purple.500" />
-                      <VStack spacing={0} align="start" flex={1}>
+                    <HStack spacing={4} w="full">
+                      <Box
+                        w="30px"
+                        h="30px"
+                        bgGradient="linear(45deg, purple.500, purple.600)"
+                        borderRadius="lg"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                      >
+                        <Icon as={FaEnvelope} color="white" fontSize="sm" />
+                      </Box>
+                      <VStack spacing={1} align="start" flex={1}>
                         <Text fontWeight="600" fontSize="sm">Email Support</Text>
                         <Text fontSize="sm" color="gray.600">support@royalhealthconsult.ng</Text>
                       </VStack>
@@ -586,12 +855,31 @@ Email: support@royalhealthconsult.ng
             </Card>
 
             {/* Assessment Information */}
-            <Alert status="success">
-              <AlertIcon />
+            <Alert 
+              status="success"
+              bg="rgba(34, 197, 94, 0.1)"
+              borderColor="rgba(34, 197, 94, 0.3)"
+              borderWidth="2px"
+              borderRadius="xl"
+              backdropFilter="blur(10px)"
+              boxShadow="0 4px 15px rgba(34, 197, 94, 0.1)"
+            >
+              <AlertIcon color="green.600" />
               <Box>
-                <AlertTitle>What to Expect</AlertTitle>
+                <AlertTitle 
+                  bgGradient="linear(45deg, green.600, emerald.600)"
+                  bgClip="text"
+                  sx={{
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
+                  fontWeight="700"
+                >
+                  What to Expect
+                </AlertTitle>
                 <AlertDescription fontSize="sm">
-                  <VStack spacing={1} align="start" mt={2}>
+                  <VStack spacing={2} align="start" mt={3}>
                     <Text>• Professional health assessment in your home</Text>
                     <Text>• Comprehensive evaluation and health screening</Text>
                     <Text>• Written assessment report within 24 hours</Text>
@@ -603,12 +891,31 @@ Email: support@royalhealthconsult.ng
             </Alert>
 
             {/* Important Notes */}
-            <Alert status="info">
-              <AlertIcon />
+            <Alert 
+              status="info"
+              bg="rgba(59, 130, 246, 0.1)"
+              borderColor="rgba(59, 130, 246, 0.3)"
+              borderWidth="2px"
+              borderRadius="xl"
+              backdropFilter="blur(10px)"
+              boxShadow="0 4px 15px rgba(59, 130, 246, 0.1)"
+            >
+              <AlertIcon color="blue.600" />
               <Box>
-                <AlertTitle>Important Notes</AlertTitle>
+                <AlertTitle 
+                  bgGradient="linear(45deg, blue.600, purple.600)"
+                  bgClip="text"
+                  sx={{
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
+                  fontWeight="700"
+                >
+                  Important Notes
+                </AlertTitle>
                 <AlertDescription fontSize="sm">
-                  <VStack spacing={1} align="start" mt={2}>
+                  <VStack spacing={2} align="start" mt={3}>
                     <Text>• {assessmentDetails.cancellationPolicy}</Text>
                     <Text>• SMS reminders will be sent 24h and 2h before assessment</Text>
                     <Text>• Healthcare professional will call 30 minutes before arrival</Text>
@@ -622,29 +929,69 @@ Email: support@royalhealthconsult.ng
             </Alert>
 
             {/* Action Buttons */}
-            <VStack spacing={3}>
+            <VStack spacing={4}>
               <Button
                 leftIcon={<FaHome />}
-                colorScheme="primary"
+                bgGradient="linear(45deg, brand.500, purple.500)"
+                color="white"
                 size="lg"
                 onClick={handleViewDashboard}
                 w="full"
+                _hover={{
+                  bgGradient: "linear(45deg, brand.600, purple.600)",
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 8px 25px rgba(194, 24, 91, 0.3)"
+                }}
+                _active={{
+                  transform: "translateY(0px)"
+                }}
+                transition="all 0.3s"
+                borderRadius="xl"
+                h={12}
+                fontWeight="600"
+                fontSize="lg"
               >
                 View Dashboard
               </Button>
               
-              <HStack spacing={3} w="full">
+              <HStack spacing={4} w="full">
                 <Button
-                  variant="outline"
+                  bgGradient="linear(45deg, green.500, emerald.500)"
+                  color="white"
                   onClick={handleBookAnother}
                   flex={1}
+                  _hover={{
+                    bgGradient: "linear(45deg, green.600, emerald.600)",
+                    transform: "translateY(-1px)",
+                    boxShadow: "0 4px 15px rgba(34, 197, 94, 0.3)"
+                  }}
+                  _active={{
+                    transform: "translateY(0px)"
+                  }}
+                  transition="all 0.2s"
+                  borderRadius="lg"
+                  h={10}
+                  fontWeight="500"
                 >
                   Book Another Assessment
                 </Button>
                 <Button
-                  variant="outline"
+                  bgGradient="linear(45deg, blue.500, purple.500)"
+                  color="white"
                   onClick={handleGoHome}
                   flex={1}
+                  _hover={{
+                    bgGradient: "linear(45deg, blue.600, purple.600)",
+                    transform: "translateY(-1px)",
+                    boxShadow: "0 4px 15px rgba(59, 130, 246, 0.3)"
+                  }}
+                  _active={{
+                    transform: "translateY(0px)"
+                  }}
+                  transition="all 0.2s"
+                  borderRadius="lg"
+                  h={10}
+                  fontWeight="500"
                 >
                   Go Home
                 </Button>
@@ -654,10 +1001,29 @@ Email: support@royalhealthconsult.ng
         </SimpleGrid>
 
         {/* SMS/Email Confirmation Notice */}
-        <Alert status="success">
-          <AlertIcon />
+        <Alert 
+          status="success"
+          bg="rgba(34, 197, 94, 0.1)"
+          borderColor="rgba(34, 197, 94, 0.3)"
+          borderWidth="2px"
+          borderRadius="xl"
+          backdropFilter="blur(10px)"
+          boxShadow="0 4px 15px rgba(34, 197, 94, 0.1)"
+        >
+          <AlertIcon color="green.600" />
           <Box>
-            <AlertTitle>Confirmation Sent!</AlertTitle>
+            <AlertTitle 
+              bgGradient="linear(45deg, green.600, emerald.600)"
+              bgClip="text"
+              sx={{
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+              fontWeight="700"
+            >
+              Confirmation Sent!
+            </AlertTitle>
             <AlertDescription>
               We've sent assessment appointment details to {patientInfo.email} and {patientInfo.phone}. 
               {patientInfo.consentToSMSUpdates && ' You\'ll receive SMS reminders as your assessment appointment approaches.'}

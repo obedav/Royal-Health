@@ -186,6 +186,55 @@ const About: React.FC = () => {
 
   return (
     <Box bg={bg} minH="100vh">
+      {/* Enhanced CSS Animations */}
+      <style>
+        {`
+          @keyframes fadeInUp {
+            from {
+              opacity: 0;
+              transform: translateY(30px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          
+          @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+          }
+          
+          @keyframes pulse-glow {
+            0%, 100% { 
+              box-shadow: 0 8px 25px rgba(194, 24, 91, 0.25);
+            }
+            50% { 
+              box-shadow: 0 12px 35px rgba(194, 24, 91, 0.4);
+            }
+          }
+          
+          @keyframes scale-in {
+            0% {
+              transform: scale(0.95);
+              opacity: 0;
+            }
+            100% {
+              transform: scale(1);
+              opacity: 1;
+            }
+          }
+          
+          .animate-on-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+          
+          .animate-on-hover:hover {
+            animation: pulse-glow 2s infinite;
+          }
+        `}
+      </style>
+
       {/* Hero Section - Enhanced */}
       <Box 
         bgGradient="linear(135deg, brand.500 0%, purple.500 50%, brand.600 100%)" 
@@ -271,6 +320,10 @@ const About: React.FC = () => {
                   transform: "translateY(-3px)",
                   boxShadow: "0 12px 35px rgba(0, 0, 0, 0.15)"
                 }}
+                _focus={{
+                  boxShadow: "0 0 0 3px rgba(194, 24, 91, 0.5)",
+                  outline: "none"
+                }}
                 leftIcon={<FaCalendarAlt />}
                 boxShadow="0 8px 25px rgba(0, 0, 0, 0.1)"
                 transition="all 0.3s ease-in-out"
@@ -280,6 +333,8 @@ const About: React.FC = () => {
                 py={6}
                 fontSize="lg"
                 fontWeight="800"
+                aria-label="Book a healthcare assessment appointment"
+                className="animate-on-hover"
               >
                 Book Assessment
               </Button>
@@ -294,6 +349,10 @@ const About: React.FC = () => {
                   transform: "translateY(-3px)",
                   boxShadow: "0 8px 25px rgba(255, 255, 255, 0.2)"
                 }}
+                _focus={{
+                  boxShadow: "0 0 0 3px rgba(255, 255, 255, 0.5)",
+                  outline: "none"
+                }}
                 transition="all 0.3s ease-in-out"
                 onClick={() => navigate('/contact')}
                 borderRadius="xl"
@@ -301,6 +360,7 @@ const About: React.FC = () => {
                 py={6}
                 fontSize="lg"
                 fontWeight="700"
+                aria-label="Contact Royal Health Consult"
               >
                 Contact Us
               </Button>
@@ -309,8 +369,8 @@ const About: React.FC = () => {
         </Container>
       </Box>
 
-      <Container maxW="6xl" py={20}>
-        <VStack spacing={20} align="stretch">
+      <Container maxW="6xl" py={{ base: 12, md: 16, lg: 20 }} px={{ base: 4, md: 6 }}>
+        <VStack spacing={{ base: 16, md: 18, lg: 20 }} align="stretch">
 
           {/* Company Introduction - Enhanced */}
           <Box textAlign="center">
@@ -397,7 +457,7 @@ const About: React.FC = () => {
                 </Text>
               </VStack>
 
-              <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={8}>
+              <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={{ base: 6, md: 8, lg: 10 }}>
                 {services.map((service, index) => (
                   <Card 
                     key={index} 
@@ -629,7 +689,7 @@ const About: React.FC = () => {
                 </Text>
               </VStack>
 
-              <SimpleGrid columns={{ base: 2, md: 4 }} spacing={8} w="full">
+              <SimpleGrid columns={{ base: 2, md: 4 }} spacing={{ base: 4, md: 6, lg: 8 }} w="full">
                 {stats.map((stat, index) => (
                   <Card 
                     key={index} 
@@ -925,24 +985,9 @@ const About: React.FC = () => {
                     transform: "translateY(-3px)",
                     boxShadow: "0 12px 35px rgba(194, 24, 91, 0.3)"
                   }}
-                  transition="all 0.3s ease-in-out"
-                  borderRadius="xl"
-                  py={6}
-                  px={8}
-                  fontSize="lg"
-                  fontWeight="800"
-                  boxShadow="0 8px 25px rgba(194, 24, 91, 0.25)"
-                >
-                  Call Us Today
-                </Button>
-                <Button
-                  size="xl"
-                  leftIcon={<FaWhatsapp />}
-                  colorScheme=""
-                  variant="solid"
-                  _hover={{ 
-                    transform: "translateY(-3px)",
-                    boxShadow: "0 12px 35px rgba(34, 197, 94, 0.3)"
+                  _focus={{
+                    boxShadow: "0 0 0 3px rgba(194, 24, 91, 0.5)",
+                    outline: "none"
                   }}
                   transition="all 0.3s ease-in-out"
                   borderRadius="xl"
@@ -950,18 +995,53 @@ const About: React.FC = () => {
                   px={8}
                   fontSize="lg"
                   fontWeight="800"
-                  boxShadow="0 8px 25px rgba(34, 197, 94, 0.25)"
+                  boxShadow="0 8px 25px rgba(194, 24, 91, 0.25)"
+                  aria-label="Call Royal Health Consult now"
+                  className="animate-on-hover"
+                >
+                  Call Us Today
+                </Button>
+                <Button
+                  size="xl"
+                  leftIcon={<FaWhatsapp />}
+                  bg="#25D366"
+                  color="white"
+                  variant="solid"
+                  _hover={{ 
+                    bg: "#128C7E",
+                    transform: "translateY(-3px)",
+                    boxShadow: "0 12px 35px rgba(37, 211, 102, 0.4)"
+                  }}
+                  _focus={{
+                    boxShadow: "0 0 0 3px rgba(37, 211, 102, 0.5)",
+                    outline: "none"
+                  }}
+                  transition="all 0.3s ease-in-out"
+                  borderRadius="xl"
+                  py={6}
+                  px={8}
+                  fontSize="lg"
+                  fontWeight="800"
+                  boxShadow="0 8px 25px rgba(37, 211, 102, 0.3)"
+                  aria-label="Contact us via WhatsApp"
+                  className="animate-on-hover"
                 >
                   WhatsApp Us
                 </Button>
                 <Button
                   size="xl"
                   leftIcon={<FaCalendarAlt />}
-                  colorScheme="purple"
+                  bg="purple.500"
+                  color="white"
                   variant="solid"
                   _hover={{ 
+                    bg: "purple.600",
                     transform: "translateY(-3px)",
                     boxShadow: "0 12px 35px rgba(147, 51, 234, 0.3)"
+                  }}
+                  _focus={{
+                    boxShadow: "0 0 0 3px rgba(147, 51, 234, 0.5)",
+                    outline: "none"
                   }}
                   transition="all 0.3s ease-in-out"
                   onClick={() => navigate('/booking')}
@@ -971,6 +1051,8 @@ const About: React.FC = () => {
                   fontSize="lg"
                   fontWeight="800"
                   boxShadow="0 8px 25px rgba(147, 51, 234, 0.25)"
+                  aria-label="Book a healthcare assessment appointment"
+                  className="animate-on-hover"
                 >
                   Book Assessment
                 </Button>

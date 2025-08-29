@@ -426,35 +426,118 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
     <Container maxW="4xl" py={8}>
       <VStack spacing={8} align="stretch">
         {/* Header */}
-        <VStack spacing={4} textAlign="center">
-          <Heading size="lg" color="gray.800">
-            Payment & Confirmation
-          </Heading>
-          <Text color="gray.600">
-            Complete your payment to confirm your healthcare appointment
-          </Text>
+        <Box
+          position="relative"
+          bg="rgba(255, 255, 255, 0.9)"
+          backdropFilter="blur(20px)"
+          borderRadius="3xl"
+          p={8}
+          border="1px solid"
+          borderColor="rgba(194, 24, 91, 0.2)"
+          boxShadow="0 8px 32px rgba(194, 24, 91, 0.15)"
+          _before={{
+            content: '""',
+            position: "absolute",
+            inset: 0,
+            borderRadius: "3xl",
+            padding: "1px",
+            background: "linear-gradient(135deg, rgba(194, 24, 91, 0.3), rgba(123, 31, 162, 0.3))",
+            mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+            maskComposite: "xor",
+            WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+            WebkitMaskComposite: "xor",
+          }}
+        >
+          <VStack spacing={6} textAlign="center">
+            <VStack spacing={3}>
+              <Heading 
+                size="xl" 
+                bgGradient="linear(45deg, brand.600, purple.600)"
+                bgClip="text"
+                sx={{
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  filter: "drop-shadow(0 2px 4px rgba(194, 24, 91, 0.2))",
+                }}
+                fontWeight="800"
+              >
+                Payment & Confirmation
+              </Heading>
+              <Text 
+                color="gray.700"
+                fontSize="lg"
+                fontWeight="500"
+                maxW="600px"
+                lineHeight="1.6"
+              >
+                Complete your payment to confirm your healthcare appointment with our qualified professionals
+              </Text>
+            </VStack>
           
-          {/* Demo Notice */}
-          <Alert status="warning" maxW="600px">
-            <AlertIcon />
-            <Box>
-              <AlertTitle fontSize="sm">Demo Mode</AlertTitle>
-              <AlertDescription fontSize="sm">
-                This is a development demo. No real payments will be processed. 
-                The system simulates payment flows for testing purposes.
-              </AlertDescription>
-            </Box>
-          </Alert>
-        </VStack>
+            {/* Demo Notice */}
+            <Alert 
+              status="warning" 
+              maxW="700px"
+              borderRadius="xl"
+              bg="rgba(255, 193, 7, 0.1)"
+              border="2px solid"
+              borderColor="rgba(255, 193, 7, 0.3)"
+              boxShadow="0 4px 15px rgba(255, 193, 7, 0.2)"
+            >
+              <AlertIcon />
+              <Box>
+                <AlertTitle fontSize="sm" fontWeight="700">Demo Mode</AlertTitle>
+                <AlertDescription fontSize="sm" lineHeight="1.5">
+                  This is a development demo. No real payments will be processed. 
+                  The system simulates payment flows for testing purposes.
+                </AlertDescription>
+              </Box>
+            </Alert>
+          </VStack>
+        </Box>
 
         <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={8}>
           {/* Payment Methods */}
           <VStack spacing={6} align="stretch">
             {/* Payment Gateway Selection */}
-            <Card bg={cardBg} borderColor={borderColor}>
-              <CardBody p={6}>
-                <VStack spacing={4} align="start">
-                  <Heading size="md">Choose Payment Gateway</Heading>
+            <Card 
+              bg="rgba(255, 255, 255, 0.85)"
+              backdropFilter="blur(15px)"
+              borderColor="rgba(194, 24, 91, 0.2)"
+              borderWidth="2px"
+              borderRadius="2xl"
+              boxShadow="0 4px 20px rgba(194, 24, 91, 0.08)"
+            >
+              <CardBody p={8}>
+                <VStack spacing={6} align="start">
+                  <HStack spacing={3}>
+                    <Box
+                      w="35px"
+                      h="35px"
+                      bgGradient="linear(45deg, brand.500, purple.500)"
+                      borderRadius="lg"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      boxShadow="0 4px 15px rgba(194, 24, 91, 0.3)"
+                    >
+                      <Icon as={FaCreditCard} color="white" fontSize="lg" />
+                    </Box>
+                    <Heading 
+                      size="md"
+                      bgGradient="linear(45deg, brand.600, purple.600)"
+                      bgClip="text"
+                      sx={{
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                      fontWeight="700"
+                    >
+                      Choose Payment Gateway
+                    </Heading>
+                  </HStack>
                   <RadioGroup
                     value={selectedGateway}
                     onChange={(value) => setSelectedGateway(value as 'flutterwave' | 'paystack')}
@@ -488,10 +571,43 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
             </Card>
 
             {/* Payment Methods */}
-            <Card bg={cardBg} borderColor={borderColor}>
-              <CardBody p={6}>
-                <VStack spacing={4} align="start">
-                  <Heading size="md">Payment Method</Heading>
+            <Card 
+              bg="rgba(255, 255, 255, 0.85)"
+              backdropFilter="blur(15px)"
+              borderColor="rgba(123, 31, 162, 0.2)"
+              borderWidth="2px"
+              borderRadius="2xl"
+              boxShadow="0 4px 20px rgba(123, 31, 162, 0.08)"
+            >
+              <CardBody p={8}>
+                <VStack spacing={6} align="start">
+                  <HStack spacing={3}>
+                    <Box
+                      w="35px"
+                      h="35px"
+                      bgGradient="linear(45deg, purple.500, brand.500)"
+                      borderRadius="lg"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      boxShadow="0 4px 15px rgba(123, 31, 162, 0.3)"
+                    >
+                      <Icon as={FaMobileAlt} color="white" fontSize="lg" />
+                    </Box>
+                    <Heading 
+                      size="md"
+                      bgGradient="linear(45deg, purple.600, brand.600)"
+                      bgClip="text"
+                      sx={{
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                      fontWeight="700"
+                    >
+                      Payment Method
+                    </Heading>
+                  </HStack>
                   <RadioGroup
                     value={selectedPaymentMethod}
                     onChange={(value) => setSelectedPaymentMethod(value as PaymentMethod)}
@@ -551,12 +667,42 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
             </Card>
 
             {/* Promo Code */}
-            <Card bg={cardBg} borderColor={borderColor}>
-              <CardBody p={6}>
-                <VStack spacing={4} align="start">
-                  <HStack spacing={2}>
-                    <Icon as={FaGift} color="pink.500" />
-                    <Heading size="md">Promo Code</Heading>
+            <Card 
+              bg="rgba(255, 255, 255, 0.85)"
+              backdropFilter="blur(15px)"
+              borderColor="rgba(194, 24, 91, 0.2)"
+              borderWidth="2px"
+              borderRadius="2xl"
+              boxShadow="0 4px 20px rgba(194, 24, 91, 0.08)"
+            >
+              <CardBody p={8}>
+                <VStack spacing={6} align="start">
+                  <HStack spacing={3}>
+                    <Box
+                      w="35px"
+                      h="35px"
+                      bgGradient="linear(45deg, pink.500, brand.500)"
+                      borderRadius="lg"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      boxShadow="0 4px 15px rgba(194, 24, 91, 0.3)"
+                    >
+                      <Icon as={FaGift} color="white" fontSize="lg" />
+                    </Box>
+                    <Heading 
+                      size="md"
+                      bgGradient="linear(45deg, pink.600, brand.600)"
+                      bgClip="text"
+                      sx={{
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                      fontWeight="700"
+                    >
+                      Promo Code
+                    </Heading>
                   </HStack>
                   <HStack spacing={2} w="full">
                     <Input
@@ -567,8 +713,21 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
                     <Button
                       onClick={() => validatePromoCode(promoCode)}
                       isDisabled={!promoCode.trim()}
-                      colorScheme="primary"
-                      variant="outline"
+                      bgGradient="linear(45deg, brand.500, purple.500)"
+                      color="white"
+                      borderRadius="xl"
+                      px={6}
+                      _hover={{
+                        bgGradient: "linear(45deg, brand.600, purple.600)",
+                        transform: "translateY(-1px)",
+                        boxShadow: "0 4px 12px rgba(194, 24, 91, 0.3)"
+                      }}
+                      _disabled={{
+                        bgGradient: "none",
+                        bg: "gray.300",
+                        color: "gray.500"
+                      }}
+                      transition="all 0.2s ease-in-out"
                     >
                       Apply
                     </Button>
@@ -589,10 +748,43 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
           {/* Order Summary */}
           <VStack spacing={6} align="stretch">
             {/* Appointment Summary */}
-            <Card bg={cardBg} borderColor={borderColor}>
-              <CardBody p={6}>
-                <VStack spacing={4} align="start">
-                  <Heading size="md">Appointment Summary</Heading>
+            <Card 
+              bg="rgba(255, 255, 255, 0.85)"
+              backdropFilter="blur(15px)"
+              borderColor="rgba(194, 24, 91, 0.2)"
+              borderWidth="2px"
+              borderRadius="2xl"
+              boxShadow="0 4px 20px rgba(194, 24, 91, 0.08)"
+            >
+              <CardBody p={8}>
+                <VStack spacing={6} align="start">
+                  <HStack spacing={3}>
+                    <Box
+                      w="35px"
+                      h="35px"
+                      bgGradient="linear(45deg, brand.500, purple.500)"
+                      borderRadius="lg"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      boxShadow="0 4px 15px rgba(194, 24, 91, 0.3)"
+                    >
+                      <Icon as={FaReceipt} color="white" fontSize="lg" />
+                    </Box>
+                    <Heading 
+                      size="md"
+                      bgGradient="linear(45deg, brand.600, purple.600)"
+                      bgClip="text"
+                      sx={{
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                      fontWeight="700"
+                    >
+                      Appointment Summary
+                    </Heading>
+                  </HStack>
                   
                   <VStack spacing={3} align="start" w="full">
                     <HStack justify="space-between" w="full">
@@ -636,10 +828,43 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
             </Card>
 
             {/* Price Breakdown */}
-            <Card bg={cardBg} borderColor={borderColor}>
-              <CardBody p={6}>
-                <VStack spacing={4} align="start">
-                  <Heading size="md">Price Breakdown</Heading>
+            <Card 
+              bg="rgba(255, 255, 255, 0.85)"
+              backdropFilter="blur(15px)"
+              borderColor="rgba(123, 31, 162, 0.2)"
+              borderWidth="2px"
+              borderRadius="2xl"
+              boxShadow="0 4px 20px rgba(123, 31, 162, 0.08)"
+            >
+              <CardBody p={8}>
+                <VStack spacing={6} align="start">
+                  <HStack spacing={3}>
+                    <Box
+                      w="35px"
+                      h="35px"
+                      bgGradient="linear(45deg, purple.500, brand.500)"
+                      borderRadius="lg"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      boxShadow="0 4px 15px rgba(123, 31, 162, 0.3)"
+                    >
+                      <Icon as={FaMoneyBillWave} color="white" fontSize="lg" />
+                    </Box>
+                    <Heading 
+                      size="md"
+                      bgGradient="linear(45deg, purple.600, brand.600)"
+                      bgClip="text"
+                      sx={{
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                      fontWeight="700"
+                    >
+                      Price Breakdown
+                    </Heading>
+                  </HStack>
                   
                   <VStack spacing={2} w="full">
                     <HStack justify="space-between" w="full">
@@ -704,13 +929,32 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
             {/* Payment Button */}
             <Button
               size="lg"
-              colorScheme="primary"
+              bgGradient="linear(45deg, brand.500, purple.500)"
+              color="white"
               onClick={selectedPaymentMethod === 'cash' ? handleCashPayment : initiatePayment}
               isLoading={isProcessingPayment}
               loadingText="Processing Payment..."
               leftIcon={selectedPaymentMethod === 'cash' ? <FaMoneyBillWave /> : <FaLock />}
               w="full"
-              py={6}
+              py={8}
+              borderRadius="2xl"
+              fontSize="lg"
+              fontWeight="700"
+              boxShadow="0 8px 25px rgba(194, 24, 91, 0.25)"
+              _hover={{
+                bgGradient: "linear(45deg, brand.600, purple.600)",
+                transform: "translateY(-2px)",
+                boxShadow: "0 12px 35px rgba(194, 24, 91, 0.35)"
+              }}
+              _active={{
+                transform: "translateY(0)",
+                boxShadow: "0 6px 20px rgba(194, 24, 91, 0.3)"
+              }}
+              _loading={{
+                bgGradient: "linear(45deg, brand.400, purple.400)",
+                _hover: { bgGradient: "linear(45deg, brand.400, purple.400)" }
+              }}
+              transition="all 0.2s ease-in-out"
             >
               {selectedPaymentMethod === 'cash' 
                 ? `Confirm Appointment - Pay ${formatPrice(pricing.total)} to Professional`

@@ -29,7 +29,7 @@ import {
   Badge,
   useColorModeValue,
   FormHelperText,
-} from '@chakra-ui/react'
+} from "@chakra-ui/react";
 import {
   FaUser,
   FaHeart,
@@ -38,59 +38,25 @@ import {
   FaCheckCircle,
   FaInfoCircle,
   FaStethoscope,
-} from 'react-icons/fa'
-import { useState, useEffect, useMemo } from 'react'
-import { BookingService } from '../../types/booking.types'
-import { ScheduleData } from './AppointmentScheduling'
-import { ASSESSMENT_PRICE } from '../../constants/assessments'
+} from "react-icons/fa";
+import { useState, useEffect, useMemo } from "react";
+import { BookingService } from "../../types/booking.types";
+import { ScheduleData } from "./AppointmentScheduling";
+import { ASSESSMENT_PRICE } from "../../constants/assessments";
+import { PatientInformation } from "../../types/patient.types";
+import { 
+  validatePatientForm, 
+  isFormValid as validateForm,
+  calculateAge,
+  formatPhoneNumber,
+  sanitizeFormData 
+} from "../../utils/patientFormValidation";
 
 interface PatientFormProps {
-  selectedService: BookingService
-  selectedSchedule: ScheduleData
-  onPatientInfoSubmit: (patientData: PatientInformation) => void
-  patientInfo?: PatientInformation
-}
-
-export interface PatientInformation {
-  // Personal Information
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
-  dateOfBirth: string
-  gender: 'male' | 'female' | 'prefer_not_to_say'
-  nationalId?: string
-  
-  // Medical Information
-  medicalHistory: {
-    conditions: string[]
-    currentMedications: string[]
-    allergies: string[]
-    previousSurgeries: string[]
-    hospitalizations: string[]
-  }
-  
-  // Emergency Contacts
-  emergencyContact: {
-    name: string
-    relationship: string
-    phone: string
-    address?: string
-  }
-  
-  // Additional Information
-  insuranceProvider?: string
-  insuranceNumber?: string
-  preferredLanguage: string
-  specialNeeds?: string
-  
-  // Consents
-  consentToTreatment: boolean
-  consentToDataProcessing: boolean
-  consentToSMSUpdates: boolean
-  
-  // Service-specific information
-  serviceSpecificInfo?: Record<string, any>
+  selectedService: BookingService;
+  selectedSchedule: ScheduleData;
+  onPatientInfoSubmit: (patientData: PatientInformation) => void;
+  patientInfo?: PatientInformation;
 }
 
 const PatientInformationForm: React.FC<PatientFormProps> = ({
@@ -99,286 +65,351 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
   onPatientInfoSubmit,
   patientInfo,
 }) => {
-  const cardBg = useColorModeValue('white', 'gray.800')
-  const borderColor = useColorModeValue('gray.200', 'gray.600')
+  const cardBg = useColorModeValue("white", "gray.800");
+  const borderColor = useColorModeValue("gray.200", "gray.600");
 
   // Form state
   const [formData, setFormData] = useState<PatientInformation>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    dateOfBirth: '',
-    gender: 'prefer_not_to_say',
-    nationalId: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    dateOfBirth: "",
+    gender: "prefer_not_to_say",
+    nationalId: "",
     medicalHistory: {
       conditions: [],
       currentMedications: [],
       allergies: [],
       previousSurgeries: [],
-      hospitalizations: []
+      hospitalizations: [],
     },
     emergencyContact: {
-      name: '',
-      relationship: '',
-      phone: '',
-      address: ''
+      name: "",
+      relationship: "",
+      phone: "",
+      address: "",
     },
-    insuranceProvider: '',
-    insuranceNumber: '',
-    preferredLanguage: 'English',
-    specialNeeds: '',
+    insuranceProvider: "",
+    insuranceNumber: "",
+    preferredLanguage: "English",
+    specialNeeds: "",
     consentToTreatment: false,
     consentToDataProcessing: false,
     consentToSMSUpdates: false,
-    serviceSpecificInfo: {}
-  })
+    serviceSpecificInfo: {},
+  });
 
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Pre-populate if patient info exists
   useEffect(() => {
     if (patientInfo) {
-      setFormData(patientInfo)
+      setFormData(patientInfo);
     }
-  }, [patientInfo])
+  }, [patientInfo]);
 
   // Common medical conditions for quick selection
   const commonConditions = [
-    'Hypertension (High Blood Pressure)',
-    'Diabetes Type 1',
-    'Diabetes Type 2',
-    'Heart Disease',
-    'Asthma',
-    'Arthritis',
-    'High Cholesterol',
-    'Kidney Disease',
-    'Liver Disease',
-    'Mental Health Conditions',
-    'Cancer',
-    'Stroke',
-    'Epilepsy',
-    'Thyroid Disorders'
-  ]
+    "Hypertension (High Blood Pressure)",
+    "Diabetes Type 1",
+    "Diabetes Type 2",
+    "Heart Disease",
+    "Asthma",
+    "Arthritis",
+    "High Cholesterol",
+    "Kidney Disease",
+    "Liver Disease",
+    "Mental Health Conditions",
+    "Cancer",
+    "Stroke",
+    "Epilepsy",
+    "Thyroid Disorders",
+  ];
 
   const commonAllergies = [
-    'Penicillin',
-    'Aspirin',
-    'Ibuprofen',
-    'Codeine',
-    'Latex',
-    'Shellfish',
-    'Nuts',
-    'Eggs',
-    'Dairy',
-    'Dust',
-    'Pollen',
-    'Pet Dander'
-  ]
+    "Penicillin",
+    "Aspirin",
+    "Ibuprofen",
+    "Codeine",
+    "Latex",
+    "Shellfish",
+    "Nuts",
+    "Eggs",
+    "Dairy",
+    "Dust",
+    "Pollen",
+    "Pet Dander",
+  ];
 
   const relationshipOptions = [
-    'Spouse/Partner',
-    'Parent',
-    'Child',
-    'Sibling',
-    'Relative',
-    'Friend',
-    'Guardian',
-    'Neighbor'
-  ]
+    "Spouse/Partner",
+    "Parent",
+    "Child",
+    "Sibling",
+    "Relative",
+    "Friend",
+    "Guardian",
+    "Neighbor",
+  ];
 
   const nigerianLanguages = [
-    'English',
-    'Hausa',
-    'Yoruba',
-    'Igbo',
-    'Pidgin English',
-    'Fulfulde',
-    'Kanuri',
-    'Tiv',
-    'Edo',
-    'Efik'
-  ]
+    "English",
+    "Hausa",
+    "Yoruba",
+    "Igbo",
+    "Pidgin English",
+    "Fulfulde",
+    "Kanuri",
+    "Tiv",
+    "Edo",
+    "Efik",
+  ];
 
   const insuranceProviders = [
-    'NHIS (National Health Insurance Scheme)',
-    'AIICO Insurance',
-    'AXA Mansard',
-    'Leadway Health',
-    'Hygeia HMO',
-    'Total Health Trust',
-    'Reliance HMO',
-    'Clearline HMO',
-    'Other',
-    'No Insurance'
-  ]
+    "NHIS (National Health Insurance Scheme)",
+    "AIICO Insurance",
+    "AXA Mansard",
+    "Leadway Health",
+    "Hygeia HMO",
+    "Total Health Trust",
+    "Reliance HMO",
+    "Clearline HMO",
+    "Other",
+    "No Insurance",
+  ];
 
-  // Memoized validation to prevent infinite loops
+  // Use the imported validation functions
   const { isFormValid, validationErrors } = useMemo(() => {
-    const newErrors: Record<string, string> = {}
+    const validationResult = validatePatientForm(formData);
+    const isValid = validateForm(formData);
 
-    // Required fields validation
-    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required'
-    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required'
-    if (!formData.email.trim()) newErrors.email = 'Email is required'
-    if (!formData.phone.trim()) newErrors.phone = 'Phone number is required'
-    if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required'
-    if (!formData.emergencyContact.name.trim()) newErrors.emergencyContactName = 'Emergency contact name is required'
-    if (!formData.emergencyContact.phone.trim()) newErrors.emergencyContactPhone = 'Emergency contact phone is required'
-    if (!formData.emergencyContact.relationship) newErrors.emergencyContactRelationship = 'Relationship is required'
-
-    // Email validation
-    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address'
-    }
-
-    // Phone validation (Nigerian format)
-    if (formData.phone && !/^(\+234|0)[7-9][0-1]\d{8}$/.test(formData.phone.replace(/\s/g, ''))) {
-      newErrors.phone = 'Please enter a valid Nigerian phone number'
-    }
-
-    // Age validation
-    if (formData.dateOfBirth) {
-      const today = new Date()
-      const birthDate = new Date(formData.dateOfBirth)
-      const age = today.getFullYear() - birthDate.getFullYear()
-      if (age < 0 || age > 120) {
-        newErrors.dateOfBirth = 'Please enter a valid date of birth'
-      }
-    }
-
-    // Consent validation
-    if (!formData.consentToTreatment) {
-      newErrors.consentToTreatment = 'Consent to treatment is required'
-    }
-    if (!formData.consentToDataProcessing) {
-      newErrors.consentToDataProcessing = 'Consent to data processing is required'
-    }
-
-    const isValid = Object.keys(newErrors).length === 0
-    
-    return { isFormValid: isValid, validationErrors: newErrors }
-  }, [formData])
+    return { 
+      isFormValid: isValid, 
+      validationErrors: validationResult 
+    };
+  }, [formData]);
 
   // Update errors when validation changes
   useEffect(() => {
-    setErrors(validationErrors)
-  }, [validationErrors])
+    setErrors(validationErrors);
+  }, [validationErrors]);
 
   // Update form data
   const updateFormData = (field: string, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
-    }))
-  }
+      [field]: value,
+    }));
+  };
 
   const updateNestedFormData = (section: string, field: string, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [section]: {
         ...prev[section as keyof PatientInformation],
-        [field]: value
-      }
-    }))
-  }
+        [field]: value,
+      },
+    }));
+  };
 
   const updateMedicalHistory = (field: string, values: string[]) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       medicalHistory: {
         ...prev.medicalHistory,
-        [field]: values
-      }
-    }))
-  }
-
-  // Calculate age from date of birth
-  const calculateAge = (dateOfBirth: string) => {
-    if (!dateOfBirth) return null
-    const today = new Date()
-    const birthDate = new Date(dateOfBirth)
-    const age = today.getFullYear() - birthDate.getFullYear()
-    const monthDiff = today.getMonth() - birthDate.getMonth()
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      return age - 1
-    }
-    return age
-  }
+        [field]: values,
+      },
+    }));
+  };
 
   // Handle form submission
   const handleSubmit = () => {
     if (isFormValid) {
-      onPatientInfoSubmit(formData)
+      // Sanitize form data before submission
+      const sanitizedData = sanitizeFormData(formData);
+      onPatientInfoSubmit(sanitizedData);
     }
-  }
+  };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-NG', {
-      style: 'currency',
-      currency: 'NGN',
-      minimumFractionDigits: 0
-    }).format(price)
-  }
+    return new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency: "NGN",
+      minimumFractionDigits: 0,
+    }).format(price);
+  };
 
-  const age = calculateAge(formData.dateOfBirth)
+  // Use the imported calculateAge function
+  const age = formData.dateOfBirth ? calculateAge(formData.dateOfBirth) : null;
 
   return (
     <Container maxW="4xl" py={8}>
       <VStack spacing={8} align="stretch">
         {/* Header */}
-        <VStack spacing={4} textAlign="center">
-          <Heading size="lg" color="gray.800">
-            Patient Information
-          </Heading>
-          <Text color="gray.600">
-            Please provide your information to help us deliver the best care possible
-          </Text>
-          
-          {/* Assessment Summary - FIXED VERSION */}
-          <Card bg="primary.50" borderColor="primary.200" w="full" maxW="600px">
-            <CardBody p={4}>
-              <VStack spacing={2}>
-                <Text fontWeight="600" color="primary.700">
-                  {selectedService.name}
-                </Text>
-                <Text fontSize="sm" color="primary.600">
-                  Healthcare professional will be assigned based on your location
-                </Text>
-                <Text fontSize="sm" color="gray.600">
-                  {new Date(selectedSchedule.date).toLocaleDateString('en-NG', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })} at {selectedSchedule.timeSlot.time}
-                </Text>
-                <Text fontSize="sm" color="gray.600">
-                  {selectedSchedule.address.street}, {selectedSchedule.address.state}
-                </Text>
-                <Badge colorScheme="green" fontSize="sm" px={3} py={1}>
-                  {formatPrice(ASSESSMENT_PRICE)}
-                </Badge>
-              </VStack>
-            </CardBody>
-          </Card>
-        </VStack>
+        <Box
+          position="relative"
+          bg="rgba(255, 255, 255, 0.9)"
+          backdropFilter="blur(20px)"
+          borderRadius="3xl"
+          p={8}
+          border="1px solid"
+          borderColor="rgba(194, 24, 91, 0.2)"
+          boxShadow="0 8px 32px rgba(194, 24, 91, 0.15)"
+          _before={{
+            content: '""',
+            position: "absolute",
+            inset: 0,
+            borderRadius: "3xl",
+            padding: "1px",
+            background: "linear-gradient(135deg, rgba(194, 24, 91, 0.3), rgba(123, 31, 162, 0.3))",
+            mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+            maskComposite: "xor",
+            WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+            WebkitMaskComposite: "xor",
+          }}
+        >
+          <VStack spacing={6} textAlign="center">
+            <VStack spacing={3}>
+              <Heading 
+                size="xl" 
+                bgGradient="linear(45deg, brand.600, purple.600)"
+                bgClip="text"
+                sx={{
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  filter: "drop-shadow(0 2px 4px rgba(194, 24, 91, 0.2))",
+                }}
+                fontWeight="800"
+              >
+                Patient Information
+              </Heading>
+              <Text 
+                color="gray.700"
+                fontSize="lg"
+                fontWeight="500"
+                maxW="600px"
+                lineHeight="1.6"
+              >
+                Please provide your information to help us deliver the best care possible with our qualified healthcare professionals
+              </Text>
+            </VStack>
+
+            {/* Enhanced Assessment Summary */}
+            <Box 
+              bg="rgba(194, 24, 91, 0.05)" 
+              borderRadius="2xl" 
+              p={6} 
+              w="full" 
+              maxW="700px"
+              border="2px solid"
+              borderColor="rgba(194, 24, 91, 0.1)"
+              boxShadow="0 4px 20px rgba(194, 24, 91, 0.08)"
+            >
+              <HStack spacing={6} align="start">
+                <Box
+                  w="60px"
+                  h="60px"
+                  bgGradient="linear(45deg, brand.500, purple.500)"
+                  borderRadius="xl"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  boxShadow="0 4px 15px rgba(194, 24, 91, 0.3)"
+                >
+                  <Icon as={FaStethoscope} color="white" fontSize="2xl" />
+                </Box>
+                <VStack align="start" spacing={3} flex="1">
+                  <Text 
+                    fontWeight="700" 
+                    color="gray.800"
+                    fontSize="lg"
+                  >
+                    {selectedService.name}
+                  </Text>
+                  <VStack align="start" spacing={1}>
+                    <Text fontSize="sm" color="gray.600">
+                      Healthcare professional will be assigned based on your location
+                    </Text>
+                    <Text fontSize="sm" color="gray.600" fontWeight="500">
+                      {new Date(selectedSchedule.date).toLocaleDateString("en-NG", {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}{" "}
+                      at {selectedSchedule.timeSlot.time}
+                    </Text>
+                    <Text fontSize="sm" color="gray.600">
+                      {selectedSchedule.address.street},{" "}
+                      {selectedSchedule.address.state}
+                    </Text>
+                  </VStack>
+                  <Badge 
+                    bg="green.500"
+                    color="white"
+                    fontSize="md" 
+                    px={4} 
+                    py={1}
+                    borderRadius="full"
+                    fontWeight="600"
+                  >
+                    {formatPrice(ASSESSMENT_PRICE)}
+                  </Badge>
+                </VStack>
+              </HStack>
+            </Box>
+          </VStack>
+        </Box>
 
         {/* Personal Information */}
-        <Card bg={cardBg} borderColor={borderColor}>
-          <CardBody p={6}>
-            <VStack spacing={6} align="start">
-              <HStack spacing={2}>
-                <Icon as={FaUser} color="primary.500" />
-                <Heading size="md">Personal Information</Heading>
+        <Card 
+          bg="rgba(255, 255, 255, 0.85)"
+          backdropFilter="blur(15px)"
+          borderColor="rgba(194, 24, 91, 0.2)"
+          borderWidth="2px"
+          borderRadius="2xl"
+          boxShadow="0 4px 20px rgba(194, 24, 91, 0.08)"
+        >
+          <CardBody p={8}>
+            <VStack spacing={8} align="start">
+              <HStack spacing={4}>
+                <Box
+                  w="40px"
+                  h="40px"
+                  bgGradient="linear(45deg, brand.500, purple.500)"
+                  borderRadius="lg"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  boxShadow="0 4px 15px rgba(194, 24, 91, 0.3)"
+                >
+                  <Icon as={FaUser} color="white" fontSize="lg" />
+                </Box>
+                <Heading 
+                  size="md"
+                  bgGradient="linear(45deg, brand.600, purple.600)"
+                  bgClip="text"
+                  sx={{
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
+                  fontWeight="700"
+                >
+                  Personal Information
+                </Heading>
               </HStack>
-              
+
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
                 <FormControl isRequired isInvalid={!!errors.firstName}>
                   <FormLabel>First Name</FormLabel>
                   <Input
                     value={formData.firstName}
-                    onChange={(e) => updateFormData('firstName', e.target.value)}
+                    onChange={(e) =>
+                      updateFormData("firstName", e.target.value)
+                    }
                     placeholder="Enter your first name"
                   />
                   <FormErrorMessage>{errors.firstName}</FormErrorMessage>
@@ -388,7 +419,7 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
                   <FormLabel>Last Name</FormLabel>
                   <Input
                     value={formData.lastName}
-                    onChange={(e) => updateFormData('lastName', e.target.value)}
+                    onChange={(e) => updateFormData("lastName", e.target.value)}
                     placeholder="Enter your last name"
                   />
                   <FormErrorMessage>{errors.lastName}</FormErrorMessage>
@@ -399,7 +430,7 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
                   <Input
                     type="email"
                     value={formData.email}
-                    onChange={(e) => updateFormData('email', e.target.value)}
+                    onChange={(e) => updateFormData("email", e.target.value)}
                     placeholder="your.email@example.com"
                   />
                   <FormErrorMessage>{errors.email}</FormErrorMessage>
@@ -409,7 +440,7 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
                   <FormLabel>Phone Number</FormLabel>
                   <Input
                     value={formData.phone}
-                    onChange={(e) => updateFormData('phone', e.target.value)}
+                    onChange={(e) => updateFormData("phone", e.target.value)}
                     placeholder="+234 801 234 5678"
                   />
                   <FormErrorMessage>{errors.phone}</FormErrorMessage>
@@ -420,12 +451,12 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
                   <Input
                     type="date"
                     value={formData.dateOfBirth}
-                    onChange={(e) => updateFormData('dateOfBirth', e.target.value)}
-                    max={new Date().toISOString().split('T')[0]}
+                    onChange={(e) =>
+                      updateFormData("dateOfBirth", e.target.value)
+                    }
+                    max={new Date().toISOString().split("T")[0]}
                   />
-                  {age && (
-                    <FormHelperText>Age: {age} years old</FormHelperText>
-                  )}
+                  {age && <FormHelperText>Age: {age} years old</FormHelperText>}
                   <FormErrorMessage>{errors.dateOfBirth}</FormErrorMessage>
                 </FormControl>
 
@@ -433,7 +464,7 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
                   <FormLabel>Gender</FormLabel>
                   <RadioGroup
                     value={formData.gender}
-                    onChange={(value) => updateFormData('gender', value)}
+                    onChange={(value) => updateFormData("gender", value)}
                   >
                     <Stack direction="row" spacing={4}>
                       <Radio value="male">Male</Radio>
@@ -447,20 +478,28 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
                   <FormLabel>National ID / BVN (Optional)</FormLabel>
                   <Input
                     value={formData.nationalId}
-                    onChange={(e) => updateFormData('nationalId', e.target.value)}
+                    onChange={(e) =>
+                      updateFormData("nationalId", e.target.value)
+                    }
                     placeholder="22123456789"
                   />
-                  <FormHelperText>For identity verification purposes</FormHelperText>
+                  <FormHelperText>
+                    For identity verification purposes
+                  </FormHelperText>
                 </FormControl>
 
                 <FormControl>
                   <FormLabel>Preferred Language</FormLabel>
                   <Select
                     value={formData.preferredLanguage}
-                    onChange={(e) => updateFormData('preferredLanguage', e.target.value)}
+                    onChange={(e) =>
+                      updateFormData("preferredLanguage", e.target.value)
+                    }
                   >
-                    {nigerianLanguages.map(lang => (
-                      <option key={lang} value={lang}>{lang}</option>
+                    {nigerianLanguages.map((lang) => (
+                      <option key={lang} value={lang}>
+                        {lang}
+                      </option>
                     ))}
                   </Select>
                 </FormControl>
@@ -470,12 +509,42 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
         </Card>
 
         {/* Medical History */}
-        <Card bg={cardBg} borderColor={borderColor}>
-          <CardBody p={6}>
-            <VStack spacing={6} align="start">
-              <HStack spacing={2}>
-                <Icon as={FaHeart} color="red.500" />
-                <Heading size="md">Medical History</Heading>
+        <Card 
+          bg="rgba(255, 255, 255, 0.85)"
+          backdropFilter="blur(15px)"
+          borderColor="rgba(220, 38, 127, 0.2)"
+          borderWidth="2px"
+          borderRadius="2xl"
+          boxShadow="0 4px 20px rgba(220, 38, 127, 0.08)"
+        >
+          <CardBody p={8}>
+            <VStack spacing={8} align="start">
+              <HStack spacing={4}>
+                <Box
+                  w="40px"
+                  h="40px"
+                  bgGradient="linear(45deg, red.500, pink.500)"
+                  borderRadius="lg"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  boxShadow="0 4px 15px rgba(220, 38, 127, 0.3)"
+                >
+                  <Icon as={FaHeart} color="white" fontSize="lg" />
+                </Box>
+                <Heading 
+                  size="md"
+                  bgGradient="linear(45deg, red.600, pink.600)"
+                  bgClip="text"
+                  sx={{
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
+                  fontWeight="700"
+                >
+                  Medical History
+                </Heading>
               </HStack>
 
               <Alert status="info">
@@ -483,8 +552,8 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
                 <Box>
                   <AlertTitle>Important!</AlertTitle>
                   <AlertDescription fontSize="sm">
-                    Please provide accurate medical information to ensure safe and effective care. 
-                    All information is kept confidential.
+                    Please provide accurate medical information to ensure safe
+                    and effective care. All information is kept confidential.
                   </AlertDescription>
                 </Box>
               </Alert>
@@ -494,10 +563,12 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
                   <FormLabel>Current Medical Conditions</FormLabel>
                   <CheckboxGroup
                     value={formData.medicalHistory.conditions}
-                    onChange={(values) => updateMedicalHistory('conditions', values as string[])}
+                    onChange={(values) =>
+                      updateMedicalHistory("conditions", values as string[])
+                    }
                   >
                     <SimpleGrid columns={{ base: 1, md: 2 }} spacing={2}>
-                      {commonConditions.map(condition => (
+                      {commonConditions.map((condition) => (
                         <Checkbox key={condition} value={condition} size="sm">
                           {condition}
                         </Checkbox>
@@ -509,24 +580,36 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
                 <FormControl>
                   <FormLabel>Current Medications</FormLabel>
                   <Textarea
-                    value={formData.medicalHistory.currentMedications.join(', ')}
-                    onChange={(e) => updateMedicalHistory('currentMedications', 
-                      e.target.value.split(',').map(med => med.trim()).filter(med => med)
+                    value={formData.medicalHistory.currentMedications.join(
+                      ", "
                     )}
+                    onChange={(e) =>
+                      updateMedicalHistory(
+                        "currentMedications",
+                        e.target.value
+                          .split(",")
+                          .map((med) => med.trim())
+                          .filter((med) => med)
+                      )
+                    }
                     placeholder="List all medications you're currently taking (e.g., Lisinopril 10mg daily, Metformin 500mg twice daily)"
                     rows={3}
                   />
-                  <FormHelperText>Include dosage and frequency if known</FormHelperText>
+                  <FormHelperText>
+                    Include dosage and frequency if known
+                  </FormHelperText>
                 </FormControl>
 
                 <FormControl>
                   <FormLabel>Allergies</FormLabel>
                   <CheckboxGroup
                     value={formData.medicalHistory.allergies}
-                    onChange={(values) => updateMedicalHistory('allergies', values as string[])}
+                    onChange={(values) =>
+                      updateMedicalHistory("allergies", values as string[])
+                    }
                   >
                     <SimpleGrid columns={{ base: 2, md: 3 }} spacing={2}>
-                      {commonAllergies.map(allergy => (
+                      {commonAllergies.map((allergy) => (
                         <Checkbox key={allergy} value={allergy} size="sm">
                           {allergy}
                         </Checkbox>
@@ -536,13 +619,21 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
                   <Textarea
                     mt={3}
                     value={formData.medicalHistory.allergies
-                      .filter(allergy => !commonAllergies.includes(allergy))
-                      .join(', ')}
+                      .filter((allergy) => !commonAllergies.includes(allergy))
+                      .join(", ")}
                     onChange={(e) => {
-                      const customAllergies = e.target.value.split(',').map(a => a.trim()).filter(a => a)
-                      const selectedCommonAllergies = formData.medicalHistory.allergies
-                        .filter(allergy => commonAllergies.includes(allergy))
-                      updateMedicalHistory('allergies', [...selectedCommonAllergies, ...customAllergies])
+                      const customAllergies = e.target.value
+                        .split(",")
+                        .map((a) => a.trim())
+                        .filter((a) => a);
+                      const selectedCommonAllergies =
+                        formData.medicalHistory.allergies.filter((allergy) =>
+                          commonAllergies.includes(allergy)
+                        );
+                      updateMedicalHistory("allergies", [
+                        ...selectedCommonAllergies,
+                        ...customAllergies,
+                      ]);
                     }}
                     placeholder="Other allergies not listed above"
                     rows={2}
@@ -554,54 +645,125 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
         </Card>
 
         {/* Emergency Contact */}
-        <Card bg={cardBg} borderColor={borderColor}>
-          <CardBody p={6}>
-            <VStack spacing={6} align="start">
-              <HStack spacing={2}>
-                <Icon as={FaPhone} color="orange.500" />
-                <Heading size="md">Emergency Contact</Heading>
+        <Card 
+          bg="rgba(255, 255, 255, 0.85)"
+          backdropFilter="blur(15px)"
+          borderColor="rgba(251, 146, 60, 0.2)"
+          borderWidth="2px"
+          borderRadius="2xl"
+          boxShadow="0 4px 20px rgba(251, 146, 60, 0.08)"
+        >
+          <CardBody p={8}>
+            <VStack spacing={8} align="start">
+              <HStack spacing={4}>
+                <Box
+                  w="40px"
+                  h="40px"
+                  bgGradient="linear(45deg, orange.500, yellow.500)"
+                  borderRadius="lg"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  boxShadow="0 4px 15px rgba(251, 146, 60, 0.3)"
+                >
+                  <Icon as={FaPhone} color="white" fontSize="lg" />
+                </Box>
+                <Heading 
+                  size="md"
+                  bgGradient="linear(45deg, orange.600, yellow.600)"
+                  bgClip="text"
+                  sx={{
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
+                  fontWeight="700"
+                >
+                  Emergency Contact
+                </Heading>
               </HStack>
 
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
-                <FormControl isRequired isInvalid={!!errors.emergencyContactName}>
+                <FormControl
+                  isRequired
+                  isInvalid={!!errors.emergencyContactName}
+                >
                   <FormLabel>Full Name</FormLabel>
                   <Input
                     value={formData.emergencyContact.name}
-                    onChange={(e) => updateNestedFormData('emergencyContact', 'name', e.target.value)}
+                    onChange={(e) =>
+                      updateNestedFormData(
+                        "emergencyContact",
+                        "name",
+                        e.target.value
+                      )
+                    }
                     placeholder="Emergency contact full name"
                   />
-                  <FormErrorMessage>{errors.emergencyContactName}</FormErrorMessage>
+                  <FormErrorMessage>
+                    {errors.emergencyContactName}
+                  </FormErrorMessage>
                 </FormControl>
 
-                <FormControl isRequired isInvalid={!!errors.emergencyContactRelationship}>
+                <FormControl
+                  isRequired
+                  isInvalid={!!errors.emergencyContactRelationship}
+                >
                   <FormLabel>Relationship</FormLabel>
                   <Select
                     value={formData.emergencyContact.relationship}
-                    onChange={(e) => updateNestedFormData('emergencyContact', 'relationship', e.target.value)}
+                    onChange={(e) =>
+                      updateNestedFormData(
+                        "emergencyContact",
+                        "relationship",
+                        e.target.value
+                      )
+                    }
                     placeholder="Select relationship"
                   >
-                    {relationshipOptions.map(relationship => (
-                      <option key={relationship} value={relationship}>{relationship}</option>
+                    {relationshipOptions.map((relationship) => (
+                      <option key={relationship} value={relationship}>
+                        {relationship}
+                      </option>
                     ))}
                   </Select>
-                  <FormErrorMessage>{errors.emergencyContactRelationship}</FormErrorMessage>
+                  <FormErrorMessage>
+                    {errors.emergencyContactRelationship}
+                  </FormErrorMessage>
                 </FormControl>
 
-                <FormControl isRequired isInvalid={!!errors.emergencyContactPhone}>
+                <FormControl
+                  isRequired
+                  isInvalid={!!errors.emergencyContactPhone}
+                >
                   <FormLabel>Phone Number</FormLabel>
                   <Input
                     value={formData.emergencyContact.phone}
-                    onChange={(e) => updateNestedFormData('emergencyContact', 'phone', e.target.value)}
+                    onChange={(e) =>
+                      updateNestedFormData(
+                        "emergencyContact",
+                        "phone",
+                        e.target.value
+                      )
+                    }
                     placeholder="+234 801 234 5678"
                   />
-                  <FormErrorMessage>{errors.emergencyContactPhone}</FormErrorMessage>
+                  <FormErrorMessage>
+                    {errors.emergencyContactPhone}
+                  </FormErrorMessage>
                 </FormControl>
 
                 <FormControl>
                   <FormLabel>Address (Optional)</FormLabel>
                   <Input
                     value={formData.emergencyContact.address}
-                    onChange={(e) => updateNestedFormData('emergencyContact', 'address', e.target.value)}
+                    onChange={(e) =>
+                      updateNestedFormData(
+                        "emergencyContact",
+                        "address",
+                        e.target.value
+                      )
+                    }
                     placeholder="Emergency contact address"
                   />
                 </FormControl>
@@ -611,12 +773,42 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
         </Card>
 
         {/* Insurance Information */}
-        <Card bg={cardBg} borderColor={borderColor}>
-          <CardBody p={6}>
-            <VStack spacing={6} align="start">
-              <HStack spacing={2}>
-                <Icon as={FaIdCard} color="blue.500" />
-                <Heading size="md">Insurance Information (Optional)</Heading>
+        <Card 
+          bg="rgba(255, 255, 255, 0.85)"
+          backdropFilter="blur(15px)"
+          borderColor="rgba(59, 130, 246, 0.2)"
+          borderWidth="2px"
+          borderRadius="2xl"
+          boxShadow="0 4px 20px rgba(59, 130, 246, 0.08)"
+        >
+          <CardBody p={8}>
+            <VStack spacing={8} align="start">
+              <HStack spacing={4}>
+                <Box
+                  w="40px"
+                  h="40px"
+                  bgGradient="linear(45deg, blue.500, cyan.500)"
+                  borderRadius="lg"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  boxShadow="0 4px 15px rgba(59, 130, 246, 0.3)"
+                >
+                  <Icon as={FaIdCard} color="white" fontSize="lg" />
+                </Box>
+                <Heading 
+                  size="md"
+                  bgGradient="linear(45deg, blue.600, cyan.600)"
+                  bgClip="text"
+                  sx={{
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
+                  fontWeight="700"
+                >
+                  Insurance Information (Optional)
+                </Heading>
               </HStack>
 
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
@@ -624,11 +816,15 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
                   <FormLabel>Insurance Provider</FormLabel>
                   <Select
                     value={formData.insuranceProvider}
-                    onChange={(e) => updateFormData('insuranceProvider', e.target.value)}
+                    onChange={(e) =>
+                      updateFormData("insuranceProvider", e.target.value)
+                    }
                     placeholder="Select insurance provider"
                   >
-                    {insuranceProviders.map(provider => (
-                      <option key={provider} value={provider}>{provider}</option>
+                    {insuranceProviders.map((provider) => (
+                      <option key={provider} value={provider}>
+                        {provider}
+                      </option>
                     ))}
                   </Select>
                 </FormControl>
@@ -637,7 +833,9 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
                   <FormLabel>Insurance Number</FormLabel>
                   <Input
                     value={formData.insuranceNumber}
-                    onChange={(e) => updateFormData('insuranceNumber', e.target.value)}
+                    onChange={(e) =>
+                      updateFormData("insuranceNumber", e.target.value)
+                    }
                     placeholder="Your insurance number/ID"
                   />
                 </FormControl>
@@ -647,19 +845,53 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
         </Card>
 
         {/* Additional Information */}
-        <Card bg={cardBg} borderColor={borderColor}>
-          <CardBody p={6}>
-            <VStack spacing={6} align="start">
-              <HStack spacing={2}>
-                <Icon as={FaInfoCircle} color="purple.500" />
-                <Heading size="md">Additional Information</Heading>
+        <Card 
+          bg="rgba(255, 255, 255, 0.85)"
+          backdropFilter="blur(15px)"
+          borderColor="rgba(123, 31, 162, 0.2)"
+          borderWidth="2px"
+          borderRadius="2xl"
+          boxShadow="0 4px 20px rgba(123, 31, 162, 0.08)"
+        >
+          <CardBody p={8}>
+            <VStack spacing={8} align="start">
+              <HStack spacing={4}>
+                <Box
+                  w="40px"
+                  h="40px"
+                  bgGradient="linear(45deg, purple.500, brand.500)"
+                  borderRadius="lg"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  boxShadow="0 4px 15px rgba(123, 31, 162, 0.3)"
+                >
+                  <Icon as={FaInfoCircle} color="white" fontSize="lg" />
+                </Box>
+                <Heading 
+                  size="md"
+                  bgGradient="linear(45deg, purple.600, brand.600)"
+                  bgClip="text"
+                  sx={{
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
+                  fontWeight="700"
+                >
+                  Additional Information
+                </Heading>
               </HStack>
 
               <FormControl>
-                <FormLabel>Special Needs or Accessibility Requirements</FormLabel>
+                <FormLabel>
+                  Special Needs or Accessibility Requirements
+                </FormLabel>
                 <Textarea
                   value={formData.specialNeeds}
-                  onChange={(e) => updateFormData('specialNeeds', e.target.value)}
+                  onChange={(e) =>
+                    updateFormData("specialNeeds", e.target.value)
+                  }
                   placeholder="Any special accommodations needed (e.g., wheelchair access, hearing assistance, language interpretation)"
                   rows={3}
                 />
@@ -669,12 +901,42 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
         </Card>
 
         {/* Consent and Agreements */}
-        <Card bg={cardBg} borderColor={borderColor}>
-          <CardBody p={6}>
-            <VStack spacing={6} align="start">
-              <HStack spacing={2}>
-                <Icon as={FaCheckCircle} color="green.500" />
-                <Heading size="md">Consent and Agreements</Heading>
+        <Card 
+          bg="rgba(255, 255, 255, 0.85)"
+          backdropFilter="blur(15px)"
+          borderColor="rgba(34, 197, 94, 0.2)"
+          borderWidth="2px"
+          borderRadius="2xl"
+          boxShadow="0 4px 20px rgba(34, 197, 94, 0.08)"
+        >
+          <CardBody p={8}>
+            <VStack spacing={8} align="start">
+              <HStack spacing={4}>
+                <Box
+                  w="40px"
+                  h="40px"
+                  bgGradient="linear(45deg, green.500, emerald.500)"
+                  borderRadius="lg"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  boxShadow="0 4px 15px rgba(34, 197, 94, 0.3)"
+                >
+                  <Icon as={FaCheckCircle} color="white" fontSize="lg" />
+                </Box>
+                <Heading 
+                  size="md"
+                  bgGradient="linear(45deg, green.600, emerald.600)"
+                  bgClip="text"
+                  sx={{
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
+                  fontWeight="700"
+                >
+                  Consent and Agreements
+                </Heading>
               </HStack>
 
               <VStack spacing={4} align="start" w="full">
@@ -682,49 +944,65 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
                   <HStack spacing={3}>
                     <Checkbox
                       isChecked={formData.consentToTreatment}
-                      onChange={(e) => updateFormData('consentToTreatment', e.target.checked)}
+                      onChange={(e) =>
+                        updateFormData("consentToTreatment", e.target.checked)
+                      }
                       colorScheme="primary"
                     />
                     <Box>
                       <Text fontWeight="600">Consent to Treatment *</Text>
                       <Text fontSize="sm" color="gray.600">
-                        I consent to receive healthcare services from Royal Health Consult and 
-                        understand the nature of the services being provided.
+                        I consent to receive healthcare services from Royal
+                        Health Consult and understand the nature of the services
+                        being provided.
                       </Text>
                     </Box>
                   </HStack>
-                  <FormErrorMessage>{errors.consentToTreatment}</FormErrorMessage>
+                  <FormErrorMessage>
+                    {errors.consentToTreatment}
+                  </FormErrorMessage>
                 </FormControl>
 
                 <FormControl isInvalid={!!errors.consentToDataProcessing}>
                   <HStack spacing={3}>
                     <Checkbox
                       isChecked={formData.consentToDataProcessing}
-                      onChange={(e) => updateFormData('consentToDataProcessing', e.target.checked)}
+                      onChange={(e) =>
+                        updateFormData(
+                          "consentToDataProcessing",
+                          e.target.checked
+                        )
+                      }
                       colorScheme="primary"
                     />
                     <Box>
                       <Text fontWeight="600">Data Processing Consent *</Text>
                       <Text fontSize="sm" color="gray.600">
-                        I agree to the processing of my personal and medical data as outlined 
-                        in the Privacy Policy for the purpose of providing healthcare services.
+                        I agree to the processing of my personal and medical
+                        data as outlined in the Privacy Policy for the purpose
+                        of providing healthcare services.
                       </Text>
                     </Box>
                   </HStack>
-                  <FormErrorMessage>{errors.consentToDataProcessing}</FormErrorMessage>
+                  <FormErrorMessage>
+                    {errors.consentToDataProcessing}
+                  </FormErrorMessage>
                 </FormControl>
 
                 <FormControl>
                   <HStack spacing={3}>
                     <Checkbox
                       isChecked={formData.consentToSMSUpdates}
-                      onChange={(e) => updateFormData('consentToSMSUpdates', e.target.checked)}
+                      onChange={(e) =>
+                        updateFormData("consentToSMSUpdates", e.target.checked)
+                      }
                       colorScheme="primary"
                     />
                     <Box>
                       <Text fontWeight="600">SMS Updates (Optional)</Text>
                       <Text fontSize="sm" color="gray.600">
-                        I would like to receive appointment reminders and health tips via SMS.
+                        I would like to receive appointment reminders and health
+                        tips via SMS.
                       </Text>
                     </Box>
                   </HStack>
@@ -741,7 +1019,8 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
             <Box>
               <AlertTitle>Information Complete!</AlertTitle>
               <AlertDescription>
-                All required information has been provided. You can now proceed to payment.
+                All required information has been provided. You can now proceed
+                to payment.
               </AlertDescription>
             </Box>
           </Alert>
@@ -753,7 +1032,8 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
             <Box>
               <AlertTitle>Please Complete Required Fields</AlertTitle>
               <AlertDescription>
-                Some required information is missing. Please fill in all required fields marked with *.
+                Some required information is missing. Please fill in all
+                required fields marked with *.
               </AlertDescription>
             </Box>
           </Alert>
@@ -762,17 +1042,46 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
         {/* Submit Button */}
         <Button
           size="lg"
-          colorScheme="primary"
+          bgGradient="linear(45deg, brand.500, purple.500)"
+          color="white"
           onClick={handleSubmit}
           isDisabled={!isFormValid}
           w="full"
-          py={6}
+          py={8}
+          borderRadius="2xl"
+          fontSize="lg"
+          fontWeight="700"
+          boxShadow="0 8px 25px rgba(194, 24, 91, 0.25)"
+          _hover={{
+            bgGradient: "linear(45deg, brand.600, purple.600)",
+            transform: "translateY(-2px)",
+            boxShadow: "0 12px 35px rgba(194, 24, 91, 0.35)"
+          }}
+          _active={{
+            transform: "translateY(0)",
+            boxShadow: "0 6px 20px rgba(194, 24, 91, 0.3)"
+          }}
+          _disabled={{
+            bgGradient: "none",
+            bg: "gray.300",
+            color: "gray.500",
+            cursor: "not-allowed",
+            transform: "none",
+            boxShadow: "none",
+            _hover: {
+              bgGradient: "none",
+              bg: "gray.300",
+              transform: "none",
+              boxShadow: "none"
+            }
+          }}
+          transition="all 0.2s ease-in-out"
         >
           Continue to Payment
         </Button>
       </VStack>
     </Container>
-  )
-}
+  );
+};
 
-export default PatientInformationForm
+export default PatientInformationForm;

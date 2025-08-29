@@ -165,7 +165,31 @@ const ServiceSelection: React.FC<ServiceSelectionProps> = ({
       <Container maxW="1200px" centerContent position="relative" zIndex={1}>
         <VStack spacing={12} align="center" w="full">
           {/* Enhanced Header */}
-          <VStack spacing={8} textAlign="center" maxW="800px" px={4}>
+          <Box
+            position="relative"
+            bg="rgba(255, 255, 255, 0.9)"
+            backdropFilter="blur(20px)"
+            borderRadius="3xl"
+            p={10}
+            border="1px solid"
+            borderColor="rgba(194, 24, 91, 0.2)"
+            boxShadow="0 8px 32px rgba(194, 24, 91, 0.15)"
+            maxW="900px"
+            w="full"
+            _before={{
+              content: '""',
+              position: "absolute",
+              inset: 0,
+              borderRadius: "3xl",
+              padding: "1px",
+              background: "linear-gradient(135deg, rgba(194, 24, 91, 0.3), rgba(123, 31, 162, 0.3))",
+              mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+              maskComposite: "xor",
+              WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+              WebkitMaskComposite: "xor",
+            }}
+          >
+            <VStack spacing={8} textAlign="center" px={4}>
             <Heading 
               size="2xl" 
               fontWeight="900"
@@ -173,6 +197,19 @@ const ServiceSelection: React.FC<ServiceSelectionProps> = ({
             >
               <Text
                 as="span"
+                bgGradient="linear(45deg, brand.600, purple.600)"
+                bgClip="text"
+                sx={{
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  filter: "drop-shadow(0 2px 4px rgba(194, 24, 91, 0.2))",
+                }}
+              >
+                Choose Your Health
+              </Text>
+              <br />
+              <Text 
+                as="span" 
                 bgGradient="linear(45deg, brand.500, purple.500)"
                 bgClip="text"
                 sx={{
@@ -180,10 +217,6 @@ const ServiceSelection: React.FC<ServiceSelectionProps> = ({
                   WebkitTextFillColor: 'transparent',
                 }}
               >
-                Choose Your Health
-              </Text>
-              <br />
-              <Text as="span" color="gray.700">
                 Assessment
               </Text>
             </Heading>
@@ -271,19 +304,32 @@ const ServiceSelection: React.FC<ServiceSelectionProps> = ({
                 <Icon as={FaExternalLinkAlt} ml={2} fontSize="sm" />
               </Link>
             </Text>
-          </VStack>
+            </VStack>
+          </Box>
 
           {/* Enhanced Pre-selection Notice */}
           {selectedService && (
             <Box
-              bgGradient="linear(135deg, brand.50, purple.50)"
+              bg="rgba(255, 255, 255, 0.85)"
+              backdropFilter="blur(15px)"
               border="2px solid"
-              borderColor="brand.300"
+              borderColor="rgba(194, 24, 91, 0.3)"
               borderRadius="2xl"
-              p={6}
+              p={8}
               w="full"
               maxW="700px"
-              boxShadow="0 6px 20px rgba(194, 24, 91, 0.1)"
+              boxShadow="0 8px 32px rgba(194, 24, 91, 0.15)"
+              position="relative"
+              _before={{
+                content: '""',
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '4px',
+                borderTopRadius: '2xl',
+                bgGradient: 'linear(90deg, brand.500, purple.500)'
+              }}
             >
               <Text 
                 fontSize="md" 
@@ -316,25 +362,27 @@ const ServiceSelection: React.FC<ServiceSelectionProps> = ({
               return (
                 <Card
                   key={service.id}
-                  bg={cardBg}
-                  borderColor={isSelected ? 'brand.400' : borderColor}
-                  borderWidth="3px"
-                  borderRadius="2xl"
+                  bg={isSelected ? "rgba(255, 255, 255, 0.95)" : "rgba(255, 255, 255, 0.85)"}
+                  backdropFilter="blur(15px)"
+                  borderColor={isSelected ? 'rgba(194, 24, 91, 0.4)' : 'rgba(194, 24, 91, 0.2)'}
+                  borderWidth="2px"
+                  borderRadius="3xl"
                   cursor="pointer"
                   transition="all 0.3s ease-in-out"
                   _hover={{
-                    transform: 'translateY(-8px)',
+                    transform: 'translateY(-8px) scale(1.02)',
                     boxShadow: isSelected 
-                      ? '0 20px 40px rgba(194, 24, 91, 0.25)' 
-                      : '0 15px 35px rgba(0, 0, 0, 0.15)',
-                    borderColor: isSelected ? 'brand.500' : 'brand.300'
+                      ? '0 25px 50px rgba(194, 24, 91, 0.3)' 
+                      : '0 20px 40px rgba(194, 24, 91, 0.2)',
+                    borderColor: isSelected ? 'rgba(194, 24, 91, 0.6)' : 'rgba(194, 24, 91, 0.4)',
+                    bg: "rgba(255, 255, 255, 0.95)"
                   }}
                   onClick={() => onServiceSelect(service)}
                   position="relative"
                   overflow="hidden"
                   maxW="400px"
                   mx="auto"
-                  boxShadow={isSelected ? '0 15px 35px rgba(194, 24, 91, 0.2)' : 'md'}
+                  boxShadow={isSelected ? '0 20px 40px rgba(194, 24, 91, 0.25)' : '0 8px 25px rgba(194, 24, 91, 0.1)'}
                 >
                   {/* Enhanced Popular Badge */}
                   {service.popular && (
@@ -375,24 +423,31 @@ const ServiceSelection: React.FC<ServiceSelectionProps> = ({
                       {/* Enhanced Assessment Icon & Category */}
                       <VStack spacing={3}>
                         <Box
-                          w={16}
-                          h={16}
+                          w={20}
+                          h={20}
                           bgGradient={isSelected 
-                            ? "linear(45deg, brand.100, purple.100)"
-                            : "linear(45deg, gray.100, gray.50)"
+                            ? "linear(45deg, brand.500, purple.500)"
+                            : "linear(45deg, brand.100, purple.100)"
                           }
                           borderRadius="2xl"
                           display="flex"
                           alignItems="center"
                           justifyContent="center"
-                          boxShadow="lg"
+                          boxShadow={isSelected 
+                            ? "0 8px 25px rgba(194, 24, 91, 0.3)" 
+                            : "0 4px 15px rgba(194, 24, 91, 0.15)"
+                          }
                           border="2px solid"
-                          borderColor={isSelected ? "brand.200" : "gray.200"}
+                          borderColor={isSelected ? "white" : "rgba(194, 24, 91, 0.2)"}
                           transition="all 0.3s ease-in-out"
+                          _hover={{
+                            transform: "scale(1.05)",
+                            boxShadow: "0 10px 30px rgba(194, 24, 91, 0.4)"
+                          }}
                         >
                           <Icon 
                             as={IconComponent} 
-                            color={isSelected ? "brand.600" : "gray.600"} 
+                            color={isSelected ? "white" : "brand.600"} 
                             fontSize="3xl" 
                           />
                         </Box>
