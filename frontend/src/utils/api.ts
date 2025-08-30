@@ -159,9 +159,28 @@ export const api = {
   },
 
   // Future: Bookings endpoints
-  bookings: {
-    // Will be implemented when booking APIs are added
-  },
+ bookings: {
+  myBookings: () => 
+    apiRequest('/bookings/my-bookings'), // GET nurse/patient bookings
+
+  create: (bookingData: any) =>
+    apiRequest('/bookings', {
+      method: 'POST',
+      body: JSON.stringify(bookingData),
+    }),
+
+  update: (id: string, bookingData: any) =>
+    apiRequest(`/bookings/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(bookingData),
+    }),
+
+  cancel: (id: string) =>
+    apiRequest(`/bookings/${id}`, {
+      method: 'DELETE',
+    }),
+},
+
 
   // Future: Nurses endpoints
   nurses: {

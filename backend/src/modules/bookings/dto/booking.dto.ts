@@ -35,10 +35,11 @@ export class CreateBookingDto {
 
   @ApiProperty({ 
     description: 'Description of the assessment',
-    example: 'Comprehensive health evaluation including vital signs monitoring'
+    example: 'Comprehensive health evaluation including vital signs monitoring',
+    default: 'General health service'
   })
   @IsString()
-  serviceDescription: string;
+  serviceDescription: string = 'General health service';
 
   @ApiProperty({ 
     description: 'Base assessment price (always 5000 NGN)',
