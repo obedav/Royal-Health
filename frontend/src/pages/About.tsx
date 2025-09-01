@@ -235,9 +235,12 @@ const About: React.FC = () => {
         `}
       </style>
 
-      {/* Hero Section - Enhanced */}
+      {/* Hero Section - Enhanced with Clear Background Image */}
       <Box 
-        bgGradient="linear(135deg, brand.500 0%, purple.500 50%, brand.600 100%)" 
+        bgImage="url('/images/about-img.jpeg')"
+        bgPosition="center top"
+        bgRepeat="no-repeat"
+        bgSize="cover"
         color="white" 
         py={{ base: 20, md: 28 }}
         position="relative"
@@ -265,20 +268,21 @@ const About: React.FC = () => {
           filter="blur(50px)"
         />
         
-        <Container maxW="6xl" position="relative">
+        <Container maxW="6xl" position="relative" zIndex={2}>
           <VStack spacing={8} textAlign="center">
             <Badge 
-              bgGradient="linear(45deg, whiteAlpha.300, whiteAlpha.400)"
-              color="brand.600" 
+              bg="blackAlpha.600"
+              color="white" 
               px={6} 
               py={3} 
               fontSize="md" 
               borderRadius="full"
               backdropFilter="blur(10px)"
-              border="1px solid"
-              borderColor="whiteAlpha.300"
+              border="2px solid"
+              borderColor="whiteAlpha.500"
               fontWeight="700"
-              boxShadow="0 8px 25px rgba(0, 0, 0, 0.1)"
+              boxShadow="0 8px 25px rgba(0, 0, 0, 0.3)"
+              textShadow="1px 1px 2px rgba(0, 0, 0, 0.8)"
             >
               Professional Healthcare Since 2020
             </Badge>
@@ -287,16 +291,30 @@ const About: React.FC = () => {
               fontWeight="900"
               lineHeight="1.1"
               maxW="5xl"
+              textShadow="3px 3px 8px rgba(0, 0, 0, 0.9), 1px 1px 2px rgba(0, 0, 0, 0.8)"
+              bg="blackAlpha.400"
+              px={6}
+              py={4}
+              borderRadius="2xl"
+              backdropFilter="blur(5px)"
+              color="white"
             >
               About{' '}
               <Text
                 as="span"
-                textShadow="0 0 30px rgba(255, 255, 255, 0.5)"
+                textShadow="3px 3px 8px rgba(0, 0, 0, 0.9), 1px 1px 2px rgba(0, 0, 0, 0.8)"
+                color="white"
               >
                 Royal Health Consult
               </Text>
               <br />
-              <Text as="span" fontSize={{ base: "xl", md: "2xl" }} opacity="0.9">
+              <Text 
+                as="span" 
+                fontSize={{ base: "xl", md: "2xl" }} 
+                opacity="0.95"
+                textShadow="3px 3px 8px rgba(0, 0, 0, 0.9), 1px 1px 2px rgba(0, 0, 0, 0.8)"
+                color="white"
+              >
                 (RHC)
               </Text>
             </Heading>
@@ -306,6 +324,13 @@ const About: React.FC = () => {
               opacity={0.95}
               lineHeight="1.8"
               fontWeight="500"
+              textShadow="3px 3px 8px rgba(0, 0, 0, 0.9), 1px 1px 2px rgba(0, 0, 0, 0.8)"
+              bg="blackAlpha.400"
+              px={6}
+              py={4}
+              borderRadius="xl"
+              backdropFilter="blur(5px)"
+              color="white"
             >
               A professional nursing and healthcare service provider dedicated to delivering 
               compassionate, reliable, and family-centered care. We are your partner in wellness and care.
@@ -315,17 +340,20 @@ const About: React.FC = () => {
                 size="xl" 
                 bg="white" 
                 color="brand.600" 
+                border="2px solid"
+                borderColor="white"
                 _hover={{ 
-                  bg: "gray.50", 
+                  bg: "brand.600", 
+                  color: "white",
                   transform: "translateY(-3px)",
-                  boxShadow: "0 12px 35px rgba(0, 0, 0, 0.15)"
+                  boxShadow: "0 12px 35px rgba(194, 24, 91, 0.4)"
                 }}
                 _focus={{
-                  boxShadow: "0 0 0 3px rgba(194, 24, 91, 0.5)",
+                  boxShadow: "0 0 0 3px rgba(255, 255, 255, 0.5)",
                   outline: "none"
                 }}
                 leftIcon={<FaCalendarAlt />}
-                boxShadow="0 8px 25px rgba(0, 0, 0, 0.1)"
+                boxShadow="0 8px 25px rgba(0, 0, 0, 0.3)"
                 transition="all 0.3s ease-in-out"
                 onClick={() => navigate('/booking')}
                 borderRadius="xl"
@@ -342,12 +370,15 @@ const About: React.FC = () => {
                 size="xl" 
                 variant="outline" 
                 borderColor="white" 
-                borderWidth="2px"
+                borderWidth="3px"
                 color="white"
+                bg="blackAlpha.300"
+                backdropFilter="blur(5px)"
                 _hover={{ 
-                  bg: "whiteAlpha.200", 
+                  bg: "white", 
+                  color: "brand.600",
                   transform: "translateY(-3px)",
-                  boxShadow: "0 8px 25px rgba(255, 255, 255, 0.2)"
+                  boxShadow: "0 12px 35px rgba(255, 255, 255, 0.4)"
                 }}
                 _focus={{
                   boxShadow: "0 0 0 3px rgba(255, 255, 255, 0.5)",
@@ -360,6 +391,8 @@ const About: React.FC = () => {
                 py={6}
                 fontSize="lg"
                 fontWeight="700"
+                textShadow="2px 2px 4px rgba(0, 0, 0, 0.8)"
+                boxShadow="0 8px 25px rgba(0, 0, 0, 0.3)"
                 aria-label="Contact Royal Health Consult"
               >
                 Contact Us

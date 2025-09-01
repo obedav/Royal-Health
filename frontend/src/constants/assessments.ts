@@ -8,14 +8,17 @@ import {
 } from 'react-icons/fa'
 import { MdHealthAndSafety, MdElderlyWoman, MdPsychology } from 'react-icons/md'
 
-// Assessment-focused healthcare services - All cost ₦5,000
+// Fixed assessment price - All health assessments have the same price
+export const ASSESSMENT_PRICE = 15000
+
+// Assessment-focused healthcare services - All cost ₦15,000 (fixed price)
 export const healthcareAssessments = [
   {
     id: 'general-health-assessment',
     name: 'General Health Assessment',
     description: 'Comprehensive health evaluation including vital signs, basic medical history review, and overall wellness check by qualified healthcare professionals.',
     shortDescription: 'Comprehensive health evaluation and wellness check',
-    price: 5000, // Fixed assessment price
+    price: ASSESSMENT_PRICE, // Fixed assessment price
     duration: 60, // 1 hour assessment
     category: 'general',
     icon: 'FaStethoscope',
@@ -43,7 +46,7 @@ export const healthcareAssessments = [
     name: 'Elderly Care Assessment',
     description: 'Specialized comprehensive health assessment for seniors (65+) focusing on age-related health concerns, mobility, cognitive function, and care needs evaluation.',
     shortDescription: 'Specialized health assessment for seniors (65+)',
-    price: 5000,
+    price: ASSESSMENT_PRICE,
     duration: 90, // 1.5 hours for thorough senior assessment
     category: 'specialized',
     icon: 'MdElderlyWoman',
@@ -71,7 +74,7 @@ export const healthcareAssessments = [
     name: 'Chronic Condition Assessment',
     description: 'Focused health assessment for patients with chronic conditions like diabetes, hypertension, arthritis, or heart conditions to monitor status and adjust care plans.',
     shortDescription: 'Health assessment for chronic condition management',
-    price: 5000,
+    price: ASSESSMENT_PRICE,
     duration: 75, // 1.25 hours for detailed chronic condition review
     category: 'specialized',
     icon: 'FaHeartbeat',
@@ -98,7 +101,7 @@ export const healthcareAssessments = [
     name: 'Post-Surgery Assessment',
     description: 'Comprehensive recovery assessment after surgical procedures, including wound evaluation, healing progress monitoring, and post-operative care recommendations.',
     shortDescription: 'Recovery assessment and monitoring after surgery',
-    price: 5000,
+    price: ASSESSMENT_PRICE,
     duration: 60, // 1 hour for post-surgery evaluation
     category: 'specialized',
     icon: 'MdHealthAndSafety',
@@ -125,7 +128,7 @@ export const healthcareAssessments = [
     name: 'Mental Health Screening',
     description: 'Compassionate mental health and psychological wellbeing assessment including mood evaluation, stress assessment, and mental health resource recommendations.',
     shortDescription: 'Mental health and psychological wellbeing assessment',
-    price: 5000,
+    price: ASSESSMENT_PRICE,
     duration: 75, // 1.25 hours for thorough mental health screening
     category: 'specialized',
     icon: 'MdPsychology',
@@ -152,7 +155,7 @@ export const healthcareAssessments = [
     name: 'Maternal Health Assessment',
     description: 'Specialized health assessment for pregnant women and new mothers, focusing on maternal wellbeing, prenatal/postnatal health monitoring, and care guidance.',
     shortDescription: 'Health assessment for pregnant women and new mothers',
-    price: 5000,
+    price: ASSESSMENT_PRICE,
     duration: 75, // 1.25 hours for comprehensive maternal assessment
     category: 'specialized',
     icon: 'FaBaby',
@@ -179,7 +182,7 @@ export const healthcareAssessments = [
     name: 'Pediatric Health Assessment',
     description: 'Child-friendly comprehensive health assessment for children and adolescents, including growth monitoring, developmental assessment, and pediatric health evaluation.',
     shortDescription: 'Child-friendly health assessment for children and teens',
-    price: 5000,
+    price: ASSESSMENT_PRICE,
     duration: 60, // 1 hour child-friendly assessment
     category: 'specialized',
     icon: 'FaBaby',
@@ -206,7 +209,7 @@ export const healthcareAssessments = [
     name: 'Routine Health Check-up',
     description: 'Regular preventive health assessment to maintain optimal wellness, early detection of health issues, and ongoing health maintenance guidance.',
     shortDescription: 'Regular preventive health assessment and wellness maintenance',
-    price: 5000,
+    price: ASSESSMENT_PRICE,
     duration: 45, // 45 minutes for routine check
     category: 'routine',
     icon: 'FaClipboardCheck',
@@ -234,7 +237,7 @@ export const healthcareAssessments = [
     name: 'Emergency Health Assessment',
     description: 'Urgent comprehensive health assessment for non-life-threatening health concerns that require immediate professional evaluation and guidance.',
     shortDescription: 'Urgent health assessment for immediate concerns',
-    price: 5000,
+    price: ASSESSMENT_PRICE,
     duration: 60, // 1 hour emergency assessment
     category: 'emergency',
     icon: 'FaAmbulance',
@@ -265,6 +268,3 @@ export const assessmentCategories = {
   routine: { name: 'Routine', color: 'green' },
   emergency: { name: 'Emergency', color: 'red' }
 }
-
-// Fixed assessment price
-export const ASSESSMENT_PRICE = 5000

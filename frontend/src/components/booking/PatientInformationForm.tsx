@@ -947,7 +947,8 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
                       onChange={(e) =>
                         updateFormData("consentToTreatment", e.target.checked)
                       }
-                      colorScheme="primary"
+                      colorScheme="green"
+                      size="lg"
                     />
                     <Box>
                       <Text fontWeight="600">Consent to Treatment *</Text>
@@ -973,7 +974,8 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
                           e.target.checked
                         )
                       }
-                      colorScheme="primary"
+                      colorScheme="green"
+                      size="lg"
                     />
                     <Box>
                       <Text fontWeight="600">Data Processing Consent *</Text>
@@ -996,7 +998,8 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
                       onChange={(e) =>
                         updateFormData("consentToSMSUpdates", e.target.checked)
                       }
-                      colorScheme="primary"
+                      colorScheme="green"
+                      size="lg"
                     />
                     <Box>
                       <Text fontWeight="600">SMS Updates (Optional)</Text>

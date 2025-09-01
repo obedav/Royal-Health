@@ -585,7 +585,7 @@ const Contact: React.FC = () => {
     <Box bg={bg} minH="100vh">
       {/* Enhanced Hero Section */}
       <Box
-        bgGradient="linear(135deg, brand.600 0%, purple.600 100%)"
+        bgGradient="linear(135deg, brand.400 0%, purple.400 50%, brand.500 100%)"
         color="white"
         py={20}
         position="relative"
@@ -1492,7 +1492,7 @@ const Contact: React.FC = () => {
 
           {/* Enhanced Final CTA */}
           <Box
-            bgGradient="linear(135deg, brand.600 0%, purple.600 100%)"
+            bgGradient="linear(135deg, brand.400 0%, purple.400 50%, brand.500 100%)"
             color="white"
             borderRadius="3xl"
             p={12}

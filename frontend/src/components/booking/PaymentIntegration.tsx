@@ -53,6 +53,7 @@ import { useState, useEffect } from 'react'
 import type { BookingService } from '../../types/booking.types'
 import type { ScheduleData } from './AppointmentScheduling'
 import type { PatientInformation } from './PatientInformationForm'
+import { ASSESSMENT_PRICE } from '../../constants/assessments'
 
 interface PaymentIntegrationProps {
   selectedService: BookingService
@@ -96,71 +97,35 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
   const toast = useToast()
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>('card')
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>('bank_transfer')
   const [isProcessingPayment, setIsProcessingPayment] = useState(false)
   const [selectedGateway, setSelectedGateway] = useState<'flutterwave' | 'paystack'>('flutterwave')
   const [promoCode, setPromoCode] = useState('')
   const [appliedDiscount, setAppliedDiscount] = useState(0)
 
-  // Calculate pricing breakdown
+  // Simple fixed pricing - no breakdown needed
   const calculatePricing = (): PricingBreakdown => {
-    const basePrice = selectedSchedule.timeSlot.price || selectedService.price
+    // Fixed price for all assessments
+    const basePrice = ASSESSMENT_PRICE
     
-    // Emergency fee (1.5x for emergency services after hours)
-    const isEmergencyAfterHours = selectedService.category === 'emergency' && 
-      (parseInt(selectedSchedule.timeSlot.time.split(':')[0]) < 8 || 
-       parseInt(selectedSchedule.timeSlot.time.split(':')[0]) > 18)
-    const emergencyFee = isEmergencyAfterHours ? basePrice * 0.5 : 0
-
-    // Weekend fee (20% for weekend services)
-    const isWeekend = new Date(selectedSchedule.date).getDay() === 0 || 
-                     new Date(selectedSchedule.date).getDay() === 6
-    const weekendFee = isWeekend && selectedService.category !== 'emergency' ? basePrice * 0.2 : 0
-
-    // Transport fee based on location
-    const transportFee = calculateTransportFee(selectedSchedule.address.state)
-    
-    // Discount from promo code
+    // Discount from promo code (if any)
     const discount = appliedDiscount
-
-    // Tax (5% VAT)
-    const subtotal = basePrice + emergencyFee + weekendFee + transportFee - discount
-    const tax = subtotal * 0.05
-
-    const total = subtotal + tax
+    
+    // Final total (just the fixed price minus any discount)
+    const total = basePrice - discount
 
     return {
       servicePrice: basePrice,
-      emergencyFee: emergencyFee > 0 ? emergencyFee : undefined,
-      weekendFee: weekendFee > 0 ? weekendFee : undefined,
-      transportFee,
+      emergencyFee: undefined,
+      weekendFee: undefined,
+      transportFee: 0,
       discount: discount > 0 ? discount : undefined,
-      tax,
+      tax: 0,
       total
     }
   }
 
-  const calculateTransportFee = (state: string): number => {
-    // Transport fees based on Nigerian states
-    const transportFees: Record<string, number> = {
-      'lagos': 2000,
-      'abuja': 3000,
-      'kano': 2500,
-      'rivers': 2500,
-      'oyo': 2000,
-      'kaduna': 2500,
-      'ogun': 1500,
-      'ondo': 2000,
-      'osun': 2000,
-      'delta': 2500,
-      'anambra': 2500,
-      'imo': 2500,
-      'enugu': 2500,
-      'edo': 2000,
-      'plateau': 3000,
-    }
-    return transportFees[state.toLowerCase()] || 3000 // Default for other states
-  }
+  // Transport fee calculation removed - fixed pricing now
 
   const pricing = calculatePricing()
 
@@ -203,7 +168,7 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
     }
     
     if (promoCodes[code.toUpperCase()]) {
-      const discount = pricing.servicePrice * promoCodes[code.toUpperCase()]
+      const discount = ASSESSMENT_PRICE * promoCodes[code.toUpperCase()]
       setAppliedDiscount(discount)
       toast({
         title: 'Promo Code Applied!',
@@ -422,6 +387,28 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
     onPaymentSuccess(paymentResult)
   }
 
+  const confirmBankTransfer = () => {
+    const paymentResult: PaymentResult = {
+      transactionId: `BANK-${Date.now()}`,
+      reference: `RHC-BANK-${Date.now()}`,
+      amount: pricing.total,
+      method: 'bank_transfer',
+      status: 'pending',
+      gateway: 'flutterwave', // Default gateway for record keeping
+      paidAt: new Date().toISOString(),
+    }
+    
+    toast({
+      title: 'Appointment Confirmed!',
+      description: 'Your appointment is scheduled. Please complete the bank transfer to secure your slot.',
+      status: 'success',
+      duration: 5000,
+    })
+    
+    onClose()
+    onPaymentSuccess(paymentResult)
+  }
+
   return (
     <Container maxW="4xl" py={8}>
       <VStack spacing={8} align="stretch">
@@ -500,77 +487,9 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
         <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={8}>
           {/* Payment Methods */}
           <VStack spacing={6} align="stretch">
-            {/* Payment Gateway Selection */}
-            <Card 
-              bg="rgba(255, 255, 255, 0.85)"
-              backdropFilter="blur(15px)"
-              borderColor="rgba(194, 24, 91, 0.2)"
-              borderWidth="2px"
-              borderRadius="2xl"
-              boxShadow="0 4px 20px rgba(194, 24, 91, 0.08)"
-            >
-              <CardBody p={8}>
-                <VStack spacing={6} align="start">
-                  <HStack spacing={3}>
-                    <Box
-                      w="35px"
-                      h="35px"
-                      bgGradient="linear(45deg, brand.500, purple.500)"
-                      borderRadius="lg"
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                      boxShadow="0 4px 15px rgba(194, 24, 91, 0.3)"
-                    >
-                      <Icon as={FaCreditCard} color="white" fontSize="lg" />
-                    </Box>
-                    <Heading 
-                      size="md"
-                      bgGradient="linear(45deg, brand.600, purple.600)"
-                      bgClip="text"
-                      sx={{
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
-                        backgroundClip: "text",
-                      }}
-                      fontWeight="700"
-                    >
-                      Choose Payment Gateway
-                    </Heading>
-                  </HStack>
-                  <RadioGroup
-                    value={selectedGateway}
-                    onChange={(value) => setSelectedGateway(value as 'flutterwave' | 'paystack')}
-                  >
-                    <Stack direction="column" spacing={3}>
-                      <HStack spacing={4}>
-                        <Radio value="flutterwave" colorScheme="primary">
-                          <HStack spacing={3}>
-                            <Box bg="orange.500" color="white" px={3} py={1} borderRadius="md" fontSize="sm" fontWeight="bold">
-                              FLW
-                            </Box>
-                            <Text>Flutterwave</Text>
-                            <Badge colorScheme="green" size="sm">Recommended</Badge>
-                          </HStack>
-                        </Radio>
-                      </HStack>
-                      <HStack spacing={4}>
-                        <Radio value="paystack" colorScheme="primary">
-                          <HStack spacing={3}>
-                            <Box bg="blue.500" color="white" px={3} py={1} borderRadius="md" fontSize="sm" fontWeight="bold">
-                              PS
-                            </Box>
-                            <Text>Paystack</Text>
-                          </HStack>
-                        </Radio>
-                      </HStack>
-                    </Stack>
-                  </RadioGroup>
-                </VStack>
-              </CardBody>
-            </Card>
+            {/* Payment Gateway Selection - Temporarily disabled */}
 
-            {/* Payment Methods */}
+            {/* Payment Methods - Temporarily Simplified */}
             <Card 
               bg="rgba(255, 255, 255, 0.85)"
               backdropFilter="blur(15px)"
@@ -592,7 +511,7 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
                       justifyContent="center"
                       boxShadow="0 4px 15px rgba(123, 31, 162, 0.3)"
                     >
-                      <Icon as={FaMobileAlt} color="white" fontSize="lg" />
+                      <Icon as={FaUniversity} color="white" fontSize="lg" />
                     </Box>
                     <Heading 
                       size="md"
@@ -608,60 +527,134 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
                       Payment Method
                     </Heading>
                   </HStack>
+
                   <RadioGroup
                     value={selectedPaymentMethod}
                     onChange={(value) => setSelectedPaymentMethod(value as PaymentMethod)}
                   >
                     <Stack direction="column" spacing={3}>
-                      <Radio value="card" colorScheme="primary">
-                        <HStack spacing={3}>
-                          <Icon as={FaCreditCard} color="blue.500" />
-                          <VStack spacing={0} align="start">
-                            <Text>Debit/Credit Card</Text>
-                            <Text fontSize="xs" color="gray.500">
-                              Visa, Mastercard, Verve
-                            </Text>
-                          </VStack>
-                        </HStack>
-                      </Radio>
-                      
-                      <Radio value="bank_transfer" colorScheme="primary">
+                      <Radio value="bank_transfer" colorScheme="green" size="lg">
                         <HStack spacing={3}>
                           <Icon as={FaUniversity} color="green.500" />
                           <VStack spacing={0} align="start">
-                            <Text>Bank Transfer</Text>
+                            <Text fontWeight="600">Bank Transfer</Text>
                             <Text fontSize="xs" color="gray.500">
-                              Direct bank transfer
-                            </Text>
-                          </VStack>
-                        </HStack>
-                      </Radio>
-                      
-                      <Radio value="ussd" colorScheme="primary">
-                        <HStack spacing={3}>
-                          <Icon as={FaMobileAlt} color="purple.500" />
-                          <VStack spacing={0} align="start">
-                            <Text>USSD</Text>
-                            <Text fontSize="xs" color="gray.500">
-                              *737# and other bank codes
-                            </Text>
-                          </VStack>
-                        </HStack>
-                      </Radio>
-                      
-                      <Radio value="cash" colorScheme="primary">
-                        <HStack spacing={3}>
-                          <Icon as={FaMoneyBillWave} color="orange.500" />
-                          <VStack spacing={0} align="start">
-                            <Text>Cash Payment</Text>
-                            <Text fontSize="xs" color="gray.500">
-                              Pay healthcare professional directly
+                              Transfer to our bank account
                             </Text>
                           </VStack>
                         </HStack>
                       </Radio>
                     </Stack>
                   </RadioGroup>
+
+                  {/* Bank Account Details */}
+                  {selectedPaymentMethod === 'bank_transfer' && (
+                    <Card 
+                      bg="rgba(34, 197, 94, 0.05)"
+                      borderColor="rgba(34, 197, 94, 0.2)"
+                      borderWidth="2px"
+                      borderRadius="xl"
+                      boxShadow="0 4px 15px rgba(34, 197, 94, 0.1)"
+                    >
+                      <CardBody p={6}>
+                        <VStack spacing={4} align="start">
+                          <HStack spacing={3}>
+                            <Box
+                              w="30px"
+                              h="30px"
+                              bgGradient="linear(45deg, green.500, emerald.500)"
+                              borderRadius="lg"
+                              display="flex"
+                              alignItems="center"
+                              justifyContent="center"
+                            >
+                              <Icon as={FaUniversity} color="white" fontSize="sm" />
+                            </Box>
+                            <Heading 
+                              size="sm"
+                              bgGradient="linear(45deg, green.600, emerald.600)"
+                              bgClip="text"
+                              sx={{
+                                WebkitBackgroundClip: "text",
+                                WebkitTextFillColor: "transparent",
+                                backgroundClip: "text",
+                              }}
+                              fontWeight="700"
+                            >
+                              Bank Account Details
+                            </Heading>
+                          </HStack>
+
+                          <VStack spacing={3} w="full" align="start">
+                            <HStack justify="space-between" w="full">
+                              <Text fontWeight="600" color="gray.700">Bank Name:</Text>
+                              <Text fontWeight="500">First Bank of Nigeria</Text>
+                            </HStack>
+                            
+                            <HStack justify="space-between" w="full">
+                              <Text fontWeight="600" color="gray.700">Account Name:</Text>
+                              <Text fontWeight="500">Royal Health Consult Ltd</Text>
+                            </HStack>
+                            
+                            <HStack justify="space-between" w="full">
+                              <Text fontWeight="600" color="gray.700">Account Number:</Text>
+                              <HStack spacing={2}>
+                                <Text fontWeight="700" fontSize="lg" color="green.600">3085649127</Text>
+                                <Button
+                                  size="xs"
+                                  colorScheme="green"
+                                  variant="outline"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText('3085649127')
+                                    toast({
+                                      title: 'Copied!',
+                                      description: 'Account number copied to clipboard',
+                                      status: 'success',
+                                      duration: 2000,
+                                    })
+                                  }}
+                                >
+                                  Copy
+                                </Button>
+                              </HStack>
+                            </HStack>
+
+                            <HStack justify="space-between" w="full">
+                              <Text fontWeight="600" color="gray.700">Amount:</Text>
+                              <Text fontWeight="700" fontSize="lg" color="green.600">{formatPrice(ASSESSMENT_PRICE)}</Text>
+                            </HStack>
+                          </VStack>
+
+                          <Alert status="info" size="sm" borderRadius="lg">
+                            <AlertIcon />
+                            <Box fontSize="sm">
+                              <AlertTitle fontSize="sm">Payment Instructions</AlertTitle>
+                              <AlertDescription>
+                                <VStack spacing={1} align="start" mt={2}>
+                                  <Text>• Transfer exactly {formatPrice(ASSESSMENT_PRICE)} to the account above</Text>
+                                  <Text>• Use your full name as reference</Text>
+                                  <Text>• Take a screenshot of your transfer receipt</Text>
+                                  <Text>• Keep your receipt for confirmation</Text>
+                                </VStack>
+                              </AlertDescription>
+                            </Box>
+                          </Alert>
+                        </VStack>
+                      </CardBody>
+                    </Card>
+                  )}
+                  
+                  {/* Info about other payment methods */}
+                  <Alert status="warning" borderRadius="lg">
+                    <AlertIcon />
+                    <Box>
+                      <AlertTitle fontSize="sm">Other Payment Methods Coming Soon</AlertTitle>
+                      <AlertDescription fontSize="sm">
+                        We're working on adding more payment options including card payments, mobile money, and USSD. 
+                        All health assessments have a fixed price of {formatPrice(ASSESSMENT_PRICE)}.
+                      </AlertDescription>
+                    </Box>
+                  </Alert>
                 </VStack>
               </CardBody>
             </Card>
@@ -827,7 +820,7 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
               </CardBody>
             </Card>
 
-            {/* Price Breakdown */}
+            {/* Simple Price Display */}
             <Card 
               bg="rgba(255, 255, 255, 0.85)"
               backdropFilter="blur(15px)"
@@ -837,7 +830,7 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
               boxShadow="0 4px 20px rgba(123, 31, 162, 0.08)"
             >
               <CardBody p={8}>
-                <VStack spacing={6} align="start">
+                <VStack spacing={6} align="center">
                   <HStack spacing={3}>
                     <Box
                       w="35px"
@@ -862,53 +855,26 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
                       }}
                       fontWeight="700"
                     >
-                      Price Breakdown
+                      Assessment Fee
                     </Heading>
                   </HStack>
                   
-                  <VStack spacing={2} w="full">
-                    <HStack justify="space-between" w="full">
-                      <Text>Service Fee</Text>
-                      <Text>{formatPrice(pricing.servicePrice)}</Text>
-                    </HStack>
-                    
-                    {pricing.emergencyFee && (
-                      <HStack justify="space-between" w="full">
-                        <Text>Emergency Fee</Text>
-                        <Text>{formatPrice(pricing.emergencyFee)}</Text>
-                      </HStack>
-                    )}
-                    
-                    {pricing.weekendFee && (
-                      <HStack justify="space-between" w="full">
-                        <Text>Weekend Fee</Text>
-                        <Text>{formatPrice(pricing.weekendFee)}</Text>
-                      </HStack>
-                    )}
-                    
-                    <HStack justify="space-between" w="full">
-                      <Text>Transport Fee</Text>
-                      <Text>{formatPrice(pricing.transportFee)}</Text>
-                    </HStack>
-                    
-                    {pricing.discount && (
-                      <HStack justify="space-between" w="full" color="green.500">
-                        <Text>Discount</Text>
-                        <Text>-{formatPrice(pricing.discount)}</Text>
-                      </HStack>
-                    )}
-                    
-                    <HStack justify="space-between" w="full">
-                      <Text>VAT (5%)</Text>
-                      <Text>{formatPrice(pricing.tax)}</Text>
-                    </HStack>
-                    
-                    <Divider />
-                    
-                    <HStack justify="space-between" w="full" fontWeight="bold" fontSize="lg">
-                      <Text>Total</Text>
-                      <Text color="primary.500">{formatPrice(pricing.total)}</Text>
-                    </HStack>
+                  <VStack spacing={3} align="center">
+                    <Text fontSize="3xl" fontWeight="900" color="green.600">
+                      ₦15,000
+                    </Text>
+                    <Text fontSize="md" color="gray.600" textAlign="center">
+                      Fixed price for all health assessments
+                    </Text>
+                    <Badge 
+                      colorScheme="green" 
+                      px={3} 
+                      py={1} 
+                      borderRadius="full"
+                      fontSize="sm"
+                    >
+                      No Hidden Charges
+                    </Badge>
                   </VStack>
                 </VStack>
               </CardBody>
@@ -931,10 +897,10 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
               size="lg"
               bgGradient="linear(45deg, brand.500, purple.500)"
               color="white"
-              onClick={selectedPaymentMethod === 'cash' ? handleCashPayment : initiatePayment}
+              onClick={() => onOpen()}
               isLoading={isProcessingPayment}
-              loadingText="Processing Payment..."
-              leftIcon={selectedPaymentMethod === 'cash' ? <FaMoneyBillWave /> : <FaLock />}
+              loadingText="Confirming Appointment..."
+              leftIcon={<FaUniversity />}
               w="full"
               py={8}
               borderRadius="2xl"
@@ -956,43 +922,76 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
               }}
               transition="all 0.2s ease-in-out"
             >
-              {selectedPaymentMethod === 'cash' 
-                ? `Confirm Appointment - Pay ${formatPrice(pricing.total)} to Professional`
-                : `Pay ${formatPrice(pricing.total)} Now`
-              }
+              Proceed with Bank Transfer
             </Button>
           </VStack>
         </SimpleGrid>
 
-        {/* Cash Payment Modal */}
+        {/* Bank Transfer Confirmation Modal */}
         <Modal isOpen={isOpen} onClose={onClose} isCentered>
           <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Cash Payment Confirmation</ModalHeader>
+          <ModalContent maxW="lg">
+            <ModalHeader>
+              <HStack spacing={3}>
+                <Icon as={FaUniversity} color="green.500" />
+                <Text>Bank Transfer Confirmation</Text>
+              </HStack>
+            </ModalHeader>
             <ModalCloseButton />
             <ModalBody pb={6}>
               <VStack spacing={4}>
-                <Alert status="warning">
+                <Alert status="success" borderRadius="lg">
                   <AlertIcon />
                   <Box>
-                    <AlertTitle>Cash Payment Selected</AlertTitle>
+                    <AlertTitle>Ready to Proceed</AlertTitle>
                     <AlertDescription>
-                      You will pay {formatPrice(pricing.total)} directly to the healthcare professional upon arrival.
+                      Your health assessment appointment will be confirmed once you complete the bank transfer of {formatPrice(ASSESSMENT_PRICE)}.
                     </AlertDescription>
                   </Box>
                 </Alert>
+
+                {/* Quick Bank Details Recap */}
+                <Card bg="gray.50" borderRadius="lg" w="full">
+                  <CardBody p={4}>
+                    <VStack spacing={2} align="start">
+                      <Text fontWeight="700" fontSize="sm" color="gray.800">Quick Reference:</Text>
+                      <HStack justify="space-between" w="full">
+                        <Text fontSize="sm" color="gray.600">Bank:</Text>
+                        <Text fontSize="sm" fontWeight="600">First Bank of Nigeria</Text>
+                      </HStack>
+                      <HStack justify="space-between" w="full">
+                        <Text fontSize="sm" color="gray.600">Account:</Text>
+                        <Text fontSize="sm" fontWeight="600">3085649127</Text>
+                      </HStack>
+                      <HStack justify="space-between" w="full">
+                        <Text fontSize="sm" color="gray.600">Amount:</Text>
+                        <Text fontSize="sm" fontWeight="700" color="green.600">{formatPrice(ASSESSMENT_PRICE)}</Text>
+                      </HStack>
+                    </VStack>
+                  </CardBody>
+                </Card>
                 
                 <Text fontSize="sm" color="gray.600" textAlign="center">
-                  Please ensure you have the exact amount ready. The healthcare professional will provide a receipt 
-                  upon payment completion.
+                  After making the transfer, please keep your receipt safe. Our team will verify your payment and 
+                  confirm your appointment within 2 hours during business hours.
                 </Text>
                 
                 <HStack spacing={3} w="full">
-                  <Button variant="outline" onClick={onClose} flex={1}>
-                    Cancel
+                  <Button variant="outline" onClick={onClose} flex={1} borderRadius="lg">
+                    Go Back
                   </Button>
-                  <Button colorScheme="primary" onClick={confirmCashPayment} flex={1}>
-                    Confirm Appointment
+                  <Button 
+                    bgGradient="linear(45deg, green.500, emerald.500)"
+                    color="white"
+                    onClick={confirmBankTransfer} 
+                    flex={1}
+                    borderRadius="lg"
+                    _hover={{
+                      bgGradient: "linear(45deg, green.600, emerald.600)",
+                    }}
+                    leftIcon={<FaCheckCircle />}
+                  >
+                    I Understand, Proceed
                   </Button>
                 </HStack>
               </VStack>
