@@ -1,14 +1,18 @@
 // backend/src/modules/bookings/bookings.service.ts
-import { 
-  Injectable, 
-  NotFoundException, 
+import {
+  Injectable,
+  NotFoundException,
   BadRequestException,
   UnauthorizedException,
-  InternalServerErrorException 
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Booking, BookingStatus, PaymentStatus } from './entities/booking.entity';
+import {
+  Booking,
+  BookingStatus,
+  PaymentStatus,
+} from './entities/booking.entity';
 import { User, UserRole } from '../users/entities/users.entity';
 import { CreateBookingDto, UpdateBookingDto } from './dto/booking.dto';
 
@@ -22,20 +26,28 @@ export class BookingsService {
   ) {}
 
   // Create assessment booking
-  async createBooking(patientId: string, createBookingDto: CreateBookingDto): Promise<Booking> {
+  async createBooking(
+    patientId: string,
+    createBookingDto: CreateBookingDto,
+  ): Promise<Booking> {
     try {
       console.log('=== CREATE ASSESSMENT BOOKING ===');
       console.log('Patient ID:', patientId);
       console.log('Booking Data:', createBookingDto);
 
       // Validate assessment price (must be exactly ₦5,000)
-      if (createBookingDto.basePrice !== 5000 || createBookingDto.totalPrice !== 5000) {
-        throw new BadRequestException('Assessment price must be exactly ₦5,000');
+      if (
+        createBookingDto.basePrice !== 5000 ||
+        createBookingDto.totalPrice !== 5000
+      ) {
+        throw new BadRequestException(
+          'Assessment price must be exactly ₦5,000',
+        );
       }
 
       // Validate patient exists
       const patient = await this.userRepository.findOne({
-        where: { id: patientId, role: UserRole.CLIENT }
+        where: { id: patientId, role: UserRole.CLIENT },
       });
 
       if (!patient) {
@@ -47,9 +59,10 @@ export class BookingsService {
         ...createBookingDto,
         patientId,
         status: BookingStatus.PENDING,
-        paymentStatus: createBookingDto.paymentMethod === 'cash' 
-          ? PaymentStatus.CASH_ON_DELIVERY 
-          : PaymentStatus.PENDING,
+        paymentStatus:
+          createBookingDto.paymentMethod === 'cash'
+            ? PaymentStatus.CASH_ON_DELIVERY
+            : PaymentStatus.PENDING,
       });
 
       const savedBooking = await this.bookingRepository.save(booking);
@@ -59,7 +72,9 @@ export class BookingsService {
       return await this.findBookingById(savedBooking.id);
     } catch (error) {
       console.error('Error creating assessment booking:', error);
-      throw new InternalServerErrorException('Failed to create assessment booking');
+      throw new InternalServerErrorException(
+        'Failed to create assessment booking',
+      );
     }
   }
 
@@ -69,7 +84,7 @@ export class BookingsService {
       const bookings = await this.bookingRepository.find({
         where: { patientId: userId },
         relations: ['patient', 'nurse'],
-        order: { createdAt: 'DESC' }
+        order: { createdAt: 'DESC' },
       });
 
       console.log(`Found ${bookings.length} bookings for user ${userId}`);
@@ -85,7 +100,7 @@ export class BookingsService {
     try {
       const bookings = await this.bookingRepository.find({
         relations: ['patient', 'nurse'],
-        order: { createdAt: 'DESC' }
+        order: { createdAt: 'DESC' },
       });
 
       console.log(`Found ${bookings.length} total bookings`);
@@ -104,16 +119,16 @@ export class BookingsService {
         .select([
           'COUNT(*) as total',
           'COUNT(CASE WHEN status = :pending THEN 1 END) as pending',
-          'COUNT(CASE WHEN status = :confirmed THEN 1 END) as confirmed', 
+          'COUNT(CASE WHEN status = :confirmed THEN 1 END) as confirmed',
           'COUNT(CASE WHEN status = :completed THEN 1 END) as completed',
           'COUNT(CASE WHEN status = :cancelled THEN 1 END) as cancelled',
-          'SUM(CASE WHEN status = :completed THEN total_price ELSE 0 END) as revenue'
+          'SUM(CASE WHEN status = :completed THEN total_price ELSE 0 END) as revenue',
         ])
         .setParameters({
           pending: BookingStatus.PENDING,
           confirmed: BookingStatus.CONFIRMED,
           completed: BookingStatus.COMPLETED,
-          cancelled: BookingStatus.CANCELLED
+          cancelled: BookingStatus.CANCELLED,
         })
         .getRawOne();
 
@@ -130,7 +145,9 @@ export class BookingsService {
       return result;
     } catch (error) {
       console.error('Error fetching booking statistics:', error);
-      throw new InternalServerErrorException('Failed to fetch booking statistics');
+      throw new InternalServerErrorException(
+        'Failed to fetch booking statistics',
+      );
     }
   }
 
@@ -138,18 +155,28 @@ export class BookingsService {
   async getAvailableNurses(): Promise<User[]> {
     try {
       const nurses = await this.userRepository.find({
-        where: { 
+        where: {
           role: UserRole.NURSE,
           // Remove status filter for now since we don't know the UserStatus enum values
         },
-        select: ['id', 'firstName', 'lastName', 'email', 'phone', 'avatar', 'createdAt']
+        select: [
+          'id',
+          'firstName',
+          'lastName',
+          'email',
+          'phone',
+          'avatar',
+          'createdAt',
+        ],
       });
 
       console.log(`Found ${nurses.length} available nurses`);
       return nurses;
     } catch (error) {
       console.error('Error fetching available nurses:', error);
-      throw new InternalServerErrorException('Failed to fetch available nurses');
+      throw new InternalServerErrorException(
+        'Failed to fetch available nurses',
+      );
     }
   }
 
@@ -158,7 +185,7 @@ export class BookingsService {
     try {
       const booking = await this.bookingRepository.findOne({
         where: { id },
-        relations: ['patient', 'nurse']
+        relations: ['patient', 'nurse'],
       });
 
       if (!booking) {
@@ -176,7 +203,10 @@ export class BookingsService {
   }
 
   // Update booking
-  async updateBooking(id: string, updateData: Partial<UpdateBookingDto>): Promise<Booking> {
+  async updateBooking(
+    id: string,
+    updateData: Partial<UpdateBookingDto>,
+  ): Promise<Booking> {
     try {
       const booking = await this.findBookingById(id);
 
@@ -202,11 +232,17 @@ export class BookingsService {
       console.log('User ID:', userId);
 
       const booking = await this.findBookingById(id);
-      console.log('✅ Booking found:', { id: booking.id, status: booking.status, patientId: booking.patientId });
+      console.log('✅ Booking found:', {
+        id: booking.id,
+        status: booking.status,
+        patientId: booking.patientId,
+      });
 
       // Check if user is authorized to cancel this booking
       if (booking.patientId !== userId) {
-        throw new UnauthorizedException('You can only cancel your own bookings');
+        throw new UnauthorizedException(
+          'You can only cancel your own bookings',
+        );
       }
 
       // Check if booking can be cancelled
@@ -219,13 +255,17 @@ export class BookingsService {
       }
 
       // Business rule: Can't cancel within 2 hours of appointment
-      const appointmentTime = new Date(`${booking.scheduledDate}T${booking.scheduledTime}`);
+      const appointmentTime = new Date(
+        `${booking.scheduledDate}T${booking.scheduledTime}`,
+      );
       const now = new Date();
       const timeDifference = appointmentTime.getTime() - now.getTime();
       const hoursUntilAppointment = timeDifference / (1000 * 60 * 60);
 
       if (hoursUntilAppointment < 2 && hoursUntilAppointment > 0) {
-        throw new BadRequestException('Cannot cancel booking within 2 hours of appointment time');
+        throw new BadRequestException(
+          'Cannot cancel booking within 2 hours of appointment time',
+        );
       }
 
       // Cancel the booking
@@ -238,9 +278,11 @@ export class BookingsService {
 
       return cancelledBooking;
     } catch (error) {
-      if (error instanceof NotFoundException || 
-          error instanceof UnauthorizedException || 
-          error instanceof BadRequestException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof UnauthorizedException ||
+        error instanceof BadRequestException
+      ) {
         throw error;
       }
       console.error('Error cancelling booking:', error);
@@ -257,23 +299,25 @@ export class BookingsService {
         category: 'general',
         duration: 60,
         price: 5000,
-        description: 'Comprehensive health evaluation with vital signs monitoring'
+        description:
+          'Comprehensive health evaluation with vital signs monitoring',
       },
       {
-        id: 'elderly-care-assessment', 
+        id: 'elderly-care-assessment',
         name: 'Elderly Care Assessment',
         category: 'specialized',
         duration: 90,
         price: 5000,
-        description: 'Specialized assessment for seniors with mobility evaluation'
+        description:
+          'Specialized assessment for seniors with mobility evaluation',
       },
       {
         id: 'chronic-condition-assessment',
-        name: 'Chronic Condition Assessment', 
+        name: 'Chronic Condition Assessment',
         category: 'specialized',
         duration: 75,
         price: 5000,
-        description: 'Assessment for patients with chronic health conditions'
+        description: 'Assessment for patients with chronic health conditions',
       },
       {
         id: 'post-surgery-assessment',
@@ -281,7 +325,7 @@ export class BookingsService {
         category: 'specialized',
         duration: 60,
         price: 5000,
-        description: 'Recovery monitoring and wound assessment'
+        description: 'Recovery monitoring and wound assessment',
       },
       {
         id: 'mental-health-screening',
@@ -289,7 +333,7 @@ export class BookingsService {
         category: 'specialized',
         duration: 60,
         price: 5000,
-        description: 'Confidential mental health and wellbeing assessment'
+        description: 'Confidential mental health and wellbeing assessment',
       },
       {
         id: 'maternal-health-assessment',
@@ -297,7 +341,7 @@ export class BookingsService {
         category: 'specialized',
         duration: 75,
         price: 5000,
-        description: 'Prenatal and postnatal health assessment'
+        description: 'Prenatal and postnatal health assessment',
       },
       {
         id: 'pediatric-assessment',
@@ -305,7 +349,8 @@ export class BookingsService {
         category: 'specialized',
         duration: 60,
         price: 5000,
-        description: 'Child-friendly health assessment and development screening'
+        description:
+          'Child-friendly health assessment and development screening',
       },
       {
         id: 'routine-checkup',
@@ -313,17 +358,17 @@ export class BookingsService {
         category: 'routine',
         duration: 45,
         price: 5000,
-        description: 'Regular preventive health assessment and wellness check'
+        description: 'Regular preventive health assessment and wellness check',
       },
       {
         id: 'emergency-assessment',
         name: 'Emergency Health Assessment',
-        category: 'emergency', 
+        category: 'emergency',
         duration: 45,
         price: 5000,
         description: 'Urgent assessment for non-life-threatening emergencies',
-        availability: '24/7'
-      }
+        availability: '24/7',
+      },
     ];
   }
 }

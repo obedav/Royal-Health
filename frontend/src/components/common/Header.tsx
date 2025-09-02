@@ -463,7 +463,7 @@ const Header: React.FC = () => {
                     <DashboardUserMenu />
                   ) : (
                     <HStack spacing={4}>
-                      <Button
+                     {/*  <Button
                         leftIcon={<Icon as={FaCube} />}
                         variant="solid"
                         bgGradient="linear(45deg, purple.500, purple.600)"
@@ -480,7 +480,7 @@ const Header: React.FC = () => {
                         transition="all 0.2s ease-in-out"
                       >
                         Go to Dashboard
-                      </Button>
+                      </Button> */}
                       <DashboardUserMenu />
                     </HStack>
                   )

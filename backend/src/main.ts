@@ -3,9 +3,38 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
+import * as compression from 'compression';
+import { AppLoggerService } from './common/logger/logger.service';
+import { createRateLimiters } from './common/middleware/security.middleware';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+  });
+
+  // Get logger instance
+  const logger = app.get(AppLoggerService);
+  app.useLogger(logger);
+
+  // Security middleware
+  app.use(
+    helmet({
+      contentSecurityPolicy:
+        process.env.NODE_ENV === 'production' ? undefined : false,
+    }),
+  );
+
+  // Compression
+  app.use(compression());
+
+  // Rate limiting for specific endpoints
+  const { generalLimiter, authLimiter, passwordResetLimiter } =
+    createRateLimiters();
+  app.use('/api/v1/auth/login', authLimiter);
+  app.use('/api/v1/auth/register', authLimiter);
+  app.use('/api/v1/auth/forgot-password', passwordResetLimiter);
+  app.use(generalLimiter);
 
   // Global validation pipe
   app.useGlobalPipes(
@@ -54,13 +83,20 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  const port = process.env.PORT || 3001;
+  const port = process.env.PORT || 5000;
   await app.listen(port);
 
-  console.log(`🚀 Royal Health API server running on port ${port}`);
-  console.log(`🏥 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 Health check: http://localhost:${port}/health`);
-  console.log(`📖 Swagger docs: http://localhost:${port}/api/docs`);
+  logger.log(`🚀 Royal Health API server running on port ${port}`, 'Bootstrap');
+  logger.log(
+    `🏥 Environment: ${process.env.NODE_ENV || 'development'}`,
+    'Bootstrap',
+  );
+  logger.log(`🔗 Health check: http://localhost:${port}/health`, 'Bootstrap');
+  logger.log(`📖 Swagger docs: http://localhost:${port}/api/docs`, 'Bootstrap');
+  logger.log(
+    `📊 Metrics: http://localhost:${port}/api/v1/metrics/health`,
+    'Bootstrap',
+  );
 }
 
 bootstrap();

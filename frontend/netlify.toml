@@ -1,11 +1,68 @@
-# netlify.toml
+# Netlify configuration for Royal Health frontend - Production Ready
 [build]
   command = "npm run build"
-  publish = ".next"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
+  publish = "dist"
 
 [build.environment]
   NODE_VERSION = "18"
-  NEXT_PUBLIC_API_BASE_URL = "https://royal-health.onrender.com/api/v1"
+  NPM_VERSION = "8"
+
+# Production environment variables
+[context.production.environment]
+  VITE_API_BASE_URL = "https://api.royalhealthconsult.com/api/v1"
+  VITE_APP_ENV = "production"
+  VITE_ENABLE_ANALYTICS = "true"
+
+# Staging environment variables  
+[context.deploy-preview.environment]
+  VITE_API_BASE_URL = "https://staging-api.royalhealthconsult.com/api/v1"
+  VITE_APP_ENV = "staging"
+  VITE_ENABLE_ANALYTICS = "false"
+
+# Security headers
+[[headers]]
+  for = "/*"
+  
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(self), microphone=(), camera=(), payment=(self), usb=(), magnetometer=(), gyroscope=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.royalhealthconsult.com https://www.google-analytics.com; worker-src 'self' blob:;"
+
+# Static assets caching
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# HTTPS redirects
+[[redirects]]
+  from = "http://royalhealthconsult.com/*"
+  to = "https://royalhealthconsult.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.royalhealthconsult.com/*"
+  to = "https://royalhealthconsult.com/:splat"
+  status = 301
+  force = true
+
+# SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

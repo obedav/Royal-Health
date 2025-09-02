@@ -8,6 +8,7 @@ import "./styles/globals.css";
 
 // Import components
 import Header from "./components/common/Header";
+import ErrorBoundary from "./components/common/ErrorBoundary";
 import { AuthProvider, ProtectedRoute } from "./hooks/useAuth";
 
 // Import pages
@@ -19,7 +20,15 @@ import Services from "./pages/Services";
 import Dashboard from "./pages/Dashboard";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 import Footer from "./components/common/Footer";
+
+// Import appointment and health record components
+import AppointmentBooking from "./components/appointments/AppointmentBooking";
+import AppointmentCalendar from "./components/appointments/AppointmentCalendar";
+import HealthRecord from "./components/health-records/HealthRecord";
+import HealthRecordHistory from "./components/health-records/HealthRecordHistory";
 
 // Admin components (if you want to add admin routes)
 // import AdminDashboard from './components/admin/AdminDashboard'
@@ -38,13 +47,14 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ChakraProvider theme={theme}>
-        <AuthProvider>
-          <Router>
-            <div className="app">
-              <Header />
-              <main className="main-content">
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ChakraProvider theme={theme}>
+          <AuthProvider>
+            <Router>
+              <div className="app">
+                <Header />
+                <main className="main-content">
                 <Routes>
                   {/* Public routes */}
                   <Route path="/" element={<Home />} />
@@ -68,6 +78,54 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <Booking />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/appointments"
+                    element={
+                      <ProtectedRoute>
+                        <AppointmentBooking />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/appointments/calendar"
+                    element={
+                      <ProtectedRoute>
+                        <AppointmentCalendar />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/health-records"
+                    element={
+                      <ProtectedRoute>
+                        <HealthRecord />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/health-records/history"
+                    element={
+                      <ProtectedRoute>
+                        <HealthRecordHistory />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/profile"
+                    element={
+                      <ProtectedRoute>
+                        <Profile />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/settings"
+                    element={
+                      <ProtectedRoute>
+                        <Settings />
                       </ProtectedRoute>
                     }
                   />
@@ -151,7 +209,9 @@ function App() {
       </ChakraProvider>
       {import.meta.env.DEV && <ReactQueryDevtools />}
     </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
+
 
 export default App;

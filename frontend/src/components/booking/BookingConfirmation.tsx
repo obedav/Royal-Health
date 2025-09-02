@@ -36,6 +36,7 @@ import {
   FaReceipt,
   FaStethoscope,
   FaClipboardList,
+  FaCalendarPlus,
 } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 import { BookingService } from '../../types/booking.types'
@@ -289,6 +290,38 @@ Email: support@royalhealthconsult.ng
     navigate('/booking')
   }
 
+  const handleAddToCalendar = () => {
+    // Create calendar event details
+    const appointmentDate = new Date(selectedSchedule.date)
+    const timeParts = selectedSchedule.timeSlot.time.match(/(\d+):(\d+)\s*(AM|PM)/i)
+    
+    if (timeParts) {
+      let hours = parseInt(timeParts[1])
+      const minutes = parseInt(timeParts[2])
+      const period = timeParts[3].toUpperCase()
+      
+      if (period === 'PM' && hours !== 12) hours += 12
+      if (period === 'AM' && hours === 12) hours = 0
+      
+      appointmentDate.setHours(hours, minutes, 0, 0)
+    }
+    
+    const endDate = new Date(appointmentDate.getTime() + selectedService.duration * 60000)
+    
+    // Create calendar URL
+    const eventDetails = {
+      title: `Health Assessment - ${selectedService.name}`,
+      start: appointmentDate.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''),
+      end: endDate.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''),
+      description: `Health Assessment with ${assessmentDetails.assignedProfessional.name}\\n\\nService: ${selectedService.name}\\nConfirmation Code: ${assessmentDetails.confirmationCode}\\nLocation: ${selectedSchedule.address.street}, ${selectedSchedule.address.city}\\n\\nContact: ${assessmentDetails.emergencyContact}`,
+      location: `${selectedSchedule.address.street}, ${selectedSchedule.address.city}, ${selectedSchedule.address.state}`
+    }
+    
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventDetails.title)}&dates=${eventDetails.start}/${eventDetails.end}&details=${encodeURIComponent(eventDetails.description)}&location=${encodeURIComponent(eventDetails.location)}`
+    
+    window.open(googleCalendarUrl, '_blank')
+  }
+
   return (
     <Container maxW="4xl" py={8}>
       <VStack spacing={8} align="stretch">
@@ -353,7 +386,7 @@ Email: support@royalhealthconsult.ng
                 }}
                 fontWeight="900"
               >
-                {paymentResult.method === 'cash' ? 'Assessment Scheduled!' : 'Assessment Confirmed!'}
+                {paymentResult.method === 'cash' ? 'Health Assessment Scheduled!' : 'Health Assessment Confirmed!'}
               </Heading>
               <Text 
                 color="gray.700" 
@@ -951,7 +984,31 @@ Email: support@royalhealthconsult.ng
                 fontWeight="600"
                 fontSize="lg"
               >
-                View Dashboard
+                View Dashboard & Track Appointment
+              </Button>
+
+              <Button
+                leftIcon={<FaCalendarPlus />}
+                bgGradient="linear(45deg, purple.500, blue.500)"
+                color="white"
+                size="lg"
+                onClick={handleAddToCalendar}
+                w="full"
+                _hover={{
+                  bgGradient: "linear(45deg, purple.600, blue.600)",
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 8px 25px rgba(147, 51, 234, 0.3)"
+                }}
+                _active={{
+                  transform: "translateY(0px)"
+                }}
+                transition="all 0.3s"
+                borderRadius="xl"
+                h={12}
+                fontWeight="600"
+                fontSize="lg"
+              >
+                Add to Google Calendar
               </Button>
               
               <HStack spacing={4} w="full">
@@ -993,7 +1050,7 @@ Email: support@royalhealthconsult.ng
                   h={10}
                   fontWeight="500"
                 >
-                  Go Home
+                  Back to Home
                 </Button>
               </HStack>
             </VStack>
@@ -1025,8 +1082,8 @@ Email: support@royalhealthconsult.ng
               Confirmation Sent!
             </AlertTitle>
             <AlertDescription>
-              We've sent assessment appointment details to {patientInfo.email} and {patientInfo.phone}. 
-              {patientInfo.consentToSMSUpdates && ' You\'ll receive SMS reminders as your assessment appointment approaches.'}
+              We've sent comprehensive assessment appointment details to {patientInfo.email} and {patientInfo.phone}. 
+              {patientInfo.consentToSMSUpdates && ' You\'ll receive timely SMS reminders 24 hours and 2 hours before your assessment appointment.'}
             </AlertDescription>
           </Box>
         </Alert>

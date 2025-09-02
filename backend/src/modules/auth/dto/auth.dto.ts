@@ -46,7 +46,8 @@ export class RegisterDto {
   @IsNotEmpty()
   @MinLength(8)
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: 'Password must contain uppercase, lowercase, number/special character',
+    message:
+      'Password must contain uppercase, lowercase, number/special character',
   })
   password: string;
 
@@ -86,10 +87,10 @@ export class RegisterDto {
   preferredLanguage?: string;
 
   // 🔥 ADD THIS NEW FIELD FOR SUPABASE INTEGRATION
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
     description: 'Supabase user ID for linking accounts',
-    required: false 
+    required: false,
   })
   @IsString()
   @IsOptional()
@@ -114,10 +115,10 @@ export class LoginDto {
   rememberMe?: boolean;
 
   // 🔥 ADD THIS NEW FIELD FOR SUPABASE INTEGRATION
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
     description: 'Supabase user ID for account verification',
-    required: false 
+    required: false,
   })
   @IsString()
   @IsOptional()
@@ -140,7 +141,8 @@ export class ResetPasswordDto {
   @IsString()
   @MinLength(8)
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: 'Password must contain uppercase, lowercase, number/special character',
+    message:
+      'Password must contain uppercase, lowercase, number/special character',
   })
   password: string;
 
@@ -158,7 +160,8 @@ export class ChangePasswordDto {
   @IsString()
   @MinLength(8)
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: 'Password must contain uppercase, lowercase, number/special character',
+    message:
+      'Password must contain uppercase, lowercase, number/special character',
   })
   newPassword: string;
 
@@ -223,7 +226,7 @@ export class AuthResponseDto {
     role: UserRole;
     status: UserStatus; // 🔥 CHANGED from string to UserStatus enum
     dateOfBirth?: Date; // 🔥 ADDED to match your User entity
-    gender?: string; // 🔥 ADDED to match your User entity  
+    gender?: string; // 🔥 ADDED to match your User entity
     nationalId?: string; // 🔥 ADDED to match your User entity
     isEmailVerified: boolean;
     isPhoneVerified: boolean;

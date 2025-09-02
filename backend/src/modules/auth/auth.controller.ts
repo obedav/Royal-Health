@@ -88,7 +88,9 @@ export class AuthController {
     description: 'Password reset email sent if email exists',
     type: MessageResponseDto,
   })
-  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto): Promise<MessageResponseDto> {
+  async forgotPassword(
+    @Body() forgotPasswordDto: ForgotPasswordDto,
+  ): Promise<MessageResponseDto> {
     const result = await this.authService.forgotPassword(forgotPasswordDto);
     return { ...result, success: true };
   }
@@ -106,7 +108,9 @@ export class AuthController {
     status: 400,
     description: 'Bad request - invalid or expired token',
   })
-  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<MessageResponseDto> {
+  async resetPassword(
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ): Promise<MessageResponseDto> {
     const result = await this.authService.resetPassword(resetPasswordDto);
     return { ...result, success: true };
   }
@@ -129,7 +133,10 @@ export class AuthController {
     @Req() req: Request & { user: User },
     @Body() changePasswordDto: ChangePasswordDto,
   ): Promise<MessageResponseDto> {
-    const result = await this.authService.changePassword(req.user.id, changePasswordDto);
+    const result = await this.authService.changePassword(
+      req.user.id,
+      changePasswordDto,
+    );
     return { ...result, success: true };
   }
 
@@ -145,7 +152,9 @@ export class AuthController {
     status: 400,
     description: 'Bad request - invalid verification token',
   })
-  async verifyEmail(@Param('token') token: string): Promise<MessageResponseDto> {
+  async verifyEmail(
+    @Param('token') token: string,
+  ): Promise<MessageResponseDto> {
     const result = await this.authService.verifyEmail(token);
     return { ...result, success: true };
   }
@@ -168,7 +177,10 @@ export class AuthController {
     @Req() req: Request & { user: User },
     @Body() verifyPhoneDto: VerifyPhoneDto,
   ): Promise<MessageResponseDto> {
-    const result = await this.authService.verifyPhone(req.user.id, verifyPhoneDto.code);
+    const result = await this.authService.verifyPhone(
+      req.user.id,
+      verifyPhoneDto.code,
+    );
     return { ...result, success: true };
   }
 
@@ -190,7 +202,10 @@ export class AuthController {
     @Req() req: Request & { user: User },
     @Body() resendVerificationDto: ResendVerificationDto,
   ): Promise<MessageResponseDto> {
-    const result = await this.authService.resendVerification(req.user.id, resendVerificationDto.type);
+    const result = await this.authService.resendVerification(
+      req.user.id,
+      resendVerificationDto.type,
+    );
     return { ...result, success: true };
   }
 
@@ -218,7 +233,9 @@ export class AuthController {
     status: 401,
     description: 'Unauthorized - invalid refresh token',
   })
-  async refreshToken(@Body('refreshToken') refreshToken: string): Promise<AuthResponseDto> {
+  async refreshToken(
+    @Body('refreshToken') refreshToken: string,
+  ): Promise<AuthResponseDto> {
     return this.authService.refreshToken(refreshToken);
   }
 
@@ -235,7 +252,13 @@ export class AuthController {
     description: 'Unauthorized - invalid token',
   })
   async getProfile(@Req() req: Request & { user: User }) {
-    const { password_hash, passwordResetToken, emailVerificationToken, phoneVerificationCode, ...user } = req.user;
+    const {
+      password_hash,
+      passwordResetToken,
+      emailVerificationToken,
+      phoneVerificationCode,
+      ...user
+    } = req.user;
     return {
       success: true,
       data: user,
@@ -252,7 +275,9 @@ export class AuthController {
     description: 'User successfully logged out',
     type: MessageResponseDto,
   })
-  async logout(@Req() req: Request & { user: User }): Promise<MessageResponseDto> {
+  async logout(
+    @Req() req: Request & { user: User },
+  ): Promise<MessageResponseDto> {
     // In a real application, you might want to blacklist the token
     // For now, we'll just return a success message
     // The client should remove the token from storage

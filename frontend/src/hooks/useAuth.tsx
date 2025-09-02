@@ -11,7 +11,7 @@ import { Box, Spinner, Center, VStack, Text } from "@chakra-ui/react";
 // Better API_BASE_URL handling with validation
 const API_BASE_URL = (() => {
   const envUrl = import.meta.env.VITE_API_BASE_URL;
-  const fallbackUrl = "http://localhost:3001/api/v1";
+  const fallbackUrl = "http://localhost:5000/api/v1";
 
   if (!envUrl || envUrl === "undefined") {
     console.warn(

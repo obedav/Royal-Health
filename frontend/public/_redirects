@@ -1,0 +1,19 @@
+# Redirects and rewrites for Netlify deployment
+# SPA routing - all routes should serve index.html
+
+# Force HTTPS redirect
+http://royalhealthconsult.com/* https://royalhealthconsult.com/:splat 301!
+http://www.royalhealthconsult.com/* https://royalhealthconsult.com/:splat 301!
+https://www.royalhealthconsult.com/* https://royalhealthconsult.com/:splat 301!
+
+# API proxy - redirect API calls to backend
+/api/* https://your-backend-api.com/api/:splat 200
+
+# Health check endpoint
+/health https://your-backend-api.com/health 200
+
+# SPA fallback - serve index.html for all non-asset routes
+/*    /index.html   200
+
+# 404 page for missing assets
+/assets/*  /404.html  404

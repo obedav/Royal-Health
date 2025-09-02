@@ -756,7 +756,7 @@ const Login = () => {
                     </Text>
 
                     {/* Demo Credentials Info - Enhanced */}
-                    <Box 
+                    {/* <Box 
                       bgGradient="linear(135deg, blue.50, blue.25)" 
                       p={5} 
                       borderRadius="xl" 
@@ -777,7 +777,7 @@ const Login = () => {
                           Password: testpassword123
                         </Text>
                       </VStack>
-                    </Box>
+                    </Box> */}
                   </VStack>
                 </VStack>
               </form>

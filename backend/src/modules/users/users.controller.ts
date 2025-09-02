@@ -18,7 +18,11 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 
-import { UsersService, type UserQuery, type UpdateUserDto } from './users.service';
+import {
+  UsersService,
+  type UserQuery,
+  type UpdateUserDto,
+} from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -103,7 +107,10 @@ export class UsersController {
     @CurrentUser('id') userId: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    const updatedUser = await this.usersService.updateProfile(userId, updateUserDto);
+    const updatedUser = await this.usersService.updateProfile(
+      userId,
+      updateUserDto,
+    );
     return {
       success: true,
       data: updatedUser,

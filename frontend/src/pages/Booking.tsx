@@ -35,6 +35,9 @@ import {
   FaPhone,
   FaWhatsapp,
   FaCheckCircle,
+  FaStethoscope,
+  FaUser,
+  FaCreditCard,
 } from "react-icons/fa";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ServiceSelection from "../components/booking/ServiceSelection";
@@ -68,23 +71,23 @@ const Booking: React.FC = () => {
     {
       title: "Select Service",
       description: "Choose service",
-      icon: FaCalendarAlt,
+      icon: "FaStethoscope",
     },
     {
       title: "Schedule",
       description: "Pick date and time",
-      icon: FaCalendarAlt,
+      icon: "FaCalendarAlt",
     },
     {
       title: "Details",
       description: "Patient information",
-      icon: FaCalendarAlt,
+      icon: "FaUser",
     },
-    { title: "Payment", description: "Confirm and pay", icon: FaCalendarAlt },
+    { title: "Payment", description: "Confirm and pay", icon: "FaCreditCard" },
     {
       title: "Confirmation",
       description: "Booking confirmed",
-      icon: FaCheckCircle,
+      icon: "FaCheckCircle",
     },
   ];
 
@@ -511,8 +514,7 @@ const Booking: React.FC = () => {
                     <Text as="span" fontWeight="800" color="blue.800">
                       {selectedService.name}
                     </Text>{" "}
-                    has been automatically selected. You can change this in step
-                    1 if needed.
+                    has been automatically selected. Continue to the next step or change your selection below.
                   </AlertDescription>
                 </Box>
               </Alert>

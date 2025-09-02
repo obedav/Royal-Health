@@ -32,66 +32,66 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
- // Replace your register method in auth.service.ts with this:
+  // Replace your register method in auth.service.ts with this:
 
-async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
-  const { email, phone, password, confirmPassword, ...userData } = registerDto;
+  async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
+    const { email, phone, password, confirmPassword, ...userData } =
+      registerDto;
 
-  // Check if passwords match
-  if (password !== confirmPassword) {
-    throw new BadRequestException('Passwords do not match');
+    // Check if passwords match
+    if (password !== confirmPassword) {
+      throw new BadRequestException('Passwords do not match');
+    }
+
+    // Check if user already exists
+    const existingUser = await this.userRepository.findOne({
+      where: [{ email }, { phone }],
+    });
+
+    if (existingUser) {
+      if (existingUser.email === email) {
+        throw new ConflictException('Email already registered');
+      }
+      if (existingUser.phone === phone) {
+        throw new ConflictException('Phone number already registered');
+      }
+    }
+
+    // Create new user - only include fields that exist in the User entity
+    const user = this.userRepository.create({
+      email,
+      phone,
+      password_hash: password, // assign here
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      role: userData.role,
+      state: userData.state,
+      city: userData.city,
+      preferredLanguage: userData.preferredLanguage || 'en',
+      emailVerificationToken: this.generateVerificationToken(),
+      phoneVerificationCode: this.generatePhoneVerificationCode(),
+      status: UserStatus.ACTIVE,
+      isEmailVerified: true,
+      isPhoneVerified: true,
+    });
+
+    const savedUser = await this.userRepository.save(user);
+
+    // TODO: Send verification email and SMS
+    // await this.emailService.sendVerificationEmail(savedUser);
+    // await this.smsService.sendVerificationSMS(savedUser);
+
+    // Generate tokens
+    const tokens = await this.generateTokens(savedUser);
+
+    return {
+      ...tokens,
+      user: this.sanitizeUser(savedUser),
+      expiresIn: 3600, // 1 hour
+    };
   }
 
-  // Check if user already exists
-  const existingUser = await this.userRepository.findOne({
-    where: [{ email }, { phone }],
-  });
-
-  if (existingUser) {
-    if (existingUser.email === email) {
-      throw new ConflictException('Email already registered');
-    }
-    if (existingUser.phone === phone) {
-      throw new ConflictException('Phone number already registered');
-    }
-  }
-
-  // Create new user - only include fields that exist in the User entity
-  const user = this.userRepository.create({
-  email,
-  phone,
-  password_hash: password, // assign here
-  firstName: userData.firstName,
-  lastName: userData.lastName,
-  role: userData.role,
-  state: userData.state,
-  city: userData.city,
-  preferredLanguage: userData.preferredLanguage || 'en',
-  emailVerificationToken: this.generateVerificationToken(),
-  phoneVerificationCode: this.generatePhoneVerificationCode(),
-  status: UserStatus.ACTIVE,
-  isEmailVerified: true,
-  isPhoneVerified: true,
-});
-
-
-  const savedUser = await this.userRepository.save(user);
-
-  // TODO: Send verification email and SMS
-  // await this.emailService.sendVerificationEmail(savedUser);
-  // await this.smsService.sendVerificationSMS(savedUser);
-
-  // Generate tokens
-  const tokens = await this.generateTokens(savedUser);
-
-  return {
-    ...tokens,
-    user: this.sanitizeUser(savedUser),
-    expiresIn: 3600, // 1 hour
-  };
-}
-
- async login(loginDto: LoginDto): Promise<AuthResponseDto> {
+  async login(loginDto: LoginDto): Promise<AuthResponseDto> {
     const { email, password, rememberMe } = loginDto;
 
     console.log('=== LOGIN ATTEMPT ===');
@@ -118,18 +118,22 @@ async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
     // Check if account is locked
     if (user.isLocked) {
       console.log('❌ Account locked until:', user.lockUntil);
-      throw new UnauthorizedException('Account temporarily locked due to too many failed attempts');
+      throw new UnauthorizedException(
+        'Account temporarily locked due to too many failed attempts',
+      );
     }
 
     // Check if account is suspended
     if (user.status === UserStatus.SUSPENDED) {
       console.log('❌ Account suspended');
-      throw new UnauthorizedException('Account suspended. Please contact support');
+      throw new UnauthorizedException(
+        'Account suspended. Please contact support',
+      );
     }
 
     // Verify password
     console.log('🔍 Comparing passwords...');
-    
+
     let isPasswordValid = false;
     try {
       isPasswordValid = await user.comparePassword(password);
@@ -144,18 +148,18 @@ async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
       // Use direct SQL update with correct column names (snake_case)
       await this.userRepository.query(
         'UPDATE users SET "login_attempts" = "login_attempts" + 1 WHERE id = $1',
-        [user.id]
+        [user.id],
       );
-      
+
       // Check if we need to lock the account
       if (user.loginAttempts + 1 >= 5) {
         const lockUntil = new Date(Date.now() + 2 * 60 * 60 * 1000);
         await this.userRepository.query(
           'UPDATE users SET "lock_until" = $1 WHERE id = $2',
-          [lockUntil, user.id]
+          [lockUntil, user.id],
         );
       }
-      
+
       throw new UnauthorizedException('Invalid credentials');
     }
 
@@ -164,7 +168,7 @@ async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
     // Update login info using direct SQL with correct column names (snake_case)
     await this.userRepository.query(
       'UPDATE users SET "login_attempts" = 0, "lock_until" = NULL, "last_login_at" = NOW() WHERE id = $1',
-      [user.id]
+      [user.id],
     );
 
     // Generate tokens
@@ -180,7 +184,9 @@ async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
     };
   }
 
-  async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<{ message: string }> {
+  async forgotPassword(
+    forgotPasswordDto: ForgotPasswordDto,
+  ): Promise<{ message: string }> {
     const { email } = forgotPasswordDto;
 
     const user = await this.userRepository.findOne({ where: { email } });
@@ -192,7 +198,9 @@ async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
 
     // Generate reset token
     const resetToken = this.generateResetToken();
-    const resetTokenHash = createHash('sha256').update(resetToken).digest('hex');
+    const resetTokenHash = createHash('sha256')
+      .update(resetToken)
+      .digest('hex');
 
     user.passwordResetToken = resetTokenHash;
     user.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
@@ -205,7 +213,9 @@ async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
     return { message: 'If the email exists, a reset link has been sent' };
   }
 
-  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<{ message: string }> {
+  async resetPassword(
+    resetPasswordDto: ResetPasswordDto,
+  ): Promise<{ message: string }> {
     const { token, password, confirmPassword } = resetPasswordDto;
 
     if (password !== confirmPassword) {
@@ -235,7 +245,10 @@ async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
     return { message: 'Password reset successful' };
   }
 
-  async changePassword(userId: string, changePasswordDto: ChangePasswordDto): Promise<{ message: string }> {
+  async changePassword(
+    userId: string,
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<{ message: string }> {
     const { currentPassword, newPassword, confirmPassword } = changePasswordDto;
 
     if (newPassword !== confirmPassword) {
@@ -280,7 +293,10 @@ async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
     return { message: 'Email verified successfully' };
   }
 
-  async verifyPhone(userId: string, code: string): Promise<{ message: string }> {
+  async verifyPhone(
+    userId: string,
+    code: string,
+  ): Promise<{ message: string }> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
     if (!user) {
@@ -299,7 +315,10 @@ async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
     return { message: 'Phone verified successfully' };
   }
 
-  async resendVerification(userId: string, type: 'email' | 'phone'): Promise<{ message: string }> {
+  async resendVerification(
+    userId: string,
+    type: 'email' | 'phone',
+  ): Promise<{ message: string }> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
     if (!user) {
@@ -333,7 +352,9 @@ async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
         secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       });
 
-      const user = await this.userRepository.findOne({ where: { id: payload.sub } });
+      const user = await this.userRepository.findOne({
+        where: { id: payload.sub },
+      });
 
       if (!user || user.status !== UserStatus.ACTIVE) {
         throw new UnauthorizedException('Invalid refresh token');
@@ -352,7 +373,9 @@ async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
   }
 
   async validateUser(payload: any): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id: payload.sub } });
+    const user = await this.userRepository.findOne({
+      where: { id: payload.sub },
+    });
 
     if (!user || user.status !== UserStatus.ACTIVE) {
       throw new UnauthorizedException('User not found or inactive');
@@ -395,22 +418,22 @@ async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
   }
 
   private sanitizeUser(user: User) {
-  const { 
-    password_hash, // 🔥 EXCLUDE sensitive fields
-    passwordResetToken, 
-    emailVerificationToken, 
-    phoneVerificationCode,
-    loginAttempts, // 🔥 EXCLUDE sensitive fields
-    isLocked,      // 🔥 EXCLUDE sensitive fields
-    lockUntil,     // 🔥 EXCLUDE sensitive fields
-    ...sanitized 
-  } = user;
-  
-  return {
-    ...sanitized,
-    // Ensure dates are properly serialized (they'll become ISO strings in JSON)
-    createdAt: sanitized.createdAt,
-    updatedAt: sanitized.updatedAt,
-  };
-}
+    const {
+      password_hash, // 🔥 EXCLUDE sensitive fields
+      passwordResetToken,
+      emailVerificationToken,
+      phoneVerificationCode,
+      loginAttempts, // 🔥 EXCLUDE sensitive fields
+      isLocked, // 🔥 EXCLUDE sensitive fields
+      lockUntil, // 🔥 EXCLUDE sensitive fields
+      ...sanitized
+    } = user;
+
+    return {
+      ...sanitized,
+      // Ensure dates are properly serialized (they'll become ISO strings in JSON)
+      createdAt: sanitized.createdAt,
+      updatedAt: sanitized.updatedAt,
+    };
+  }
 }

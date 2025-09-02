@@ -16,7 +16,7 @@ export enum BookingStatus {
   IN_PROGRESS = 'in_progress',
   COMPLETED = 'completed',
   CANCELLED = 'cancelled',
-  RESCHEDULED = 'rescheduled'
+  RESCHEDULED = 'rescheduled',
 }
 
 export enum PaymentStatus {
@@ -24,7 +24,7 @@ export enum PaymentStatus {
   PAID = 'paid',
   FAILED = 'failed',
   REFUNDED = 'refunded',
-  CASH_ON_DELIVERY = 'cash_on_delivery'
+  CASH_ON_DELIVERY = 'cash_on_delivery',
 }
 
 @Entity('bookings')
@@ -46,10 +46,22 @@ export class Booking {
   category: string;
 
   // Pricing (always 5000 for assessments)
-  @Column({ name: 'base_price', type: 'decimal', precision: 10, scale: 2, default: 5000 })
+  @Column({
+    name: 'base_price',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 5000,
+  })
   basePrice: number;
 
-  @Column({ name: 'total_price', type: 'decimal', precision: 10, scale: 2, default: 5000 })
+  @Column({
+    name: 'total_price',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 5000,
+  })
   totalPrice: number;
 
   // Scheduling
@@ -97,7 +109,7 @@ export class Booking {
     name: 'status',
     type: 'enum',
     enum: BookingStatus,
-    default: BookingStatus.PENDING
+    default: BookingStatus.PENDING,
   })
   status: BookingStatus;
 
@@ -105,7 +117,7 @@ export class Booking {
     name: 'payment_status',
     type: 'enum',
     enum: PaymentStatus,
-    default: PaymentStatus.PENDING
+    default: PaymentStatus.PENDING,
   })
   paymentStatus: PaymentStatus;
 

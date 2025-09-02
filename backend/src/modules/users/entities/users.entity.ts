@@ -42,10 +42,10 @@ export class User {
   password_hash: string;
 
   @Column({ name: 'first_name', nullable: true })
-firstName: string;
+  firstName: string;
 
-@Column({ name: 'last_name', nullable: true })
-lastName: string;
+  @Column({ name: 'last_name', nullable: true })
+  lastName: string;
 
   @Column({ unique: true })
   phone: string;
@@ -56,11 +56,11 @@ lastName: string;
   @Column({ type: 'varchar', enum: UserStatus, default: UserStatus.ACTIVE })
   status: UserStatus;
 
-@Column({ name: 'is_email_verified', default: false })
-isEmailVerified: boolean;
+  @Column({ name: 'is_email_verified', default: false })
+  isEmailVerified: boolean;
 
-@Column({ name: 'is_phone_verified', default: false })
-isPhoneVerified: boolean;
+  @Column({ name: 'is_phone_verified', default: false })
+  isPhoneVerified: boolean;
 
   @Column({ type: 'date', nullable: true, name: 'date_of_birth' })
   dateOfBirth: Date;
@@ -98,7 +98,11 @@ isPhoneVerified: boolean;
   @Exclude()
   passwordResetToken: string;
 
-  @Column({ type: 'timestamptz', nullable: true, name: 'password_reset_expires' })
+  @Column({
+    type: 'timestamptz',
+    nullable: true,
+    name: 'password_reset_expires',
+  })
   passwordResetExpires: Date;
 
   @Column({ type: 'integer', default: 0, name: 'login_attempts' })
@@ -127,7 +131,11 @@ isPhoneVerified: boolean;
   // Only hash password on update if it's been modified and not already hashed
   @BeforeUpdate()
   async hashPasswordOnUpdate() {
-    if (this.password_hash && !this.password_hash.startsWith('$2a$') && !this.password_hash.startsWith('$2b$')) {
+    if (
+      this.password_hash &&
+      !this.password_hash.startsWith('$2a$') &&
+      !this.password_hash.startsWith('$2b$')
+    ) {
       this.password_hash = await bcrypt.hash(this.password_hash, 12);
     }
   }
@@ -155,7 +163,7 @@ isPhoneVerified: boolean;
       this.lockUntil = null;
     } else {
       this.loginAttempts += 1;
-      
+
       // Lock account after 5 failed attempts for 2 hours
       if (this.loginAttempts >= 5 && !this.isLocked) {
         this.lockUntil = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2 hours
@@ -181,8 +189,11 @@ isPhoneVerified: boolean;
     const birthDate = new Date(this.dateOfBirth);
     const age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
       return age - 1 >= 18;
     }
     return age >= 18;

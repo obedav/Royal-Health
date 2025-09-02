@@ -1,175 +1,185 @@
 // backend/src/modules/bookings/dto/booking.dto.ts
-import { IsString, IsNumber, IsEnum, IsOptional, IsDateString, IsObject, ValidateNested, Min, Max } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsEnum,
+  IsOptional,
+  IsDateString,
+  IsObject,
+  ValidateNested,
+  Min,
+  Max,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 
 // Assessment service categories
 export enum AssessmentCategory {
   GENERAL = 'general',
-  SPECIALIZED = 'specialized', 
+  SPECIALIZED = 'specialized',
   EMERGENCY = 'emergency',
-  ROUTINE = 'routine'
+  ROUTINE = 'routine',
 }
 
 export enum PaymentMethod {
   CARD = 'card',
   BANK_TRANSFER = 'bank-transfer',
   USSD = 'ussd',
-  CASH = 'cash'
+  CASH = 'cash',
 }
 
 export class CreateBookingDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Type of assessment service',
-    example: 'general-health-assessment'
+    example: 'general-health-assessment',
   })
   @IsString()
   serviceType: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Name of the assessment service',
-    example: 'General Health Assessment'
+    example: 'General Health Assessment',
   })
   @IsString()
   serviceName: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Description of the assessment',
     example: 'Comprehensive health evaluation including vital signs monitoring',
-    default: 'General health service'
+    default: 'General health service',
   })
   @IsString()
   serviceDescription: string = 'General health service';
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Base assessment price (always 5000 NGN)',
     example: 5000,
     minimum: 5000,
-    maximum: 5000
+    maximum: 5000,
   })
   @IsNumber()
   @Min(5000)
   @Max(5000)
   basePrice: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Total price for assessment (always 5000 NGN)',
-    example: 5000
+    example: 5000,
   })
   @IsNumber()
   @Min(5000)
-  @Max(5000) 
+  @Max(5000)
   totalPrice: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Scheduled date for assessment',
-    example: '2025-08-25'
+    example: '2025-08-25',
   })
   @IsDateString()
   scheduledDate: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Scheduled time for assessment',
-    example: '10:00 AM'
+    example: '10:00 AM',
   })
   @IsString()
   scheduledTime: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Duration of assessment in minutes',
     example: 60,
     minimum: 45,
-    maximum: 90
+    maximum: 90,
   })
   @IsNumber()
   @Min(45)
   @Max(90)
   duration: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Patient address for home assessment',
-    example: '123 Victoria Island, Lagos'
+    example: '123 Victoria Island, Lagos',
   })
   @IsString()
   patientAddress: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'City where assessment will take place',
-    example: 'Lagos'
+    example: 'Lagos',
   })
   @IsString()
   city: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'State where assessment will take place',
-    example: 'Lagos'
+    example: 'Lagos',
   })
   @IsString()
   state: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Emergency contact name',
-    example: 'John Doe'
+    example: 'John Doe',
   })
   @IsString()
   emergencyContactName: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Emergency contact phone number',
-    example: '+2348012345678'
+    example: '+2348012345678',
   })
   @IsString()
   emergencyContactPhone: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Current medical conditions (optional)',
     example: 'Hypertension, Diabetes',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   medicalConditions?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Current medications being taken (optional)',
     example: 'Lisinopril 10mg daily, Metformin 500mg twice daily',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   currentMedications?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Known allergies (optional)',
     example: 'Penicillin allergy, Shellfish allergy',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   allergies?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Special requirements for the assessment (optional)',
     example: 'Patient has mobility issues, requires wheelchair access',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   specialRequirements?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Preferred payment method',
     enum: PaymentMethod,
-    example: PaymentMethod.CARD
+    example: PaymentMethod.CARD,
   })
   @IsEnum(PaymentMethod)
   paymentMethod: PaymentMethod;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Assessment category',
     enum: AssessmentCategory,
     example: AssessmentCategory.GENERAL,
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsEnum(AssessmentCategory)
@@ -178,63 +188,64 @@ export class CreateBookingDto {
 
 // Update DTO for partial updates
 export class UpdateBookingDto extends PartialType(CreateBookingDto) {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Booking status update',
     example: 'confirmed',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   status?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Payment status update',
     example: 'paid',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   paymentStatus?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Assigned nurse ID',
     example: 'nurse-uuid-here',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   nurseId?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Assessment notes from healthcare professional',
-    example: 'Patient shows normal vital signs. Recommend follow-up in 6 months.',
-    required: false
+    example:
+      'Patient shows normal vital signs. Recommend follow-up in 6 months.',
+    required: false,
   })
   @IsOptional()
   @IsString()
   assessmentNotes?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Assessment recommendations',
     example: 'Maintain current medication. Increase physical activity.',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   assessmentRecommendations?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Whether follow-up is required',
     example: true,
-    required: false
+    required: false,
   })
   @IsOptional()
   followUpRequired?: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Follow-up date if required',
     example: '2025-09-25',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsDateString()

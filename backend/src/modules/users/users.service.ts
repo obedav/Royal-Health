@@ -88,7 +88,7 @@ export class UsersService {
     const [users, total] = await queryBuilder.getManyAndCount();
 
     return {
-      users: users.map(user => this.sanitizeUser(user)),
+      users: users.map((user) => this.sanitizeUser(user)),
       pagination: {
         page,
         limit,
@@ -189,7 +189,9 @@ export class UsersService {
       this.userRepository.count({ where: { role: UserRole.CLIENT } }),
       this.userRepository.count({ where: { role: UserRole.NURSE } }),
       this.userRepository.count({ where: { role: UserRole.ADMIN } }),
-      this.userRepository.count({ where: { status: UserStatus.PENDING_VERIFICATION } }),
+      this.userRepository.count({
+        where: { status: UserStatus.PENDING_VERIFICATION },
+      }),
       this.userRepository.find({
         order: { createdAt: 'DESC' },
         take: 10,
@@ -205,11 +207,14 @@ export class UsersService {
         admins: adminsCount,
       },
       pendingVerification,
-      recent: recentUsers.map(user => this.sanitizeUser(user)),
+      recent: recentUsers.map((user) => this.sanitizeUser(user)),
     };
   }
 
-  async updateProfile(userId: string, updateData: UpdateUserDto): Promise<User> {
+  async updateProfile(
+    userId: string,
+    updateData: UpdateUserDto,
+  ): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
     if (!user) {
@@ -234,7 +239,13 @@ export class UsersService {
   }
 
   private sanitizeUser(user: User): any {
-    const { password_hash, passwordResetToken, emailVerificationToken, phoneVerificationCode, ...sanitized } = user;
+    const {
+      password_hash,
+      passwordResetToken,
+      emailVerificationToken,
+      phoneVerificationCode,
+      ...sanitized
+    } = user;
     return sanitized;
   }
 

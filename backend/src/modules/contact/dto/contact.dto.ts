@@ -13,7 +13,10 @@ export class CreateContactDto {
   @IsNotEmpty()
   lastName: string;
 
-  @ApiProperty({ description: 'Email address', example: 'john.doe@example.com' })
+  @ApiProperty({
+    description: 'Email address',
+    example: 'john.doe@example.com',
+  })
   @IsEmail()
   @IsNotEmpty()
   email: string;
@@ -23,21 +26,36 @@ export class CreateContactDto {
   @IsNotEmpty()
   phone: string;
 
-  @ApiProperty({ description: 'Subject of inquiry', example: 'Booking assistance needed' })
+  @ApiProperty({
+    description: 'Subject of inquiry',
+    example: 'Booking assistance needed',
+  })
   @IsString()
   @IsNotEmpty()
   subject: string;
 
-  @ApiProperty({ 
-    description: 'Type of inquiry', 
+  @ApiProperty({
+    description: 'Type of inquiry',
     example: 'booking',
-    enum: ['general', 'booking', 'medical', 'emergency', 'partnership', 'careers', 'technical', 'feedback']
+    enum: [
+      'general',
+      'booking',
+      'medical',
+      'emergency',
+      'partnership',
+      'careers',
+      'technical',
+      'feedback',
+    ],
   })
   @IsString()
   @IsNotEmpty()
   inquiryType: string;
 
-  @ApiProperty({ description: 'Message content', example: 'I need help with booking an appointment for tomorrow.' })
+  @ApiProperty({
+    description: 'Message content',
+    example: 'I need help with booking an appointment for tomorrow.',
+  })
   @IsString()
   @IsNotEmpty()
   message: string;
@@ -47,7 +65,11 @@ export class CreateContactDto {
   @IsString()
   submittedAt?: string;
 
-  @ApiProperty({ description: 'Source of submission', required: false, example: 'website_contact_form' })
+  @ApiProperty({
+    description: 'Source of submission',
+    required: false,
+    example: 'website_contact_form',
+  })
   @IsOptional()
   @IsString()
   source?: string;
