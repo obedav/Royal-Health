@@ -417,6 +417,24 @@ export class AuthService {
     return randomBytes(32).toString('hex');
   }
 
+  async testDatabaseConnection() {
+    try {
+      // Test basic database connectivity
+      const result = await this.userRepository.query('SELECT NOW() as current_time, version() as db_version');
+      const userCount = await this.userRepository.count();
+      
+      return {
+        timestamp: result[0]?.current_time,
+        dbVersion: result[0]?.db_version,
+        userCount,
+        connectionStatus: 'healthy'
+      };
+    } catch (error) {
+      console.error('Database connection test failed:', error);
+      throw error;
+    }
+  }
+
   private sanitizeUser(user: User) {
     const {
       password_hash, // 🔥 EXCLUDE sensitive fields

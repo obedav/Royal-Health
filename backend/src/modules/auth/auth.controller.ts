@@ -286,4 +286,21 @@ export class AuthController {
       success: true,
     };
   }
+
+  @Public() 
+  @Get('debug/db-test')
+  @ApiOperation({ summary: 'Test database connection (temporary debug endpoint)' })
+  async testDbConnection() {
+    try {
+      const result = await this.authService.testDatabaseConnection();
+      return { success: true, message: 'Database connection successful', data: result };
+    } catch (error) {
+      return { 
+        success: false, 
+        message: 'Database connection failed', 
+        error: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      };
+    }
+  }
 }
