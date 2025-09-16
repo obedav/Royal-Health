@@ -45,7 +45,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }
 
     // Security logging for specific cases
-    if (status === HttpStatus.UNAUTHORIZED || status === HttpStatus.FORBIDDEN) {
+    if (
+      status === Number(HttpStatus.UNAUTHORIZED) ||
+      status === Number(HttpStatus.FORBIDDEN)
+    ) {
       this.logger.logSecurity('Unauthorized access attempt', 'medium', {
         url: request.url,
         method: request.method,

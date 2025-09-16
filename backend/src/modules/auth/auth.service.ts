@@ -147,7 +147,7 @@ export class AuthService {
       console.log('❌ Password invalid - incrementing login attempts');
       // Use direct SQL update with correct column names (snake_case)
       await this.userRepository.query(
-        'UPDATE users SET "login_attempts" = "login_attempts" + 1 WHERE id = $1',
+        'UPDATE users SET `login_attempts` = `login_attempts` + 1 WHERE id = ?',
         [user.id],
       );
 
@@ -155,7 +155,7 @@ export class AuthService {
       if (user.loginAttempts + 1 >= 5) {
         const lockUntil = new Date(Date.now() + 2 * 60 * 60 * 1000);
         await this.userRepository.query(
-          'UPDATE users SET "lock_until" = $1 WHERE id = $2',
+          'UPDATE users SET `lock_until` = ? WHERE id = ?',
           [lockUntil, user.id],
         );
       }
@@ -167,7 +167,7 @@ export class AuthService {
 
     // Update login info using direct SQL with correct column names (snake_case)
     await this.userRepository.query(
-      'UPDATE users SET "login_attempts" = 0, "lock_until" = NULL, "last_login_at" = NOW() WHERE id = $1',
+      'UPDATE users SET `login_attempts` = 0, `lock_until` = NULL, `last_login_at` = NOW() WHERE id = ?',
       [user.id],
     );
 
@@ -420,14 +420,16 @@ export class AuthService {
   async testDatabaseConnection() {
     try {
       // Test basic database connectivity
-      const result = await this.userRepository.query('SELECT NOW() as current_time, version() as db_version');
+      const result = await this.userRepository.query(
+        'SELECT NOW() as current_time, version() as db_version',
+      );
       const userCount = await this.userRepository.count();
-      
+
       return {
         timestamp: result[0]?.current_time,
         dbVersion: result[0]?.db_version,
         userCount,
-        connectionStatus: 'healthy'
+        connectionStatus: 'healthy',
       };
     } catch (error) {
       console.error('Database connection test failed:', error);

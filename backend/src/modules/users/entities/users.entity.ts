@@ -50,10 +50,10 @@ export class User {
   @Column({ unique: true })
   phone: string;
 
-  @Column({ type: 'varchar', enum: UserRole, default: UserRole.CLIENT })
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.CLIENT })
   role: UserRole;
 
-  @Column({ type: 'varchar', enum: UserStatus, default: UserStatus.ACTIVE })
+  @Column({ type: 'enum', enum: UserStatus, default: UserStatus.ACTIVE })
   status: UserStatus;
 
   @Column({ name: 'is_email_verified', default: false })
@@ -65,7 +65,7 @@ export class User {
   @Column({ type: 'date', nullable: true, name: 'date_of_birth' })
   dateOfBirth: Date;
 
-  @Column({ type: 'varchar', enum: Gender, nullable: true })
+  @Column({ type: 'enum', enum: Gender, nullable: true })
   gender: Gender;
 
   @Column({ nullable: true, name: 'national_id' })
@@ -99,25 +99,25 @@ export class User {
   passwordResetToken: string;
 
   @Column({
-    type: 'timestamptz',
+    type: 'datetime',
     nullable: true,
     name: 'password_reset_expires',
   })
   passwordResetExpires: Date;
 
-  @Column({ type: 'integer', default: 0, name: 'login_attempts' })
+  @Column({ type: 'int', default: 0, name: 'login_attempts' })
   loginAttempts: number;
 
-  @Column({ type: 'timestamptz', nullable: true, name: 'lock_until' })
+  @Column({ type: 'datetime', nullable: true, name: 'lock_until' })
   lockUntil: Date;
 
-  @Column({ type: 'timestamptz', nullable: true, name: 'last_login_at' })
+  @Column({ type: 'datetime', nullable: true, name: 'last_login_at' })
   lastLoginAt: Date;
 
-  @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
+  @CreateDateColumn({ type: 'datetime', name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamptz', name: 'updated_at' })
+  @UpdateDateColumn({ type: 'datetime', name: 'updated_at' })
   updatedAt: Date;
 
   // Hash password before saving (only on insert)

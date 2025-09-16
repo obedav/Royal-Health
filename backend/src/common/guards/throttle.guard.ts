@@ -1,6 +1,7 @@
 // backend/src/common/guards/throttle.guard.ts
 import { Injectable, ExecutionContext, CanActivate } from '@nestjs/common';
 import { ThrottlerException } from '@nestjs/throttler';
+import { Request } from 'express';
 import { AppLoggerService } from '../logger/logger.service';
 
 @Injectable()
@@ -10,7 +11,7 @@ export class CustomThrottlerGuard implements CanActivate {
   constructor(private readonly logger: AppLoggerService) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<Request>();
     const key = `${request.ip}_${request.url}`;
     const now = Date.now();
     const windowMs = 60 * 1000; // 1 minute
@@ -31,10 +32,10 @@ export class CustomThrottlerGuard implements CanActivate {
     if (record.count >= maxRequests) {
       // Log rate limiting event
       this.logger.logSecurity('Rate limit exceeded', 'medium', {
-        ip: request.ip,
-        userAgent: request.headers['user-agent'],
-        url: request.url,
-        method: request.method,
+        ip: request.ip || 'unknown',
+        userAgent: request.headers['user-agent'] || 'unknown',
+        url: request.url || 'unknown',
+        method: request.method || 'unknown',
         limit: maxRequests,
         windowMs,
       });

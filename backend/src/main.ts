@@ -45,17 +45,21 @@ async function bootstrap() {
     }),
   );
 
-  // CORS Configuration
+  // CORS Configuration - Dynamic based on environment
+  const corsOrigins = process.env.NODE_ENV === 'production' 
+    ? (process.env.CORS_ORIGINS || '').split(',').filter(Boolean)
+    : [
+        'https://royal-health-testing.vercel.app',
+        'https://royal-health-testing-git-main-david-m-gs-projects.vercel.app',
+        'https://royal-health-testing-q1fpjru6e-david-m-gs-projects.vercel.app',
+        /^https:\/\/royal-health-testing-.*\.vercel\.app$/,
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'http://localhost:4173',
+      ];
+
   app.enableCors({
-    origin: [
-      'https://royal-health-testing.vercel.app',
-      'https://royal-health-testing-git-main-david-m-gs-projects.vercel.app',
-      'https://royal-health-testing-q1fpjru6e-david-m-gs-projects.vercel.app',
-      /^https:\/\/royal-health-testing-.*\.vercel\.app$/,
-      'http://localhost:5173',
-      'http://localhost:3000',
-      'http://localhost:4173',
-    ],
+    origin: corsOrigins,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [
       'Origin',

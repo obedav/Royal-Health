@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { Request } from 'express';
 import { AppLoggerService } from '../logger/logger.service';
 
 @Injectable()
@@ -14,12 +15,12 @@ export class CacheInterceptor implements NestInterceptor {
   constructor(private readonly logger: AppLoggerService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<Request>();
     const { method, url } = request;
 
     return next.handle().pipe(
       tap({
-        next: (data) => {
+        next: () => {
           // Log cache miss/hit information
           const cacheInfo = request.headers['x-cache-status'];
           if (cacheInfo) {
@@ -35,14 +36,14 @@ export class CacheInterceptor implements NestInterceptor {
 export interface CacheConfig {
   ttl: number; // Time to live in seconds
   key?: string; // Custom cache key
-  condition?: (request: any) => boolean; // Condition for caching
+  condition?: (request: Request & { user?: any }) => boolean; // Condition for caching
 }
 
 export const getCacheKey = (
   context: ExecutionContext,
   customKey?: string,
 ): string => {
-  const request = context.switchToHttp().getRequest();
+  const request = context.switchToHttp().getRequest<Request & { user?: any }>();
 
   if (customKey) {
     return customKey;
@@ -55,7 +56,7 @@ export const getCacheKey = (
 };
 
 export const shouldCache = (context: ExecutionContext): boolean => {
-  const request = context.switchToHttp().getRequest();
+  const request = context.switchToHttp().getRequest<Request & { user?: any }>();
 
   // Only cache GET requests
   if (request.method !== 'GET') {

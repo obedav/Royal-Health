@@ -153,15 +153,15 @@ export class Booking {
   followUpDate?: string;
 
   // Timestamps
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', type: 'datetime' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: 'updated_at', type: 'datetime' })
   updatedAt: Date;
 
-  @Column({ name: 'completed_at', type: 'timestamp', nullable: true })
+  @Column({ name: 'completed_at', type: 'datetime', nullable: true })
   completedAt?: Date;
 
-  @Column({ name: 'cancelled_at', type: 'timestamp', nullable: true })
+  @Column({ name: 'cancelled_at', type: 'datetime', nullable: true })
   cancelledAt?: Date;
 }

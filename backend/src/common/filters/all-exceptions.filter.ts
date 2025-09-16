@@ -33,7 +33,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     } else {
       status = HttpStatus.INTERNAL_SERVER_ERROR;
       message = 'Unknown error occurred';
-      stack = String(exception);
+      stack = exception ? String(exception) : 'Unknown error';
     }
 
     const errorResponse = {
@@ -50,7 +50,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     // Log all unhandled exceptions as errors
     this.logger.logError(new Error(message), 'UnhandledException', {
-      originalException: exception,
+      originalException:
+        exception instanceof Error ? exception.message : String(exception),
       url: request.url,
       method: request.method,
       ip: request.ip,

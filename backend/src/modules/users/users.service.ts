@@ -3,11 +3,26 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
-  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindManyOptions } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User, UserRole, UserStatus } from './entities/users.entity';
+
+export type SanitizedUser = Omit<
+  User,
+  | 'password_hash'
+  | 'passwordResetToken'
+  | 'emailVerificationToken'
+  | 'phoneVerificationCode'
+  | 'hashPasswordOnInsert'
+  | 'hashPasswordOnUpdate'
+  | 'comparePassword'
+  | 'incrementLoginAttempts'
+  | 'resetLoginAttempts'
+  | 'isLocked'
+  | 'fullName'
+  | 'isAdult'
+>;
 
 export interface UserQuery {
   page?: number;
@@ -98,7 +113,7 @@ export class UsersService {
     };
   }
 
-  async findOne(id: string): Promise<User> {
+  async findOne(id: string): Promise<SanitizedUser> {
     const user = await this.userRepository.findOne({ where: { id } });
 
     if (!user) {
@@ -116,7 +131,7 @@ export class UsersService {
     return this.userRepository.findOne({ where: { phone } });
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<SanitizedUser> {
     const user = await this.userRepository.findOne({ where: { id } });
 
     if (!user) {
@@ -138,7 +153,7 @@ export class UsersService {
     return this.sanitizeUser(updatedUser);
   }
 
-  async updateStatus(id: string, status: UserStatus): Promise<User> {
+  async updateStatus(id: string, status: UserStatus): Promise<SanitizedUser> {
     const user = await this.userRepository.findOne({ where: { id } });
 
     if (!user) {
@@ -151,7 +166,7 @@ export class UsersService {
     return this.sanitizeUser(updatedUser);
   }
 
-  async updateRole(id: string, role: UserRole): Promise<User> {
+  async updateRole(id: string, role: UserRole): Promise<SanitizedUser> {
     const user = await this.userRepository.findOne({ where: { id } });
 
     if (!user) {
@@ -214,7 +229,7 @@ export class UsersService {
   async updateProfile(
     userId: string,
     updateData: UpdateUserDto,
-  ): Promise<User> {
+  ): Promise<SanitizedUser> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
     if (!user) {
@@ -238,12 +253,12 @@ export class UsersService {
     return this.sanitizeUser(updatedUser);
   }
 
-  private sanitizeUser(user: User): any {
+  private sanitizeUser(user: User): SanitizedUser {
     const {
-      password_hash,
-      passwordResetToken,
-      emailVerificationToken,
-      phoneVerificationCode,
+      password_hash: _passwordHash,
+      passwordResetToken: _passwordResetToken,
+      emailVerificationToken: _emailVerificationToken,
+      phoneVerificationCode: _phoneVerificationCode,
       ...sanitized
     } = user;
     return sanitized;

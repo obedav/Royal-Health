@@ -64,49 +64,9 @@ import { Booking } from './modules/bookings/entities/booking.entity';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const isProduction = configService.get('NODE_ENV') === 'production';
-
-        if (isProduction) {
-          const directUrl = configService.get<string>('DATABASE_URL_DIRECT');
-          const poolerUrl = configService.get<string>('DATABASE_URL_POOLER');
-          const fallbackUrl = configService.get<string>('DATABASE_URL');
-
-          const databaseUrl = directUrl || poolerUrl || fallbackUrl;
-          if (!databaseUrl) {
-            throw new Error('❌ No production DATABASE_URL found');
-          }
-
-          console.log(
-            `🔗 Connecting to Supabase Database (${directUrl ? 'Direct' : poolerUrl ? 'Pooler' : 'Default'})...`,
-          );
-
-          return {
-            type: 'postgres',
-            url: databaseUrl,
-            entities: [User, Booking],
-            synchronize: false, // Never in production
-            logging: false,
-            ssl: { rejectUnauthorized: false }, // SSL enabled for production
-          };
-        }
-
-        // Local development config
-        console.log(
-          '💻 Connecting to Local Postgres Database (Development)...',
-        );
-
-        return {
-          type: 'postgres',
-          host: configService.get('DB_HOST', 'localhost'),
-          port: parseInt(configService.get('DB_PORT', '5432')),
-          username: configService.get('DB_USERNAME', 'postgres'),
-          password: String(configService.get('DB_PASSWORD', 'postgres')),
-          database: configService.get('DB_DATABASE', 'royal_health_db'),
-          entities: [User, Booking],
-          synchronize: true,
-          logging: true,
-          ssl: false, // SSL disabled for local dev
-        };
+        // Import the enhanced database configuration
+        const { getDatabaseConfig } = require('./config/database.config');
+        return getDatabaseConfig(configService);
       },
     }),
 

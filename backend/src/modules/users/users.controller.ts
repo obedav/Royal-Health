@@ -86,7 +86,7 @@ export class UsersController {
     status: 200,
     description: 'Profile retrieved successfully',
   })
-  async getProfile(@CurrentUser() user: User) {
+  getProfile(@CurrentUser() user: User) {
     return {
       success: true,
       data: user,
