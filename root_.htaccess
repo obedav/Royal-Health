@@ -1,0 +1,20 @@
+RewriteEngine On
+
+# Enable CORS headers
+Header always set Access-Control-Allow-Origin "https://ancerlarins.com"
+Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+Header always set Access-Control-Allow-Credentials true
+
+# Handle preflight OPTIONS requests
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ $1 [R=200,L]
+
+# Route /api/v1/* requests to backend-php/index.php
+RewriteCond %{REQUEST_URI} ^/api/v1/(.*)$
+RewriteRule ^api/v1/(.*)$ backend-php/index.php [QSA,L,E=API_PATH:$1]
+
+# Security headers
+Header set X-Content-Type-Options nosniff
+Header set X-Frame-Options DENY
+Header set X-XSS-Protection "1; mode=block"

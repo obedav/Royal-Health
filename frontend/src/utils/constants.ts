@@ -39,8 +39,12 @@ export const NIGERIAN_STATES = [
   { value: 'fct', label: 'Federal Capital Territory' },
 ]
 
-// Phone number format
-export const PHONE_REGEX = /^(\+234|234|0)?[789][01]\d{8}$/
+// Nigerian phone number validation (covers MTN, Airtel, Glo, 9mobile)
+// Valid formats: +2348012345678, 08012345678, 8012345678
+export const PHONE_REGEX = /^(\+234|234|0)?[7-9][0-1]\d{8}$/
+
+// International phone number validation (more flexible for global numbers)
+export const INTERNATIONAL_PHONE_REGEX = /^[\+]?[1-9][\d]{1,14}$/
 
 // Emergency Contact Types
 export const EMERGENCY_CONTACT_TYPES = [

@@ -44,7 +44,7 @@ import ServiceSelection from "../components/booking/ServiceSelection";
 import AppointmentScheduling from "../components/booking/AppointmentScheduling";
 import type { ScheduleData } from "../components/booking/AppointmentScheduling";
 import PatientInformationForm from "../components/booking/PatientInformationForm";
-import type { PatientInformation } from "../components/booking/PatientInformationForm";
+import type { PatientInformation } from "../types/patient.types";
 import PaymentIntegration from "../components/booking/PaymentIntegration";
 import type { PaymentResult } from "../components/booking/PaymentIntegration";
 import BookingConfirmation from "../components/booking/BookingConfirmation";
@@ -66,7 +66,7 @@ const Booking: React.FC = () => {
     PaymentResult | undefined
   >();
 
-  // Enhanced booking steps with better icons
+  // Enhanced booking steps with payment removed
   const steps = [
     {
       title: "Select Service",
@@ -83,7 +83,6 @@ const Booking: React.FC = () => {
       description: "Patient information",
       icon: "FaUser",
     },
-    { title: "Payment", description: "Confirm and pay", icon: "FaCreditCard" },
     {
       title: "Confirmation",
       description: "Booking confirmed",
@@ -229,12 +228,11 @@ const Booking: React.FC = () => {
         );
       case 3:
         return selectedService && selectedSchedule && patientInfo ? (
-          <PaymentIntegration
+          <BookingConfirmation
             selectedService={selectedService}
             selectedSchedule={selectedSchedule}
             patientInfo={patientInfo}
-            onPaymentSuccess={handlePaymentSuccess}
-            onPaymentError={handlePaymentError}
+            paymentResult={null} // No payment required
           />
         ) : (
           <Box textAlign="center" py={20}>
@@ -255,44 +253,7 @@ const Booking: React.FC = () => {
                   Previous Steps Required!
                 </AlertTitle>
                 <AlertDescription fontWeight="600" color="orange.700">
-                  Please complete all previous steps before proceeding to
-                  payment.
-                </AlertDescription>
-              </Box>
-            </Alert>
-          </Box>
-        );
-      case 4:
-        return selectedService &&
-          selectedSchedule &&
-          patientInfo &&
-          paymentResult ? (
-          <BookingConfirmation
-            selectedService={selectedService}
-            selectedSchedule={selectedSchedule}
-            patientInfo={patientInfo}
-            paymentResult={paymentResult}
-          />
-        ) : (
-          <Box textAlign="center" py={20}>
-            <Alert
-              status="warning"
-              maxW="500px"
-              mx="auto"
-              borderRadius="2xl"
-              border="3px solid"
-              borderColor="orange.300"
-              bg="orange.50"
-              boxShadow="0 8px 25px rgba(249, 115, 22, 0.15)"
-              p={6}
-            >
-              <AlertIcon boxSize="24px" />
-              <Box>
-                <AlertTitle fontWeight="800" fontSize="lg">
-                  Payment Required!
-                </AlertTitle>
-                <AlertDescription fontWeight="600" color="orange.700">
-                  Please complete payment to view your booking confirmation.
+                  Please complete all previous steps to view confirmation.
                 </AlertDescription>
               </Box>
             </Alert>
@@ -817,38 +778,7 @@ const Booking: React.FC = () => {
                   }}
                   transition="all 0.3s ease-in-out"
                 >
-                  Continue to Payment
-                </Button>
-              ) : activeStep === 3 ? (
-                <Button
-                  rightIcon={<FaArrowRight />}
-                  onClick={handleNext}
-                  bgGradient="linear(45deg, brand.500, purple.500)"
-                  color="white"
-                  size="lg"
-                  borderRadius="2xl"
-                  fontWeight="800"
-                  px={10}
-                  py={7}
-                  fontSize="md"
-                  isDisabled={!paymentResult}
-                  boxShadow="0 8px 25px rgba(194, 24, 91, 0.3)"
-                  _hover={{
-                    bgGradient: "linear(45deg, brand.600, purple.600)",
-                    transform: "translateY(-3px)",
-                    boxShadow: "0 12px 30px rgba(194, 24, 91, 0.4)",
-                  }}
-                  _disabled={{
-                    opacity: 0.5,
-                    cursor: "not-allowed",
-                    _hover: {
-                      transform: "none",
-                      boxShadow: "0 8px 25px rgba(194, 24, 91, 0.3)",
-                    },
-                  }}
-                  transition="all 0.3s ease-in-out"
-                >
-                  View Confirmation
+                  Continue to Confirmation
                 </Button>
               ) : activeStep < steps.length - 1 ? (
                 <Button
@@ -874,7 +804,7 @@ const Booking: React.FC = () => {
                 </Button>
               ) : (
                 <Button
-                  onClick={() => navigate("/dashboard")}
+                  onClick={() => navigate("/")}
                   bgGradient="linear(45deg, brand.500, purple.500)"
                   color="white"
                   size="lg"
@@ -891,7 +821,7 @@ const Booking: React.FC = () => {
                   }}
                   transition="all 0.3s ease-in-out"
                 >
-                  View Dashboard
+                  Back to Home
                 </Button>
               )}
             </HStack>

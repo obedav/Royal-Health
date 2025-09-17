@@ -162,6 +162,7 @@ const Services: React.FC = () => {
           description:
             "Professional physiotherapy sessions and mobility assistance at home.",
           icon: FaWheelchair,
+          image: "/images/care-img.jpeg",
           features: [
             "Physiotherapy sessions at home",
             "Range-of-motion exercises",
@@ -177,6 +178,7 @@ const Services: React.FC = () => {
           description:
             "Specialized care and support for individuals living with dementia.",
           icon: FaBrain,
+          image: "/images/about-img.jpeg",
           features: [
             "Structured daily routines",
             "Safety supervision and fall prevention",
@@ -192,6 +194,7 @@ const Services: React.FC = () => {
           description:
             "Comprehensive stroke recovery and rehabilitation support.",
           icon: FaHeartbeat,
+          image: "/images/services-bg-img.png",
           features: [
             "Monitoring and rehabilitation support",
             "Physiotherapy coordination",
@@ -207,6 +210,7 @@ const Services: React.FC = () => {
           description:
             "Compassionate end-of-life care focused on comfort and dignity.",
           icon: FaHeart,
+          image: "/images/m-care.png",
           features: [
             "Pain and symptom management",
             "Emotional and spiritual support",
@@ -387,18 +391,18 @@ const Services: React.FC = () => {
   ];
 
   const handleBookService = (serviceId: string) => {
-    navigate(`/booking?service=${serviceId}`);
+    navigate('/consultation');
   };
 
   const handleQuickBook = () => {
-    navigate("/booking");
+    navigate("/consultation");
   };
 
   return (
     <Box minH="100vh">
       {/* Hero Section with Background Image */}
       <Box
-        minH="100vh"
+        minH="35vh"
         bg="brand.600" // Fallback color if image doesn't load
         sx={{
           backgroundImage: "url('/images/img2.jpg')",
@@ -418,8 +422,8 @@ const Services: React.FC = () => {
           zIndex: 1,
         }}
       >
-        <Container maxW="7xl" position="relative" zIndex={2} py={8}>
-          <VStack spacing={10} align="stretch">
+        <Container maxW="7xl" position="relative" zIndex={2} py={2}>
+          <VStack spacing={4} align="stretch">
             {/* Breadcrumb - Enhanced */}
             <Breadcrumb
               spacing="8px"
@@ -445,11 +449,11 @@ const Services: React.FC = () => {
 
             {/* Header Section - Enhanced */}
             <VStack
-              spacing={6}
+              spacing={4}
               textAlign="center"
               maxW="800px"
               mx="auto"
-              py={20}
+              py={2}
             >
               <Box
                 position="relative"
@@ -627,9 +631,9 @@ const Services: React.FC = () => {
       </Box>
 
       {/* Main Content Section */}
-      <Box bg="gray.50" py={12}>
+      <Box bg="gray.50" py={4}>
         <Container maxW="7xl">
-          <VStack spacing={10} align="stretch">
+          <VStack spacing={6} align="stretch">
             {/* Service Categories Tabs - Enhanced */}
             <Tabs variant="enclosed" colorScheme="brand">
               <TabList
@@ -729,10 +733,10 @@ const Services: React.FC = () => {
                             {service.image && (
                               <Box
                                 w="full"
-                                h="200px"
+                                h="360px"
                                 bgImage={`url(${service.image})`}
                                 bgSize="cover"
-                                bgPosition="center"
+                                bgPosition="center 30%"
                                 position="relative"
                                 _before={{
                                   content: '""',

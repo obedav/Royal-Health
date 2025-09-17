@@ -114,7 +114,7 @@ const HeroSection: React.FC = () => {
               <Button
                 size="lg"
                 variant="gradient"
-                onClick={() => navigate('/booking')}
+                onClick={() => navigate('/consultation')}
                 className="hover-lift pulse-animation"
                 px={8}
                 py={6}

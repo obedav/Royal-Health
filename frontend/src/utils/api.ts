@@ -1,11 +1,14 @@
 // src/utils/api.ts - API helper with automatic token handling
+import SecureTokenStorage from './secureStorage';
 
 // Dynamic API base URL - uses Vite environment variable
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
-                    'https://royal-health.onrender.com/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ||
+                    'https://ancerlarins.com/api/v1';
 
-// For debugging - log which URL is being used
-console.log('🔗 API Base URL:', API_BASE_URL);
+// Log API URL only in development
+if (process.env.NODE_ENV === 'development') {
+  console.log('🔗 API Base URL:', API_BASE_URL);
+}
 
 interface ApiResponse<T = any> {
   data?: T;
@@ -26,16 +29,14 @@ class ApiError extends Error {
   }
 }
 
-// Helper function to get auth token
+// Helper function to get auth token securely
 const getAuthToken = (): string | null => {
-  return localStorage.getItem('accessToken');
+  return SecureTokenStorage.getAccessToken();
 };
 
 // Helper function to handle logout on 401
 const handleUnauthorized = () => {
-  localStorage.removeItem('accessToken');
-  localStorage.removeItem('refreshToken');
-  localStorage.removeItem('user');
+  SecureTokenStorage.clearTokens();
   // Redirect to login page
   window.location.href = '/login';
 };
@@ -49,7 +50,7 @@ const wakeUpBackend = async (): Promise<void> => {
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {
-    console.log('Backend wake-up request sent...');
+    // Backend wake-up request sent (silent)
   }
 };
 
@@ -111,7 +112,9 @@ export const apiRequest = async <T = any>(
     }
 
     // Network or other errors
-    console.error('API request failed:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('API request failed:', error);
+    }
     throw new ApiError(0, 'Network error - please check your connection');
   }
 };

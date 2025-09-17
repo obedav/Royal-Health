@@ -1,37 +1,18 @@
-// src/App.tsx - Updated with proper route protection and About/Contact components
+// src/App.tsx - Enhanced with best practices
 import { ChakraProvider } from "@chakra-ui/react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import theme from "./styles/theme";
 import "./styles/globals.css";
 
 // Import components
-import Header from "./components/common/Header";
+import SimpleHeader from "./components/common/SimpleHeader";
 import ErrorBoundary from "./components/common/ErrorBoundary";
-import { AuthProvider, ProtectedRoute } from "./hooks/useAuth";
-
-// Import pages
-import Home from "./pages/Home";
-import Booking from "./pages/Booking";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Services from "./pages/Services";
-import Dashboard from "./pages/Dashboard";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import Profile from "./pages/Profile";
-import Settings from "./pages/Settings";
+import AppRouter from "./router/AppRouter";
 import Footer from "./components/common/Footer";
-
-// Import appointment and health record components
-import AppointmentBooking from "./components/appointments/AppointmentBooking";
-import AppointmentCalendar from "./components/appointments/AppointmentCalendar";
-import HealthRecord from "./components/health-records/HealthRecord";
-import HealthRecordHistory from "./components/health-records/HealthRecordHistory";
-
-// Admin components (if you want to add admin routes)
-// import AdminDashboard from './components/admin/AdminDashboard'
+import { ENV_CONFIG } from "./config/app.config";
+import { BookingProvider } from "./context/BookingContext";
 
 // Create React Query client
 const queryClient = new QueryClient({
@@ -50,168 +31,22 @@ function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <ChakraProvider theme={theme}>
-          <AuthProvider>
+          <BookingProvider>
             <Router>
               <div className="app">
-                <Header />
+                <SimpleHeader />
                 <main className="main-content">
-                <Routes>
-                  {/* Public routes */}
-                  <Route path="/" element={<Home />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/services" element={<Services />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/contact" element={<Contact />} />
-
-                  {/* Protected routes */}
-                  <Route
-                    path="/dashboard"
-                    element={
-                      <ProtectedRoute>
-                        <Dashboard />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/booking"
-                    element={
-                      <ProtectedRoute>
-                        <Booking />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/appointments"
-                    element={
-                      <ProtectedRoute>
-                        <AppointmentBooking />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/appointments/calendar"
-                    element={
-                      <ProtectedRoute>
-                        <AppointmentCalendar />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/health-records"
-                    element={
-                      <ProtectedRoute>
-                        <HealthRecord />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/health-records/history"
-                    element={
-                      <ProtectedRoute>
-                        <HealthRecordHistory />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/profile"
-                    element={
-                      <ProtectedRoute>
-                        <Profile />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/settings"
-                    element={
-                      <ProtectedRoute>
-                        <Settings />
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  {/* Admin routes (uncomment if you want admin access) */}
-                  {/*
-                  <Route 
-                    path="/admin" 
-                    element={
-                      <ProtectedRoute requiredRole="admin">
-                        <AdminDashboard />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  */}
-
-                  {/* Catch all route - 404 page */}
-                  <Route
-                    path="*"
-                    element={
-                      <div
-                        style={{
-                          padding: "80px 40px",
-                          textAlign: "center",
-                          minHeight: "60vh",
-                          display: "flex",
-                          flexDirection: "column",
-                          justifyContent: "center",
-                          alignItems: "center",
-                        }}
-                      >
-                        <h1
-                          style={{
-                            fontSize: "4rem",
-                            color: "#E53E3E",
-                            marginBottom: "1rem",
-                          }}
-                        >
-                          404
-                        </h1>
-                        <h2
-                          style={{
-                            fontSize: "2rem",
-                            marginBottom: "1rem",
-                            color: "#2D3748",
-                          }}
-                        >
-                          Page Not Found
-                        </h2>
-                        <p
-                          style={{
-                            fontSize: "1.2rem",
-                            color: "#718096",
-                            marginBottom: "2rem",
-                          }}
-                        >
-                          The page you're looking for doesn't exist.
-                        </p>
-                        <a
-                          href="/"
-                          style={{
-                            padding: "12px 24px",
-                            backgroundColor: "#9F7AEA",
-                            color: "white",
-                            textDecoration: "none",
-                            borderRadius: "8px",
-                            fontSize: "1.1rem",
-                          }}
-                        >
-                          Go Back Home
-                        </a>
-                      </div>
-                    }
-                  />
-                </Routes>
-              </main>
-              <Footer />
-            </div>
-          </Router>
-        </AuthProvider>
-      </ChakraProvider>
-      {import.meta.env.DEV && <ReactQueryDevtools />}
-    </QueryClientProvider>
+                  <AppRouter />
+                </main>
+                <Footer />
+              </div>
+            </Router>
+          </BookingProvider>
+        </ChakraProvider>
+        {ENV_CONFIG.IS_DEVELOPMENT && <ReactQueryDevtools />}
+      </QueryClientProvider>
     </ErrorBoundary>
   );
 }
-
 
 export default App;

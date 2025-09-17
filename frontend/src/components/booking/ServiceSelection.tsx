@@ -707,17 +707,17 @@ const ServiceSelection: React.FC<ServiceSelectionProps> = ({
                   >
                     Medical Emergency?
                   </Text>
-                  <Text 
-                    fontSize="md" 
-                    color="red.600" 
+                  <Text
+                    fontSize="md"
+                    color="red.600"
                     lineHeight="1.5"
                     fontWeight="600"
                   >
-                    For life-threatening emergencies, call{' '}
+                    For life-threatening emergencies,{' '}
                     <Text as="span" fontWeight="800" color="red.800">
-                      199 (Nigeria Emergency)
-                    </Text>{' '}
-                    or go to the nearest hospital. Our assessment services are for non-emergency health evaluations.
+                      go to the nearest hospital immediately
+                    </Text>
+                    . Our assessment services are for non-emergency health evaluations.
                   </Text>
                 </VStack>
               </HStack>

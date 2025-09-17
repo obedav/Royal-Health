@@ -79,19 +79,24 @@ class Database {
         $setClause = [];
         $params = [];
         $i = 1;
-        
+
         // Use positional parameters for SET clause
         foreach ($data as $column => $value) {
             $setClause[] = "{$column} = ?";
             $params[] = $value;
         }
         $setClause = implode(', ', $setClause);
-        
+
         // Add WHERE parameters
         $params = array_merge($params, $whereParams);
-        
+
         $sql = "UPDATE {$table} SET {$setClause} WHERE {$where}";
-        
+
+        $stmt = $this->query($sql, $params);
+        return $stmt->rowCount();
+    }
+
+    public function execute($sql, $params = []) {
         $stmt = $this->query($sql, $params);
         return $stmt->rowCount();
     }

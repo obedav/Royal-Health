@@ -31,6 +31,8 @@ import {
   Spinner,
   Center,
 } from "@chakra-ui/react";
+import PhoneNumberInput from "../components/common/PhoneNumberInput";
+import { validatePhoneForForm } from "../utils/phoneValidation";
 import {
   FaPhone,
   FaEnvelope,
@@ -116,7 +118,7 @@ const Contact: React.FC = () => {
   const toast = useToast();
 
   const API_BASE_URL =
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api/v1";
+    import.meta.env.VITE_API_BASE_URL || "https://ancerlarins.com/api/v1";
 
   // Default contact info fallback
   const getDefaultContactInfo = (): ContactInfo => ({
@@ -151,14 +153,14 @@ const Contact: React.FC = () => {
     try {
       // Try to fetch contact information
       try {
-        console.log("🔄 Trying to fetch contact info...");
+        // Fetching contact info from API
         const contactResponse = await fetch(
           `${API_BASE_URL}/company/contact-info`
         );
 
         if (contactResponse.ok) {
           const contactData = await contactResponse.json();
-          console.log("✅ Contact info loaded from API:", contactData);
+          // Contact info loaded successfully
           setContactInfo(contactData);
         } else if (contactResponse.status === 404) {
           console.warn(
@@ -458,9 +460,12 @@ const Contact: React.FC = () => {
         if (!/\S+@\S+\.\S+/.test(value)) return 'Please enter a valid email address';
         return undefined;
       case 'phone':
-        if (!value.trim()) return 'Phone number is required';
-        if (!/^[\+]?[1-9][\d]{0,15}$/.test(value.replace(/\s/g, ''))) return 'Please enter a valid phone number';
-        return undefined;
+        const phoneValidation = validatePhoneForForm(value, {
+          required: true,
+          allowInternational: true,
+          preferNigerian: true
+        });
+        return phoneValidation.error;
       case 'subject':
         return !value.trim() ? 'Subject is required' : undefined;
       case 'inquiryType':
@@ -972,32 +977,16 @@ const Contact: React.FC = () => {
                         {errors.email}
                       </FormErrorMessage>
                     </FormControl>
-                    <FormControl isRequired isInvalid={!!errors.phone}>
-                      <FormLabel fontWeight="600" color="gray.700">
-                        Phone
-                      </FormLabel>
-                      <Input
-                        value={formData.phone}
-                        onChange={(e) =>
-                          handleInputChange("phone", e.target.value)
-                        }
-                        placeholder="Enter your phone number"
-                        borderWidth="2px"
-                        borderColor="gray.200"
-                        _focus={{
-                          borderColor: "brand.400",
-                          boxShadow: "0 0 0 1px #C2185B",
-                        }}
-                        _hover={{ borderColor: "brand.300" }}
-                        borderRadius="xl"
-                        fontSize="md"
-                        fontWeight="500"
-                        type="tel"
-                      />
-                      <FormErrorMessage fontWeight="600">
-                        {errors.phone}
-                      </FormErrorMessage>
-                    </FormControl>
+                    <PhoneNumberInput
+                      label="Phone"
+                      value={formData.phone}
+                      onChange={(value) => handleInputChange("phone", value)}
+                      placeholder="801 234 5678"
+                      isRequired={true}
+                      isInvalid={!!errors.phone}
+                      errorMessage={errors.phone}
+                      borderColor="gray.200"
+                    />
                     <FormControl isRequired isInvalid={!!errors.subject}>
                       <FormLabel fontWeight="600" color="gray.700">
                         Subject

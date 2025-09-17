@@ -95,7 +95,7 @@ const Footer: React.FC = () => {
               <Text color="white">Phone: +234 706 332 5184</Text>
               <Text color="white">Email: care@royalhealthconsult.com</Text>
               <Text color="white">
-                Address: 4 Barthlomew Ezeogu Street, Lagos, Nigeria
+                Address: 4 Barthlomew Ezeogu Street, Oke Alfa, Isolo, Lagos, Nigeria
               </Text>
             </VStack>
           </VStack>
@@ -106,7 +106,7 @@ const Footer: React.FC = () => {
               Follow Us
             </Heading>
             <HStack spacing={4}>
-              <Link href="https://facebook.com" isExternal>
+              <Link href="https://www.facebook.com/profile.php?id=61579018860340" isExternal>
                 <Icon
                   as={FaFacebook}
                   boxSize={6}
@@ -122,7 +122,7 @@ const Footer: React.FC = () => {
                   _hover={{ color: "purple.200" }}
                 />
               </Link>
-              <Link href="https://instagram.com" isExternal>
+              <Link href="https://www.instagram.com/theroyalhealthconsult" isExternal>
                 <Icon
                   as={FaInstagram}
                   boxSize={6}

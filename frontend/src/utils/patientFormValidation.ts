@@ -1,12 +1,11 @@
 // src/utils/patientFormValidation.ts
 
 import { PatientInformation, PatientFormErrors } from '../types/patient.types'
+import { validatePhone, formatNigerianPhone } from './phoneValidation'
 
 export const validateNigerianPhoneNumber = (phone: string): boolean => {
-  // Remove spaces and check Nigerian phone format
-  const cleanPhone = phone.replace(/\s/g, '')
-  const nigerianPhoneRegex = /^(\+234|0)[7-9][0-1]\d{8}$/
-  return nigerianPhoneRegex.test(cleanPhone)
+  const validation = validatePhone(phone, false) // Nigerian only
+  return validation.isValid && validation.type === 'nigerian'
 }
 
 export const validateEmail = (email: string): boolean => {
@@ -97,22 +96,7 @@ export const calculateAge = (dateOfBirth: string): number | null => {
 }
 
 export const formatPhoneNumber = (phone: string): string => {
-  // Remove all non-digits
-  const digits = phone.replace(/\D/g, '')
-  
-  // If starts with 234, format as +234
-  if (digits.startsWith('234')) {
-    return `+234 ${digits.slice(3, 6)} ${digits.slice(6, 9)} ${digits.slice(9)}`
-  }
-  
-  // If starts with 0, replace with +234
-  if (digits.startsWith('0')) {
-    const withoutZero = digits.slice(1)
-    return `+234 ${withoutZero.slice(0, 3)} ${withoutZero.slice(3, 6)} ${withoutZero.slice(6)}`
-  }
-  
-  // Return as is if doesn't match expected patterns
-  return phone
+  return formatNigerianPhone(phone)
 }
 
 export const sanitizeFormData = (formData: PatientInformation): PatientInformation => {

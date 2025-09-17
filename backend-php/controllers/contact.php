@@ -85,9 +85,16 @@ function handleContactSubmit() {
             // Continue execution - we'll still return success even if DB fails
         }
         
-        // Send email notification to admin
+        // Send email notification using new EmailService
         try {
-            sendAdminNotification($input, $referenceId);
+            require_once '../utils/email.php';
+            $contactData = array_merge($messageData, [
+                'reference_id' => $referenceId,
+                'first_name' => trim($input['firstName']),
+                'last_name' => trim($input['lastName']),
+                'inquiry_type' => trim($input['inquiryType'])
+            ]);
+            EmailService::sendContactNotification($contactData);
         } catch (Exception $emailError) {
             error_log("Email notification failed: " . $emailError->getMessage());
             // Continue execution - we'll still return success even if email fails

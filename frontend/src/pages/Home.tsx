@@ -83,9 +83,18 @@ const Home: React.FC = () => {
           loop
           muted
           playsInline
-          onError={(e) => console.log("Video error:", e)}
-          onLoadStart={() => console.log("Video loading started")}
-          onCanPlay={() => console.log("Video can play")}
+          onError={(e) => {
+            // Handle video loading error gracefully
+            if (process.env.NODE_ENV === 'development') {
+              console.warn("Video loading failed:", e)
+            }
+          }}
+          onLoadStart={() => {
+            // Video loading started
+          }}
+          onCanPlay={() => {
+            // Video is ready to play
+          }}
           style={{
             width: "100%",
             height: "100%",
@@ -203,7 +212,7 @@ const Home: React.FC = () => {
                     size="lg"
                     bgGradient="linear(45deg, brand.500, purple.500)"
                     color="white"
-                    onClick={() => navigate("/booking")}
+                    onClick={() => navigate("/consultation")}
                     className="hover-lift pulse-animation"
                     px={8}
                     py={6}

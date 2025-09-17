@@ -19,7 +19,12 @@ import {
   AlertDescription,
   Flex,
   SimpleGrid,
+  Fade,
+  ScaleFade,
+  useBreakpointValue,
+  Tooltip,
 } from '@chakra-ui/react'
+import { keyframes } from '@emotion/react'
 import {
   FaCheckCircle,
   FaCalendarAlt,
@@ -49,7 +54,7 @@ interface BookingConfirmationProps {
   selectedService: BookingService
   selectedSchedule: ScheduleData
   patientInfo: PatientInformation
-  paymentResult: PaymentResult
+  paymentResult: PaymentResult | null
 }
 
 export interface AssessmentBookingDetails {
@@ -71,6 +76,59 @@ export interface AssessmentBookingDetails {
   }
 }
 
+// Animation keyframes
+const pulseRing = keyframes`
+  0% {
+    transform: scale(0.33);
+  }
+  40%, 50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.33);
+  }
+`
+
+const bounceIn = keyframes`
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+`
+
+const slideInFromLeft = keyframes`
+  0% {
+    transform: translateX(-100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+`
+
+const slideInFromRight = keyframes`
+  0% {
+    transform: translateX(100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+`
+
 const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
   selectedService,
   selectedSchedule,
@@ -80,6 +138,7 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
   const cardBg = useColorModeValue('white', 'gray.800')
   const borderColor = useColorModeValue('gray.200', 'gray.600')
   const navigate = useNavigate()
+  const isMobile = useBreakpointValue({ base: true, md: false })
 
   // Generate mock healthcare professional data since it's not in ScheduleData
   const generateMockProfessional = () => {
@@ -102,7 +161,7 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
   const assessmentDetails: AssessmentBookingDetails = {
     bookingId: `RHC-${Date.now().toString().slice(-6)}`,
     confirmationCode: `ASS${mockProfessional.name.split(' ')[1].slice(0, 3).toUpperCase()}${Date.now().toString().slice(-4)}`,
-    status: paymentResult.method === 'cash' ? 'pending' : 'confirmed',
+    status: paymentResult ? (paymentResult.method === 'cash' ? 'pending' : 'confirmed') : 'pending',
     createdAt: new Date().toISOString(),
     estimatedArrival: calculateEstimatedArrival(),
     assessmentInstructions: generateAssessmentPreparationInstructions(),
@@ -238,7 +297,6 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
 ROYAL HEALTH CONSULT - ASSESSMENT RECEIPT
 =========================================
 Booking ID: ${assessmentDetails.bookingId}
-Confirmation Code: ${assessmentDetails.confirmationCode}
 
 ASSESSMENT DETAILS:
 Assessment Type: ${selectedService.name}
@@ -250,9 +308,12 @@ Healthcare Professional: ${assessmentDetails.assignedProfessional.name}
 
 PAYMENT INFORMATION:
 Assessment Fee: ${formatPrice(ASSESSMENT_PRICE)}
-Payment Method: ${paymentResult.method.toUpperCase()}
+${paymentResult ?
+  `Payment Method: ${paymentResult.method.toUpperCase()}
 Transaction ID: ${paymentResult.transactionId}
-Payment Status: ${paymentResult.status.toUpperCase()}
+Payment Status: ${paymentResult.status.toUpperCase()}` :
+  `Payment: To be discussed during consultation
+Payment will be arranged with the healthcare professional upon service delivery.`}
 
 LOCATION:
 Address: ${selectedSchedule.address.street}, ${selectedSchedule.address.state}
@@ -282,12 +343,12 @@ Email: support@royalhealthconsult.ng
     navigate('/')
   }
 
-  const handleViewDashboard = () => {
+  /* const handleViewDashboard = () => {
     navigate('/dashboard')
   }
-
+ */
   const handleBookAnother = () => {
-    navigate('/booking')
+    navigate('/consultation')
   }
 
   const handleAddToCalendar = () => {
@@ -313,7 +374,7 @@ Email: support@royalhealthconsult.ng
       title: `Health Assessment - ${selectedService.name}`,
       start: appointmentDate.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''),
       end: endDate.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''),
-      description: `Health Assessment with ${assessmentDetails.assignedProfessional.name}\\n\\nService: ${selectedService.name}\\nConfirmation Code: ${assessmentDetails.confirmationCode}\\nLocation: ${selectedSchedule.address.street}, ${selectedSchedule.address.city}\\n\\nContact: ${assessmentDetails.emergencyContact}`,
+      description: `Health Assessment with ${assessmentDetails.assignedProfessional.name}\\n\\nService: ${selectedService.name}\\nBooking ID: ${assessmentDetails.bookingId}\\nLocation: ${selectedSchedule.address.street}, ${selectedSchedule.address.city}\\n\\nContact: ${assessmentDetails.emergencyContact}`,
       location: `${selectedSchedule.address.street}, ${selectedSchedule.address.city}, ${selectedSchedule.address.state}`
     }
     
@@ -323,154 +384,150 @@ Email: support@royalhealthconsult.ng
   }
 
   return (
-    <Container maxW="4xl" py={8}>
-      <VStack spacing={8} align="stretch">
-        {/* Success Header */}
-        <Box
-          position="relative"
-          bg="rgba(255, 255, 255, 0.9)"
-          backdropFilter="blur(20px)"
-          borderRadius="3xl"
-          p={10}
-          border="1px solid"
-          borderColor="rgba(34, 197, 94, 0.2)"
-          boxShadow="0 8px 32px rgba(34, 197, 94, 0.15)"
-          _before={{
-            content: '""',
-            position: "absolute",
-            inset: 0,
-            borderRadius: "3xl",
-            padding: "1px",
-            background: "linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(16, 185, 129, 0.3))",
-            mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-            maskComposite: "xor",
-            WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-            WebkitMaskComposite: "xor",
-          }}
-        >
-          <VStack spacing={8} textAlign="center">
+    <Box minH="100vh" bg="linear-gradient(135deg, rgba(251, 251, 254, 1) 0%, rgba(243, 244, 255, 1) 50%, rgba(238, 242, 255, 1) 100%)">
+      <Container maxW="6xl" py={{ base: 6, md: 12 }}>
+        <VStack spacing={{ base: 6, md: 10 }} align="stretch">
+          {/* Enhanced Success Header with Animations */}
+          <Fade in={true} transition={{ enter: { duration: 0.8 } }}>
             <Box
-              w={24}
-              h={24}
-              bgGradient="linear(45deg, green.500, emerald.500)"
-              borderRadius="full"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              boxShadow="0 8px 25px rgba(34, 197, 94, 0.4)"
               position="relative"
+              bg="rgba(255, 255, 255, 0.95)"
+              backdropFilter="blur(30px)"
+              borderRadius="3xl"
+              p={{ base: 6, md: 12 }}
+              border="1px solid"
+              borderColor="rgba(34, 197, 94, 0.2)"
+              boxShadow="0 20px 60px rgba(34, 197, 94, 0.15), 0 8px 25px rgba(0, 0, 0, 0.05)"
+              overflow="hidden"
               _before={{
                 content: '""',
                 position: "absolute",
-                w: 28,
-                h: 28,
-                bgGradient: "linear(45deg, green.300, emerald.300)",
-                borderRadius: "full",
-                opacity: 0.3,
-                zIndex: -1,
+                inset: 0,
+                borderRadius: "3xl",
+                padding: "2px",
+                background: "linear-gradient(135deg, rgba(34, 197, 94, 0.4), rgba(16, 185, 129, 0.3), rgba(59, 130, 246, 0.2))",
+                mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                maskComposite: "xor",
+                WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                WebkitMaskComposite: "xor",
+              }}
+              _after={{
+                content: '""',
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: "radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.03) 0%, transparent 70%)",
+                borderRadius: "3xl",
+                zIndex: 0,
               }}
             >
-              <Icon as={FaCheckCircle} color="white" fontSize="4xl" />
-            </Box>
-            
-            <VStack spacing={4}>
-              <Heading 
-                size="2xl" 
-                bgGradient="linear(45deg, green.600, emerald.600)"
-                bgClip="text"
-                sx={{
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                  filter: "drop-shadow(0 2px 4px rgba(34, 197, 94, 0.2))",
-                }}
-                fontWeight="900"
-              >
-                {paymentResult.method === 'cash' ? 'Health Assessment Scheduled!' : 'Health Assessment Confirmed!'}
-              </Heading>
-              <Text 
-                color="gray.700" 
-                fontSize="lg"
-                fontWeight="500"
-                maxW="600px"
-                lineHeight="1.6"
-              >
-                {paymentResult.method === 'cash' 
-                  ? 'Your health assessment is scheduled with our qualified healthcare professionals. Payment will be collected after the assessment.'
-                  : 'Your payment has been processed successfully and your assessment appointment is confirmed with our qualified healthcare professionals.'
-                }
-              </Text>
-            </VStack>
-
-            {/* Enhanced Confirmation Code */}
-            <Card 
-              bg="rgba(34, 197, 94, 0.08)" 
-              borderColor="rgba(34, 197, 94, 0.3)" 
-              borderWidth="2px"
-              borderRadius="2xl"
-              boxShadow="0 4px 20px rgba(34, 197, 94, 0.1)"
-            >
-              <CardBody p={8} textAlign="center">
-                <VStack spacing={4}>
-                  <HStack spacing={3}>
+              <VStack spacing={{ base: 6, md: 10 }} textAlign="center" position="relative" zIndex={1}>
+                {/* Animated Success Icon */}
+                <ScaleFade in={true} initialScale={0.3} transition={{ enter: { duration: 1, delay: 0.3 } }}>
+                  <Box position="relative">
+                    {/* Pulsing ring animation */}
                     <Box
-                      w="30px"
-                      h="30px"
+                      position="absolute"
+                      w={32}
+                      h={32}
+                      borderRadius="full"
+                      bg="rgba(34, 197, 94, 0.2)"
+                      animation={`${pulseRing} 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite`}
+                      top="50%"
+                      left="50%"
+                      transform="translate(-50%, -50%)"
+                    />
+                    <Box
+                      w={{ base: 20, md: 28 }}
+                      h={{ base: 20, md: 28 }}
                       bgGradient="linear(45deg, green.500, emerald.500)"
-                      borderRadius="lg"
+                      borderRadius="full"
                       display="flex"
                       alignItems="center"
                       justifyContent="center"
+                      boxShadow="0 15px 40px rgba(34, 197, 94, 0.4), 0 5px 15px rgba(0, 0, 0, 0.1)"
+                      position="relative"
+                      animation={`${bounceIn} 1s ease-out 0.5s both`}
+                      _before={{
+                        content: '""',
+                        position: "absolute",
+                        w: { base: 24, md: 32 },
+                        h: { base: 24, md: 32 },
+                        bgGradient: "linear(45deg, green.300, emerald.300)",
+                        borderRadius: "full",
+                        opacity: 0.3,
+                        zIndex: -1,
+                      }}
                     >
-                      <Icon as={FaReceipt} color="white" fontSize="sm" />
+                      <Icon as={FaCheckCircle} color="white" fontSize={{ base: "3xl", md: "5xl" }} />
                     </Box>
-                    <Text 
-                      fontSize="sm" 
-                      bgGradient="linear(45deg, green.600, emerald.600)"
+                  </Box>
+                </ScaleFade>
+            
+                {/* Enhanced Title and Description */}
+                <Fade in={true} transition={{ enter: { duration: 0.6, delay: 0.8 } }}>
+                  <VStack spacing={{ base: 3, md: 6 }}>
+                    <Heading
+                      size={{ base: "xl", md: "3xl" }}
+                      bgGradient="linear(45deg, green.600, emerald.600, blue.600)"
                       bgClip="text"
                       sx={{
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
                         backgroundClip: "text",
+                        filter: "drop-shadow(0 2px 6px rgba(34, 197, 94, 0.3))",
                       }}
-                      fontWeight="700"
+                      fontWeight="900"
+                      textAlign="center"
+                      lineHeight="1.2"
                     >
-                      ASSESSMENT CONFIRMATION CODE
+                      {paymentResult ? (paymentResult.method === 'cash' ? 'Health Assessment Scheduled!' : 'Health Assessment Confirmed!') : 'Health Assessment Scheduled!'}
+                    </Heading>
+                    <Text
+                      color="gray.700"
+                      fontSize={{ base: "md", md: "xl" }}
+                      fontWeight="500"
+                      maxW={{ base: "90%", md: "700px" }}
+                      lineHeight="1.7"
+                      textAlign="center"
+                    >
+                      {paymentResult ?
+                        (paymentResult.method === 'cash'
+                          ? 'Your health assessment is scheduled with our qualified healthcare professionals. Payment will be collected after the assessment.'
+                          : 'Your payment has been processed successfully and your assessment appointment is confirmed with our qualified healthcare professionals.'
+                        ) :
+                        'Your health assessment is scheduled with our qualified healthcare professionals. Payment details will be discussed during the consultation.'
+                      }
                     </Text>
-                  </HStack>
-                  <Badge
-                    bgGradient="linear(45deg, green.500, emerald.500)"
-                    color="white"
-                    fontSize="2xl" 
-                    fontWeight="bold"
-                    letterSpacing="wider"
-                    px={6}
-                    py={3}
-                    borderRadius="xl"
-                  >
-                    {assessmentDetails.confirmationCode}
-                  </Badge>
-                  <Text fontSize="xs" color="gray.600" fontWeight="500">
-                    Please save this code for your records and reference
-                  </Text>
-                </VStack>
-              </CardBody>
-            </Card>
-          </VStack>
-        </Box>
+                  </VStack>
+                </Fade>
 
-        <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={8}>
-          {/* Assessment Details */}
-          <VStack spacing={6} align="stretch">
-            <Card 
-              bg="rgba(255, 255, 255, 0.85)"
-              backdropFilter="blur(15px)"
+              </VStack>
+            </Box>
+          </Fade>
+
+      {/* Enhanced Content Grid with Staggered Animations */}
+      <SimpleGrid columns={{ base: 1, xl: 2 }} spacing={{ base: 6, md: 10 }} w="full">
+        {/* Left Column - Assessment Details */}
+        <Box animation={`${slideInFromLeft} 0.8s ease-out 1.5s both`}>
+          <VStack spacing={{ base: 4, md: 8 }} align="stretch">
+            <Card
+              bg="rgba(255, 255, 255, 0.95)"
+              backdropFilter="blur(25px)"
               borderColor="rgba(194, 24, 91, 0.2)"
               borderWidth="2px"
-              borderRadius="2xl"
-              boxShadow="0 4px 20px rgba(194, 24, 91, 0.08)"
+              borderRadius="3xl"
+              boxShadow="0 10px 35px rgba(194, 24, 91, 0.12), 0 4px 15px rgba(0, 0, 0, 0.05)"
+              overflow="hidden"
+              _hover={{
+                transform: "translateY(-4px)",
+                boxShadow: "0 20px 50px rgba(194, 24, 91, 0.18), 0 8px 25px rgba(0, 0, 0, 0.08)",
+              }}
+              transition="all 0.3s ease-in-out"
             >
-              <CardBody p={8}>
+              <CardBody p={{ base: 6, md: 10 }}>
                 <VStack spacing={8} align="start">
                   <HStack spacing={4}>
                     <Box
@@ -645,26 +702,40 @@ Email: support@royalhealthconsult.ng
                       <Text fontWeight="600">{formatPrice(ASSESSMENT_PRICE)}</Text>
                     </HStack>
                     
-                    <HStack justify="space-between" w="full">
-                      <Text>Payment Method</Text>
-                      <Badge colorScheme={paymentResult.method === 'cash' ? 'orange' : 'green'}>
-                        {paymentResult.method.replace('_', ' ').toUpperCase()}
-                      </Badge>
-                    </HStack>
-                    
-                    <HStack justify="space-between" w="full">
-                      <Text>Transaction ID</Text>
-                      <Text fontSize="sm" color="gray.600">
-                        {paymentResult.transactionId}
-                      </Text>
-                    </HStack>
-                    
-                    <HStack justify="space-between" w="full">
-                      <Text>Status</Text>
-                      <Badge colorScheme={paymentResult.status === 'success' ? 'green' : 'yellow'}>
-                        {paymentResult.status.toUpperCase()}
-                      </Badge>
-                    </HStack>
+                    {paymentResult ? (
+                      <>
+                        <HStack justify="space-between" w="full">
+                          <Text>Payment Method</Text>
+                          <Badge colorScheme={paymentResult.method === 'cash' ? 'orange' : 'green'}>
+                            {paymentResult.method.replace('_', ' ').toUpperCase()}
+                          </Badge>
+                        </HStack>
+
+                        <HStack justify="space-between" w="full">
+                          <Text>Transaction ID</Text>
+                          <Text fontSize="sm" color="gray.600">
+                            {paymentResult.transactionId}
+                          </Text>
+                        </HStack>
+
+                        <HStack justify="space-between" w="full">
+                          <Text>Status</Text>
+                          <Badge colorScheme={paymentResult.status === 'success' ? 'green' : 'yellow'}>
+                            {paymentResult.status.toUpperCase()}
+                          </Badge>
+                        </HStack>
+                      </>
+                    ) : (
+                      <VStack spacing={2} w="full" p={4} bg="blue.50" borderRadius="lg" border="2px solid" borderColor="blue.200">
+                        <Text fontSize="sm" fontWeight="600" color="blue.700" textAlign="center">
+                          Payment Discussion Scheduled
+                        </Text>
+                        <Text fontSize="xs" color="blue.600" textAlign="center" lineHeight="1.4">
+                          Payment details will be discussed with the healthcare professional during your consultation.
+                          Multiple payment options will be available.
+                        </Text>
+                      </VStack>
+                    )}
 
                     <Divider />
 
@@ -725,9 +796,11 @@ Email: support@royalhealthconsult.ng
               </CardBody>
             </Card>
           </VStack>
+        </Box>
 
-          {/* Instructions & Next Steps */}
-          <VStack spacing={6} align="stretch">
+        {/* Right Column - Instructions & Next Steps */}
+        <Box animation={`${slideInFromRight} 0.8s ease-out 1.8s both`}>
+          <VStack spacing={{ base: 4, md: 8 }} align="stretch">
             {/* Preparation Instructions */}
             <Card 
               bg="rgba(255, 255, 255, 0.85)"
@@ -953,123 +1026,168 @@ Email: support@royalhealthconsult.ng
                     <Text>• SMS reminders will be sent 24h and 2h before assessment</Text>
                     <Text>• Healthcare professional will call 30 minutes before arrival</Text>
                     <Text>• {assessmentDetails.followUpInfo}</Text>
-                    {paymentResult.method === 'cash' && (
+                    {paymentResult && paymentResult.method === 'cash' && (
                       <Text>• Please have exact amount ready: {formatPrice(ASSESSMENT_PRICE)}</Text>
+                    )}
+                    {!paymentResult && (
+                      <Text>• Payment will be discussed and arranged during your consultation</Text>
                     )}
                   </VStack>
                 </AlertDescription>
               </Box>
             </Alert>
 
-            {/* Action Buttons */}
-            <VStack spacing={4}>
-              <Button
+            {/* Enhanced Action Buttons */}
+            <VStack spacing={{ base: 3, md: 6 }}>
+            {/*   <Button
                 leftIcon={<FaHome />}
                 bgGradient="linear(45deg, brand.500, purple.500)"
                 color="white"
-                size="lg"
+                size={{ base: "md", md: "lg" }}
                 onClick={handleViewDashboard}
                 w="full"
                 _hover={{
                   bgGradient: "linear(45deg, brand.600, purple.600)",
-                  transform: "translateY(-2px)",
-                  boxShadow: "0 8px 25px rgba(194, 24, 91, 0.3)"
+                  transform: "translateY(-3px)",
+                  boxShadow: "0 12px 35px rgba(194, 24, 91, 0.35)"
                 }}
                 _active={{
-                  transform: "translateY(0px)"
+                  transform: "translateY(-1px)"
                 }}
-                transition="all 0.3s"
-                borderRadius="xl"
-                h={12}
-                fontWeight="600"
-                fontSize="lg"
+                transition="all 0.3s ease-in-out"
+                borderRadius="2xl"
+                h={{ base: 10, md: 14 }}
+                fontWeight="700"
+                fontSize={{ base: "md", md: "lg" }}
+                boxShadow="0 6px 20px rgba(194, 24, 91, 0.2)"
               >
                 View Dashboard & Track Appointment
-              </Button>
+              </Button> */}
 
               <Button
                 leftIcon={<FaCalendarPlus />}
                 bgGradient="linear(45deg, purple.500, blue.500)"
                 color="white"
-                size="lg"
+                size={{ base: "md", md: "lg" }}
                 onClick={handleAddToCalendar}
                 w="full"
                 _hover={{
                   bgGradient: "linear(45deg, purple.600, blue.600)",
-                  transform: "translateY(-2px)",
-                  boxShadow: "0 8px 25px rgba(147, 51, 234, 0.3)"
+                  transform: "translateY(-3px)",
+                  boxShadow: "0 12px 35px rgba(147, 51, 234, 0.35)"
                 }}
                 _active={{
-                  transform: "translateY(0px)"
+                  transform: "translateY(-1px)"
                 }}
-                transition="all 0.3s"
-                borderRadius="xl"
-                h={12}
-                fontWeight="600"
-                fontSize="lg"
+                transition="all 0.3s ease-in-out"
+                borderRadius="2xl"
+                h={{ base: 10, md: 14 }}
+                fontWeight="700"
+                fontSize={{ base: "md", md: "lg" }}
+                boxShadow="0 6px 20px rgba(147, 51, 234, 0.2)"
               >
                 Add to Google Calendar
               </Button>
-              
-              <HStack spacing={4} w="full">
+
+              <Flex
+                direction={{ base: "column", sm: "row" }}
+                gap={{ base: 3, sm: 4 }}
+                w="full"
+              >
                 <Button
-                  bgGradient="linear(45deg, green.500, emerald.500)"
+                  bg="green.500"
                   color="white"
                   onClick={handleBookAnother}
                   flex={1}
+                  size={{ base: "md", md: "lg" }}
                   _hover={{
-                    bgGradient: "linear(45deg, green.600, emerald.600)",
-                    transform: "translateY(-1px)",
-                    boxShadow: "0 4px 15px rgba(34, 197, 94, 0.3)"
+                    bg: "green.600",
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 8px 25px rgba(34, 197, 94, 0.4)"
                   }}
                   _active={{
                     transform: "translateY(0px)"
                   }}
-                  transition="all 0.2s"
-                  borderRadius="lg"
-                  h={10}
-                  fontWeight="500"
+                  transition="all 0.3s ease-in-out"
+                  borderRadius="xl"
+                  borderWidth="2px"
+                  borderColor="green.300"
+                  h={{ base: 12, md: 14 }}
+                  fontWeight="800"
+                  fontSize={{ base: "md", md: "lg" }}
+                  boxShadow="0 6px 20px rgba(34, 197, 94, 0.3)"
+                  minW={{ base: "auto", sm: "180px" }}
+                  px={{ base: 4, md: 6 }}
+                  textShadow="0 2px 4px rgba(0, 0, 0, 0.5)"
+                  whiteSpace="nowrap"
+                  overflow="visible"
+                  sx={{
+                    textTransform: "none",
+                    letterSpacing: "0.5px"
+                  }}
                 >
                   Book Another Assessment
                 </Button>
                 <Button
-                  bgGradient="linear(45deg, blue.500, purple.500)"
+                  bg="blue.500"
                   color="white"
                   onClick={handleGoHome}
                   flex={1}
+                  size={{ base: "md", md: "lg" }}
                   _hover={{
-                    bgGradient: "linear(45deg, blue.600, purple.600)",
-                    transform: "translateY(-1px)",
-                    boxShadow: "0 4px 15px rgba(59, 130, 246, 0.3)"
+                    bg: "blue.600",
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 8px 25px rgba(59, 130, 246, 0.4)"
                   }}
                   _active={{
                     transform: "translateY(0px)"
                   }}
-                  transition="all 0.2s"
-                  borderRadius="lg"
-                  h={10}
-                  fontWeight="500"
+                  transition="all 0.3s ease-in-out"
+                  borderRadius="xl"
+                  borderWidth="2px"
+                  borderColor="blue.300"
+                  h={{ base: 12, md: 14 }}
+                  fontWeight="800"
+                  fontSize={{ base: "md", md: "lg" }}
+                  boxShadow="0 6px 20px rgba(59, 130, 246, 0.3)"
+                  minW={{ base: "auto", sm: "140px" }}
+                  px={{ base: 4, md: 6 }}
+                  textShadow="0 2px 4px rgba(0, 0, 0, 0.5)"
+                  whiteSpace="nowrap"
+                  overflow="visible"
+                  sx={{
+                    textTransform: "none",
+                    letterSpacing: "0.5px"
+                  }}
                 >
                   Back to Home
                 </Button>
-              </HStack>
+              </Flex>
             </VStack>
           </VStack>
-        </SimpleGrid>
+        </Box>
+      </SimpleGrid>
 
-        {/* SMS/Email Confirmation Notice */}
-        <Alert 
+      {/* Enhanced Final Confirmation Notice */}
+      <Fade in={true} transition={{ enter: { duration: 0.6, delay: 2.5 } }}>
+        <Alert
           status="success"
-          bg="rgba(34, 197, 94, 0.1)"
+          bg="rgba(34, 197, 94, 0.08)"
           borderColor="rgba(34, 197, 94, 0.3)"
           borderWidth="2px"
-          borderRadius="xl"
-          backdropFilter="blur(10px)"
-          boxShadow="0 4px 15px rgba(34, 197, 94, 0.1)"
+          borderRadius="2xl"
+          backdropFilter="blur(15px)"
+          boxShadow="0 8px 25px rgba(34, 197, 94, 0.12), 0 3px 10px rgba(0, 0, 0, 0.05)"
+          p={{ base: 4, md: 6 }}
+          _hover={{
+            transform: "translateY(-2px)",
+            boxShadow: "0 12px 35px rgba(34, 197, 94, 0.18), 0 5px 15px rgba(0, 0, 0, 0.08)",
+          }}
+          transition="all 0.3s ease-in-out"
         >
-          <AlertIcon color="green.600" />
+          <AlertIcon color="green.600" fontSize={{ base: "xl", md: "2xl" }} />
           <Box>
-            <AlertTitle 
+            <AlertTitle
               bgGradient="linear(45deg, green.600, emerald.600)"
               bgClip="text"
               sx={{
@@ -1078,17 +1196,32 @@ Email: support@royalhealthconsult.ng
                 backgroundClip: "text",
               }}
               fontWeight="700"
+              fontSize={{ base: "md", md: "lg" }}
             >
               Confirmation Sent!
             </AlertTitle>
-            <AlertDescription>
-              We've sent comprehensive assessment appointment details to {patientInfo.email} and {patientInfo.phone}. 
-              {patientInfo.consentToSMSUpdates && ' You\'ll receive timely SMS reminders 24 hours and 2 hours before your assessment appointment.'}
+            <AlertDescription fontSize={{ base: "sm", md: "md" }} lineHeight="1.6">
+              We've sent comprehensive assessment appointment details to{" "}
+              <Text as="span" fontWeight="600" color="green.700">
+                {patientInfo.email}
+              </Text>{" "}
+              and{" "}
+              <Text as="span" fontWeight="600" color="green.700">
+                {patientInfo.phone}
+              </Text>
+              .
+              {patientInfo.consentToSMSUpdates && (
+                <Text mt={2}>
+                  📱 You'll receive timely SMS reminders 24 hours and 2 hours before your assessment appointment.
+                </Text>
+              )}
             </AlertDescription>
           </Box>
         </Alert>
-      </VStack>
-    </Container>
+      </Fade>
+    </VStack>
+  </Container>
+</Box>
   )
 }
 

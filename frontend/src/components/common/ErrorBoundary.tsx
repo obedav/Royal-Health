@@ -14,6 +14,15 @@ import {
 } from '@chakra-ui/react';
 import { FaRedo, FaHome } from 'react-icons/fa';
 
+// Type declarations for global error monitoring
+declare global {
+  interface Window {
+    Sentry?: {
+      captureException: (error: Error, context?: any) => void;
+    };
+  }
+}
+
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
@@ -41,16 +50,61 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
-    
+    // Only log to console in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('ErrorBoundary caught an error:', error, errorInfo);
+    }
+
     this.setState({
       error,
       errorInfo,
     });
 
-    // Log error to monitoring service in production
-    if (process.env.NODE_ENV === 'production') {
-      // TODO: Add error reporting service (Sentry, etc.)
+    // Send error to monitoring service in production
+    this.reportError(error, errorInfo);
+  }
+
+  private reportError = (error: Error, errorInfo: ErrorInfo) => {
+    // Report to external monitoring service
+    if (typeof window !== 'undefined') {
+      // Check for Sentry
+      if (window.Sentry) {
+        window.Sentry.captureException(error, {
+          contexts: {
+            react: errorInfo,
+            user: {
+              userAgent: navigator.userAgent,
+              url: window.location.href,
+              timestamp: new Date().toISOString(),
+            }
+          }
+        });
+      }
+
+      // Fallback: Send to our own error logging endpoint
+      this.sendToErrorEndpoint(error, errorInfo);
+    }
+  }
+
+  private sendToErrorEndpoint = async (error: Error, errorInfo: ErrorInfo) => {
+    try {
+      await fetch('/api/errors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: error.message,
+          stack: error.stack,
+          componentStack: errorInfo.componentStack,
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+    } catch (reportingError) {
+      // Silently fail if error reporting fails
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Failed to report error:', reportingError);
+      }
     }
   }
 

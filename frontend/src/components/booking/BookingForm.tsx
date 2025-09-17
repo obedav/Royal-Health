@@ -31,6 +31,8 @@ import { useState } from 'react'
 import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaPhone, FaStethoscope } from 'react-icons/fa'
 import { BookingService, BookingFormData, TimeSlot } from '../../types/booking.types'
 import { NIGERIAN_STATES, PHONE_REGEX, ASSESSMENT_PRICE } from '../../utils/constants'
+import { useBookingStore, useGuestSession } from '../../store/bookingStore'
+import bookingService from '../../services/booking.service'
 
 // Validation schema for assessment booking
 const assessmentBookingSchema = z.object({
@@ -78,13 +80,18 @@ interface BookingFormProps {
   service: BookingService
   onSubmit: (data: BookingFormData) => void
   onBack: () => void
+  allowGuestBooking?: boolean
 }
 
-const BookingForm: React.FC<BookingFormProps> = ({ service, onSubmit, onBack }) => {
+const BookingForm: React.FC<BookingFormProps> = ({ service, onSubmit, onBack, allowGuestBooking = true }) => {
   const [availableTimeSlots, setAvailableTimeSlots] = useState<TimeSlot[]>([])
   const [selectedDate, setSelectedDate] = useState<string>('')
   const [isLoadingSlots, setIsLoadingSlots] = useState(false)
   const toast = useToast()
+
+  // Guest session management
+  const { session, createSession, isGuest } = useGuestSession()
+  const { currentBooking, updateBookingData } = useBookingStore()
 
   const {
     control,
@@ -152,39 +159,64 @@ const BookingForm: React.FC<BookingFormProps> = ({ service, onSubmit, onBack }) 
     }
   }
 
-  const onFormSubmit = (data: AssessmentBookingSchema) => {
-    const formData: BookingFormData = {
-      serviceId: service.id,
-      date: data.date,
-      timeSlot: data.timeSlot,
-      duration: service.duration,
-      patientName: data.patientName,
-      patientAge: data.patientAge,
-      patientGender: data.patientGender,
-      patientPhone: data.patientPhone,
-      patientEmail: data.patientEmail || undefined,
-      medicalCondition: data.currentMedicalConditions,
-      medications: data.currentMedications,
-      allergies: data.knownAllergies,
-      emergencyContact: {
-        name: data.emergencyContactName,
-        phone: data.emergencyContactPhone,
-        relationship: data.emergencyContactRelationship
-      },
-      address: {
-        street: data.street,
-        area: data.area,
-        city: data.city,
-        state: data.state,
-        landmark: data.landmark
-      },
-      specialRequirements: data.specialRequirements,
-      nurseGenderPreference: data.nurseGenderPreference,
-      paymentMethod: data.paymentMethod,
-      totalAmount: ASSESSMENT_PRICE // Fixed ₦5,000 assessment fee
-    }
+  const onFormSubmit = async (data: AssessmentBookingSchema) => {
+    try {
+      // Create guest session if not exists and guest booking is allowed
+      if (allowGuestBooking && !session) {
+        createSession(
+          data.patientPhone,
+          data.patientEmail || undefined,
+          data.patientName
+        )
+      }
 
-    onSubmit(formData)
+      const formData: BookingFormData = {
+        serviceId: service.id,
+        date: data.date,
+        timeSlot: data.timeSlot,
+        duration: service.duration,
+        patientName: data.patientName,
+        patientAge: data.patientAge,
+        patientGender: data.patientGender,
+        patientPhone: data.patientPhone,
+        patientEmail: data.patientEmail || undefined,
+        medicalCondition: data.currentMedicalConditions,
+        medications: data.currentMedications,
+        allergies: data.knownAllergies,
+        emergencyContact: {
+          name: data.emergencyContactName,
+          phone: data.emergencyContactPhone,
+          relationship: data.emergencyContactRelationship
+        },
+        address: {
+          street: data.street,
+          area: data.area,
+          city: data.city,
+          state: data.state,
+          landmark: data.landmark
+        },
+        specialRequirements: data.specialRequirements,
+        nurseGenderPreference: data.nurseGenderPreference,
+        paymentMethod: data.paymentMethod,
+        totalAmount: ASSESSMENT_PRICE // Fixed ₦5,000 assessment fee
+      }
+
+      // Update booking store
+      updateBookingData(formData)
+
+      // Submit booking
+      onSubmit(formData)
+
+    } catch (error) {
+      console.error('Error submitting booking:', error)
+      toast({
+        title: 'Booking Error',
+        description: 'Failed to submit booking. Please try again.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      })
+    }
   }
 
   // Get minimum date (today)
@@ -244,7 +276,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ service, onSubmit, onBack }) 
               >
                 Book Your {service.name}
               </Heading>
-              <Text 
+              <Text
                 color="gray.700"
                 fontSize="lg"
                 fontWeight="500"
@@ -253,6 +285,28 @@ const BookingForm: React.FC<BookingFormProps> = ({ service, onSubmit, onBack }) 
               >
                 Schedule your professional healthcare assessment at home with our qualified healthcare professionals
               </Text>
+              {allowGuestBooking && !isGuest && (
+                <Alert status="info" borderRadius="lg">
+                  <AlertIcon />
+                  <Box>
+                    <AlertTitle>Quick Booking!</AlertTitle>
+                    <AlertDescription fontSize="sm">
+                      Book instantly with just your phone number. No account registration required!
+                    </AlertDescription>
+                  </Box>
+                </Alert>
+              )}
+              {isGuest && session && (
+                <Alert status="success" borderRadius="lg">
+                  <AlertIcon />
+                  <Box>
+                    <AlertTitle>Guest Session Active</AlertTitle>
+                    <AlertDescription fontSize="sm">
+                      Booking as guest user. You can upgrade to a full account later to track all your bookings.
+                    </AlertDescription>
+                  </Box>
+                </Alert>
+              )}
             </VStack>
           </VStack>
         </Box>

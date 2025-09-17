@@ -23,7 +23,10 @@ import {
   ListIcon,
   Flex,
   Wrap,
-  WrapItem
+  WrapItem,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink
 } from '@chakra-ui/react';
 import {
   FaHeart,
@@ -50,7 +53,8 @@ import {
   FaHandsHelping,
   FaUserNurse,
   FaBuilding,
-  FaUserFriends
+  FaUserFriends,
+  FaChevronRight
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
@@ -235,169 +239,172 @@ const About: React.FC = () => {
         `}
       </style>
 
-      {/* Hero Section - Enhanced with Clear Background Image */}
-      <Box 
-        bgImage="url('/images/about-img.jpeg')"
-        bgPosition="center top"
-        bgRepeat="no-repeat"
-        bgSize="cover"
-        color="white" 
-        py={{ base: 20, md: 28 }}
+      {/* Hero Section - Matching Services Page Style */}
+      <Box
+        minH="35vh"
+        bg="brand.600"
+        sx={{
+          backgroundImage: "url('/images/about-img.jpeg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
         position="relative"
-        overflow="hidden"
+        _before={{
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          bg: 'linear-gradient(135deg, rgba(194, 24, 91, 0.2), rgba(139, 69, 19, 0.1))',
+          zIndex: 1,
+        }}
       >
-        {/* Background Decorative Elements */}
-        <Box
-          position="absolute"
-          top="10%"
-          right="10%"
-          w="150px"
-          h="150px"
-          borderRadius="full"
-          bg="whiteAlpha.200"
-          filter="blur(60px)"
-        />
-        <Box
-          position="absolute"
-          bottom="20%"
-          left="15%"
-          w="120px"
-          h="120px"
-          borderRadius="full"
-          bg="whiteAlpha.300"
-          filter="blur(50px)"
-        />
-        
-        <Container maxW="6xl" position="relative" zIndex={2}>
-          <VStack spacing={8} textAlign="center">
-            <Badge 
-              bg="blackAlpha.600"
-              color="white" 
-              px={6} 
-              py={3} 
-              fontSize="md" 
-              borderRadius="full"
-              backdropFilter="blur(10px)"
-              border="2px solid"
-              borderColor="whiteAlpha.500"
-              fontWeight="700"
-              boxShadow="0 8px 25px rgba(0, 0, 0, 0.3)"
-              textShadow="1px 1px 2px rgba(0, 0, 0, 0.8)"
-            >
-              Professional Healthcare Since 2020
-            </Badge>
-            <Heading 
-              size={{ base: "xl", md: "3xl" }} 
-              fontWeight="900"
-              lineHeight="1.1"
-              maxW="5xl"
-              textShadow="3px 3px 8px rgba(0, 0, 0, 0.9), 1px 1px 2px rgba(0, 0, 0, 0.8)"
-              bg="blackAlpha.400"
-              px={6}
-              py={4}
-              borderRadius="2xl"
-              backdropFilter="blur(5px)"
-              color="white"
-            >
-              About{' '}
+        <Container maxW="7xl" position="relative" zIndex={2} py={2}>
+          <VStack spacing={4} align="stretch">
+            {/* Breadcrumb */}
+            <Breadcrumb spacing="8px" separator={<FaChevronRight color="white" />}>
+              <BreadcrumbItem>
+                <BreadcrumbLink
+                  onClick={() => navigate('/')}
+                  color="white"
+                  cursor="pointer"
+                  _hover={{ color: 'brand.200', textDecoration: 'none' }}
+                  fontWeight="600"
+                >
+                  Home
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbItem isCurrentPage>
+                <BreadcrumbLink color="brand.100" fontWeight="600">
+                  About Us
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+            </Breadcrumb>
+
+            {/* Header Section */}
+            <VStack spacing={4} textAlign="center" maxW="800px" mx="auto" py={2}>
+              <Box
+                position="relative"
+                display="inline-block"
+                bg="rgba(255, 255, 255, 0.15)"
+                backdropFilter="blur(20px)"
+                borderRadius="3xl"
+                px={10}
+                py={6}
+                border="1px solid"
+                borderColor="rgba(255, 255, 255, 0.3)"
+                boxShadow="0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.4)"
+              >
+                <Heading size="3xl" fontWeight="900" position="relative" zIndex={2}>
+                  <Text
+                    as="span"
+                    bgGradient="linear(45deg, brand.600, purple.600)"
+                    bgClip="text"
+                    sx={{
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                      filter: 'drop-shadow(0 2px 4px rgba(194, 24, 91, 0.3))',
+                    }}
+                  >
+                    About Royal Health
+                  </Text>{' '}
+                  <Text
+                    as="span"
+                    bgGradient="linear(45deg, brand.700, purple.700)"
+                    bgClip="text"
+                    sx={{
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                      filter: 'drop-shadow(0 2px 4px rgba(123, 31, 162, 0.3))',
+                    }}
+                  >
+                    Consult
+                  </Text>
+                </Heading>
+              </Box>
+
               <Text
-                as="span"
-                textShadow="3px 3px 8px rgba(0, 0, 0, 0.9), 1px 1px 2px rgba(0, 0, 0, 0.8)"
                 color="white"
+                fontSize="xl"
+                lineHeight="1.6"
+                textShadow="1px 1px 2px rgba(0,0,0,0.5)"
               >
-                Royal Health Consult
+                Professional healthcare service provider dedicated to delivering compassionate, reliable, and family-centered care. We are your partner in wellness and care.
               </Text>
-              <br />
-              <Text 
-                as="span" 
-                fontSize={{ base: "xl", md: "2xl" }} 
-                opacity="0.95"
-                textShadow="3px 3px 8px rgba(0, 0, 0, 0.9), 1px 1px 2px rgba(0, 0, 0, 0.8)"
-                color="white"
-              >
-                (RHC)
-              </Text>
-            </Heading>
-            <Text 
-              fontSize={{ base: "lg", md: "xl" }} 
-              maxW="4xl" 
-              opacity={0.95}
-              lineHeight="1.8"
-              fontWeight="500"
-              textShadow="3px 3px 8px rgba(0, 0, 0, 0.9), 1px 1px 2px rgba(0, 0, 0, 0.8)"
-              bg="blackAlpha.400"
-              px={6}
-              py={4}
-              borderRadius="xl"
-              backdropFilter="blur(5px)"
-              color="white"
-            >
-              A professional nursing and healthcare service provider dedicated to delivering 
-              compassionate, reliable, and family-centered care. We are your partner in wellness and care.
-            </Text>
-            <HStack spacing={6} flexWrap="wrap" justify="center">
-              <Button 
-                size="xl" 
-                bg="white" 
-                color="brand.600" 
-                border="2px solid"
-                borderColor="white"
-                _hover={{ 
-                  bg: "brand.600", 
-                  color: "white",
-                  transform: "translateY(-3px)",
-                  boxShadow: "0 12px 35px rgba(194, 24, 91, 0.4)"
-                }}
-                _focus={{
-                  boxShadow: "0 0 0 3px rgba(255, 255, 255, 0.5)",
-                  outline: "none"
-                }}
-                leftIcon={<FaCalendarAlt />}
-                boxShadow="0 8px 25px rgba(0, 0, 0, 0.3)"
-                transition="all 0.3s ease-in-out"
-                onClick={() => navigate('/booking')}
-                borderRadius="xl"
-                px={8}
-                py={6}
-                fontSize="lg"
-                fontWeight="800"
-                aria-label="Book a healthcare assessment appointment"
-                className="animate-on-hover"
-              >
-                Book Assessment
-              </Button>
-              <Button 
-                size="xl" 
-                variant="outline" 
-                borderColor="white" 
-                borderWidth="3px"
-                color="white"
-                bg="blackAlpha.300"
-                backdropFilter="blur(5px)"
-                _hover={{ 
-                  bg: "white", 
-                  color: "brand.600",
-                  transform: "translateY(-3px)",
-                  boxShadow: "0 12px 35px rgba(255, 255, 255, 0.4)"
-                }}
-                _focus={{
-                  boxShadow: "0 0 0 3px rgba(255, 255, 255, 0.5)",
-                  outline: "none"
-                }}
-                transition="all 0.3s ease-in-out"
-                onClick={() => navigate('/contact')}
-                borderRadius="xl"
-                px={8}
-                py={6}
-                fontSize="lg"
-                fontWeight="700"
-                textShadow="2px 2px 4px rgba(0, 0, 0, 0.8)"
-                boxShadow="0 8px 25px rgba(0, 0, 0, 0.3)"
-                aria-label="Contact Royal Health Consult"
-              >
-                Contact Us
-              </Button>
-            </HStack>
+
+              {/* Quick Action Buttons */}
+              <HStack spacing={4} flexWrap="wrap" justify="center" pt={4}>
+                <Button
+                  size="lg"
+                  bg="white"
+                  color="brand.600"
+                  rightIcon={<FaCalendarAlt />}
+                  onClick={() => navigate('/services?category=assessments')}
+                  px={8}
+                  py={6}
+                  fontSize="lg"
+                  fontWeight="700"
+                  borderRadius="xl"
+                  boxShadow="0 4px 14px rgba(0,0,0,0.3)"
+                  _hover={{
+                    bg: 'brand.50',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 25px rgba(0,0,0,0.4)',
+                  }}
+                  transition="all 0.2s ease-in-out"
+                >
+                  Book Consultation
+                </Button>
+
+                <Button
+                  size="lg"
+                  variant="outline"
+                  borderColor="white"
+                  color="white"
+                  rightIcon={<FaPhone />}
+                  onClick={() => navigate('/contact')}
+                  px={8}
+                  py={6}
+                  fontSize="lg"
+                  fontWeight="700"
+                  borderRadius="xl"
+                  _hover={{
+                    bg: 'rgba(255,255,255,0.1)',
+                    transform: 'translateY(-2px)',
+                  }}
+                  transition="all 0.2s ease-in-out"
+                >
+                  Contact Us
+                </Button>
+              </HStack>
+
+              {/* Stats */}
+              <HStack spacing={8} pt={4}>
+                {[
+                  { number: '200+', label: 'Happy Clients' },
+                  { number: '50+', label: 'Healthcare Professionals' },
+                  { number: '5+', label: 'Years Experience' },
+                ].map((stat, index) => (
+                  <VStack key={index} spacing={1}>
+                    <Text
+                      fontSize="2xl"
+                      fontWeight="900"
+                      color="white"
+                      textShadow="1px 1px 2px rgba(0,0,0,0.5)"
+                    >
+                      {stat.number}
+                    </Text>
+                    <Text fontSize="sm" color="white" fontWeight="600" opacity={0.9}>
+                      {stat.label}
+                    </Text>
+                  </VStack>
+                ))}
+              </HStack>
+            </VStack>
           </VStack>
         </Container>
       </Box>
@@ -1077,7 +1084,7 @@ const About: React.FC = () => {
                     outline: "none"
                   }}
                   transition="all 0.3s ease-in-out"
-                  onClick={() => navigate('/booking')}
+                  onClick={() => navigate('/consultation')}
                   borderRadius="xl"
                   py={6}
                   px={8}

@@ -40,17 +40,20 @@ import {
   FaStethoscope,
 } from "react-icons/fa";
 import { useState, useEffect, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { BookingService } from "../../types/booking.types";
 import { ScheduleData } from "./AppointmentScheduling";
 import { ASSESSMENT_PRICE } from "../../constants/assessments";
-import { PatientInformation } from "../../types/patient.types";
-import { 
-  validatePatientForm, 
+import type { PatientInformation } from "../../types/patient.types";
+import {
+  validatePatientForm,
   isFormValid as validateForm,
   calculateAge,
   formatPhoneNumber,
-  sanitizeFormData 
+  sanitizeFormData
 } from "../../utils/patientFormValidation";
+import { useBookingContext } from "../../context/BookingContext";
+import PhoneNumberInput from "../common/PhoneNumberInput";
 
 interface PatientFormProps {
   selectedService: BookingService;
@@ -67,6 +70,9 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
 }) => {
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
+  const [searchParams] = useSearchParams();
+  const { consultationData, convertConsultationToPatientInfo } = useBookingContext();
+  const [isPreFilled, setIsPreFilled] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState<PatientInformation>({
@@ -102,12 +108,53 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Pre-populate if patient info exists
+  // Pre-populate if patient info exists or coming from consultation
   useEffect(() => {
-    if (patientInfo) {
+    const fromConsultation = searchParams.get('from') === 'consultation';
+
+    if (fromConsultation && consultationData && !isPreFilled) {
+      // Convert consultation data to patient information format
+      const convertedData = convertConsultationToPatientInfo(consultationData);
+
+      // Create patient info with proper structure
+      const preFilledData: PatientInformation = {
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        dateOfBirth: "",
+        gender: "prefer_not_to_say",
+        nationalId: "",
+        medicalHistory: {
+          conditions: [],
+          currentMedications: [],
+          allergies: [],
+          previousSurgeries: [],
+          hospitalizations: [],
+        },
+        emergencyContact: {
+          name: "",
+          relationship: "",
+          phone: "",
+          address: "",
+        },
+        insuranceProvider: "",
+        insuranceNumber: "",
+        preferredLanguage: "English",
+        specialNeeds: "",
+        consentToTreatment: false,
+        consentToDataProcessing: false,
+        consentToSMSUpdates: false,
+        serviceSpecificInfo: {},
+        ...convertedData,
+      };
+
+      setFormData(preFilledData);
+      setIsPreFilled(true);
+    } else if (patientInfo && !isPreFilled) {
       setFormData(patientInfo);
     }
-  }, [patientInfo]);
+  }, [patientInfo, consultationData, searchParams, convertConsultationToPatientInfo, isPreFilled]);
 
   // Common medical conditions for quick selection
   const commonConditions = [
@@ -195,6 +242,14 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
     setErrors(validationErrors);
   }, [validationErrors]);
 
+  // Auto-submit when form becomes valid
+  useEffect(() => {
+    if (isFormValid) {
+      const sanitizedData = sanitizeFormData(formData);
+      onPatientInfoSubmit(sanitizedData);
+    }
+  }, [isFormValid, formData, onPatientInfoSubmit]);
+
   // Update form data
   const updateFormData = (field: string, value: any) => {
     setFormData((prev) => ({
@@ -246,6 +301,36 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
   return (
     <Container maxW="4xl" py={8}>
       <VStack spacing={8} align="stretch">
+        {/* Pre-fill Notification */}
+        {isPreFilled && (
+          <Alert
+            status="success"
+            maxW="800px"
+            mx="auto"
+            borderRadius="2xl"
+            border="3px solid"
+            borderColor="green.300"
+            bg="green.50"
+            boxShadow="0 8px 25px rgba(34, 197, 94, 0.15)"
+            p={6}
+            mb={8}
+          >
+            <AlertIcon boxSize="24px" />
+            <Box>
+              <AlertTitle fontSize="lg" fontWeight="800" color="green.700">
+                Information Pre-filled!
+              </AlertTitle>
+              <AlertDescription
+                fontSize="md"
+                fontWeight="600"
+                color="green.600"
+              >
+                Your basic information has been automatically filled from your consultation request. Please review and complete any missing details.
+              </AlertDescription>
+            </Box>
+          </Alert>
+        )}
+
         {/* Header */}
         <Box
           position="relative"
@@ -404,47 +489,59 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
 
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
                 <FormControl isRequired isInvalid={!!errors.firstName}>
-                  <FormLabel>First Name</FormLabel>
+                  <FormLabel>First Name {isPreFilled && formData.firstName && <Text as="span" fontSize="sm" color="green.600" fontWeight="500">(auto-filled)</Text>}</FormLabel>
                   <Input
                     value={formData.firstName}
                     onChange={(e) =>
                       updateFormData("firstName", e.target.value)
                     }
                     placeholder="Enter your first name"
+                    bg={isPreFilled && formData.firstName ? "green.50" : "white"}
+                    borderColor={isPreFilled && formData.firstName ? "green.200" : "gray.200"}
                   />
                   <FormErrorMessage>{errors.firstName}</FormErrorMessage>
                 </FormControl>
 
                 <FormControl isRequired isInvalid={!!errors.lastName}>
-                  <FormLabel>Last Name</FormLabel>
+                  <FormLabel>Last Name {isPreFilled && formData.lastName && <Text as="span" fontSize="sm" color="green.600" fontWeight="500">(auto-filled)</Text>}</FormLabel>
                   <Input
                     value={formData.lastName}
                     onChange={(e) => updateFormData("lastName", e.target.value)}
                     placeholder="Enter your last name"
+                    bg={isPreFilled && formData.lastName ? "green.50" : "white"}
+                    borderColor={isPreFilled && formData.lastName ? "green.200" : "gray.200"}
                   />
                   <FormErrorMessage>{errors.lastName}</FormErrorMessage>
                 </FormControl>
 
                 <FormControl isRequired isInvalid={!!errors.email}>
-                  <FormLabel>Email Address</FormLabel>
+                  <FormLabel>Email Address {isPreFilled && formData.email && <Text as="span" fontSize="sm" color="green.600" fontWeight="500">(auto-filled)</Text>}</FormLabel>
                   <Input
                     type="email"
                     value={formData.email}
                     onChange={(e) => updateFormData("email", e.target.value)}
                     placeholder="your.email@example.com"
+                    bg={isPreFilled && formData.email ? "green.50" : "white"}
+                    borderColor={isPreFilled && formData.email ? "green.200" : "gray.200"}
                   />
                   <FormErrorMessage>{errors.email}</FormErrorMessage>
                 </FormControl>
 
-                <FormControl isRequired isInvalid={!!errors.phone}>
-                  <FormLabel>Phone Number</FormLabel>
-                  <Input
-                    value={formData.phone}
-                    onChange={(e) => updateFormData("phone", e.target.value)}
-                    placeholder="+234 801 234 5678"
-                  />
-                  <FormErrorMessage>{errors.phone}</FormErrorMessage>
-                </FormControl>
+                <PhoneNumberInput
+                  label={
+                    <>
+                      Phone Number {isPreFilled && formData.phone && <Text as="span" fontSize="sm" color="green.600" fontWeight="500">(auto-filled)</Text>}
+                    </>
+                  }
+                  value={formData.phone}
+                  onChange={(value) => updateFormData("phone", value)}
+                  placeholder="801 234 5678"
+                  isRequired={true}
+                  isInvalid={!!errors.phone}
+                  errorMessage={errors.phone}
+                  bg={isPreFilled && formData.phone ? "green.50" : "white"}
+                  borderColor={isPreFilled && formData.phone ? "green.200" : "gray.200"}
+                />
 
                 <FormControl isRequired isInvalid={!!errors.dateOfBirth}>
                   <FormLabel>Date of Birth</FormLabel>
@@ -732,26 +829,21 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
                   </FormErrorMessage>
                 </FormControl>
 
-                <FormControl
-                  isRequired
+                <PhoneNumberInput
+                  label="Phone Number"
+                  value={formData.emergencyContact.phone}
+                  onChange={(value) =>
+                    updateNestedFormData(
+                      "emergencyContact",
+                      "phone",
+                      value
+                    )
+                  }
+                  placeholder="801 234 5678"
+                  isRequired={true}
                   isInvalid={!!errors.emergencyContactPhone}
-                >
-                  <FormLabel>Phone Number</FormLabel>
-                  <Input
-                    value={formData.emergencyContact.phone}
-                    onChange={(e) =>
-                      updateNestedFormData(
-                        "emergencyContact",
-                        "phone",
-                        e.target.value
-                      )
-                    }
-                    placeholder="+234 801 234 5678"
-                  />
-                  <FormErrorMessage>
-                    {errors.emergencyContactPhone}
-                  </FormErrorMessage>
-                </FormControl>
+                  errorMessage={errors.emergencyContactPhone}
+                />
 
                 <FormControl>
                   <FormLabel>Address (Optional)</FormLabel>
@@ -1022,8 +1114,8 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
             <Box>
               <AlertTitle>Information Complete!</AlertTitle>
               <AlertDescription>
-                All required information has been provided. You can now proceed
-                to payment.
+                All required information has been provided. You can now complete
+                your booking.
               </AlertDescription>
             </Box>
           </Alert>
@@ -1043,7 +1135,7 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
         )}
 
         {/* Submit Button */}
-        <Button
+        {/* <Button
           size="lg"
           bgGradient="linear(45deg, brand.500, purple.500)"
           color="white"
@@ -1080,8 +1172,8 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
           }}
           transition="all 0.2s ease-in-out"
         >
-          Continue to Payment
-        </Button>
+          Complete Booking
+        </Button> */}
       </VStack>
     </Container>
   );

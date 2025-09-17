@@ -9,9 +9,9 @@ import {
 import { MdHealthAndSafety, MdElderlyWoman, MdPsychology } from 'react-icons/md'
 
 // Fixed assessment price - All health assessments have the same price
-export const ASSESSMENT_PRICE = 15000
+export const ASSESSMENT_PRICE = 30000
 
-// Assessment-focused healthcare services - All cost ₦15,000 (fixed price)
+// Assessment-focused healthcare services - All cost ₦30,000 (fixed price)
 export const healthcareAssessments = [
   {
     id: 'general-health-assessment',
