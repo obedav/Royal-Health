@@ -118,7 +118,7 @@ const Contact: React.FC = () => {
   const toast = useToast();
 
   const API_BASE_URL =
-    import.meta.env.VITE_API_BASE_URL || "https://ancerlarins.com/api/v1";
+    import.meta.env.VITE_API_BASE_URL || "https://royalhealthconsult.com/api/v1";
 
   // Default contact info fallback
   const getDefaultContactInfo = (): ContactInfo => ({
@@ -160,8 +160,9 @@ const Contact: React.FC = () => {
 
         if (contactResponse.ok) {
           const contactData = await contactResponse.json();
-          // Contact info loaded successfully
-          setContactInfo(contactData);
+          // Handle API response format - extract data if it's wrapped
+          const contactInfo = contactData.data || contactData;
+          setContactInfo(contactInfo);
         } else if (contactResponse.status === 404) {
           console.warn(
             "⚠️ Contact info API not available (404), using fallback data"
@@ -184,7 +185,9 @@ const Contact: React.FC = () => {
         if (faqResponse.ok) {
           const faqData = await faqResponse.json();
           console.log("✅ FAQs loaded from API:", faqData);
-          setFaqs(faqData.filter((faq: FAQ) => faq.isActive));
+          // Handle API response format {success: true, data: Array}
+          const faqs = Array.isArray(faqData) ? faqData : faqData.data || [];
+          setFaqs(faqs.filter((faq: FAQ) => faq.isActive));
         } else if (faqResponse.status === 404) {
           console.warn("⚠️ FAQ API not available (404), using default FAQs");
           setFaqs(getDefaultFAQs());
@@ -258,12 +261,12 @@ const Contact: React.FC = () => {
   ];
 
   // Enhanced quickServices array with brand colors
-  const quickServices = [
+  const quickServices = contactInfo ? [
     {
       icon: FaAmbulance,
       title: "Emergency Services",
       description: "Immediate medical assistance",
-      phone: contactInfo?.phones[0] || "+234 808 374 7339",
+      phone: contactInfo?.phones?.[0] || "+234 808 374 7339",
       available: "24/7",
       color: "red",
     },
@@ -271,7 +274,7 @@ const Contact: React.FC = () => {
       icon: FaHeadset,
       title: "Customer Support",
       description: "General inquiries and support",
-      phone: contactInfo?.phones[0] || "+234 808 374 7339",
+      phone: contactInfo?.phones?.[0] || "+234 808 374 7339",
       available: "Mon-Fri 8AM-6PM",
       color: "brand", // Using our enhanced brand color
     },
@@ -279,7 +282,7 @@ const Contact: React.FC = () => {
       icon: FaQuestionCircle,
       title: "Booking Assistance",
       description: "Help with appointments",
-      phone: contactInfo?.phones[1] || "+234 706 332 5184",
+      phone: contactInfo?.phones?.[1] || "+234 706 332 5184",
       available: "Mon-Fri 8AM-8PM",
       color: "green",
     },
@@ -287,13 +290,13 @@ const Contact: React.FC = () => {
       icon: FaUserTie,
       title: "Partnership Inquiries",
       description: "Partnerships and collaborations",
-      phone: contactInfo?.phones[2] || "+234 803 404 7213",
+      phone: contactInfo?.phones?.[2] || "+234 803 404 7213",
       available: "Mon-Fri 9AM-5PM",
       color: "purple", // Using our enhanced purple
     },
-  ];
+  ] : [];
 
-  const socialLinks = [
+  const socialLinks = contactInfo ? [
     {
       icon: FaFacebook,
       url: contactInfo?.socialMedia.facebook,
@@ -324,7 +327,7 @@ const Contact: React.FC = () => {
         border: "#25D366"
       }
     },
-  ].filter((link) => link.url); // Only show links that exist
+  ].filter((link) => link.url) : []; // Only show links that exist
 
   const validateForm = (): boolean => {
     const newErrors: Partial<ContactForm> = {};
@@ -356,7 +359,7 @@ const Contact: React.FC = () => {
       console.log("🔄 Trying to submit contact form...");
 
       // Try to send contact form to real backend
-      const response = await fetch(`${API_BASE_URL}/contact/submit`, {
+      const response = await fetch(`${API_BASE_URL}/contact`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -690,7 +693,7 @@ const Contact: React.FC = () => {
                 immediately. For urgent but non-life-threatening situations,
                 call our emergency line:{" "}
                 <Text as="span" fontWeight="700" color="red.800">
-                  {contactInfo?.phones[0] || "+234 808 374 7339"}
+                  {contactInfo?.phones?.[0] || "+234 808 374 7339"}
                 </Text>
               </AlertDescription>
             </Box>
@@ -1159,7 +1162,7 @@ const Contact: React.FC = () => {
                           <Text fontWeight="700" color="gray.800" fontSize="lg">
                             Phone
                           </Text>
-                          {contactInfo?.phones.map((phone, idx) => (
+                          {(contactInfo?.phones || []).map((phone, idx) => (
                             <Link
                               key={idx}
                               href={`tel:${phone}`}
@@ -1211,7 +1214,7 @@ const Contact: React.FC = () => {
                           <Text fontWeight="700" color="gray.800" fontSize="lg">
                             Email
                           </Text>
-                          {contactInfo?.emails.map((email, idx) => (
+                          {(contactInfo?.emails || []).map((email, idx) => (
                             <Link
                               key={idx}
                               href={`mailto:${email}`}
@@ -1307,13 +1310,13 @@ const Contact: React.FC = () => {
                             Business Hours
                           </Text>
                           <Text color="gray.600" fontSize="sm" fontWeight="500">
-                            {contactInfo?.businessHours.weekdays}
+                            {contactInfo?.businessHours?.weekdays || 'Mon - Fri: 8:00 AM - 6:00 PM'}
                           </Text>
                           <Text color="gray.600" fontSize="sm" fontWeight="500">
-                            {contactInfo?.businessHours.saturday}
+                            {contactInfo?.businessHours?.saturday || 'Sat: 9:00 AM - 4:00 PM'}
                           </Text>
                           <Text color="gray.600" fontSize="sm" fontWeight="500">
-                            {contactInfo?.businessHours.sunday}
+                            {contactInfo?.businessHours?.sunday || 'Sun: Closed'}
                           </Text>
                           <Badge
                             colorScheme="red"
@@ -1427,7 +1430,7 @@ const Contact: React.FC = () => {
               </VStack>
 
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={8}>
-                {faqs.slice(0, 6).map((faq) => (
+                {(faqs || []).slice(0, 6).map((faq) => (
                   <Card
                     key={faq.id}
                     bg={cardBg}
@@ -1539,7 +1542,7 @@ const Contact: React.FC = () => {
                   leftIcon={<FaPhone />}
                   onClick={() =>
                     window.open(
-                      `tel:${contactInfo?.phones[0] || "+2349012345678"}`
+                      `tel:${contactInfo?.phones?.[0] || "+2349012345678"}`
                     )
                   }
                   borderRadius="xl"

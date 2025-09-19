@@ -1,5 +1,6 @@
 // src/utils/phoneValidation.ts
 import { PHONE_REGEX, INTERNATIONAL_PHONE_REGEX } from './constants';
+import { parsePhoneNumber, isValidPhoneNumber, formatInCallingCode } from 'libphonenumber-js';
 
 /**
  * Nigerian Phone Number Validation and Formatting Utilities
@@ -7,14 +8,16 @@ import { PHONE_REGEX, INTERNATIONAL_PHONE_REGEX } from './constants';
 
 // Nigerian network prefixes
 export const NIGERIAN_NETWORKS = {
-  MTN: ['803', '806', '813', '814', '816', '903', '906'],
-  AIRTEL: ['802', '808', '812', '901', '902', '904', '907'],
-  GLO: ['805', '807', '815', '811', '905'],
-  '9MOBILE': ['809', '817', '818', '908', '909']
+  MTN: ['803', '806', '813', '814', '816', '810', '903', '906', '703', '706', '704'],
+  AIRTEL: ['802', '808', '812', '701', '708', '901', '902', '904', '907'],
+  GLO: ['805', '807', '815', '811', '705', '905'],
+  '9MOBILE': ['809', '817', '818', '819', '908', '909'],
+  NTEL: ['804'],
+  SMILE: ['702']
 };
 
 /**
- * Validate Nigerian phone number
+ * Validate Nigerian phone number using network prefixes
  */
 export const validateNigerianPhone = (phone: string): boolean => {
   if (!phone) return false;
@@ -22,32 +25,45 @@ export const validateNigerianPhone = (phone: string): boolean => {
   // Remove all non-digit characters
   const cleanPhone = phone.replace(/\D/g, '');
 
-  // Check different formats
+  // Extract the network prefix to check against known prefixes
+  const allPrefixes = Object.values(NIGERIAN_NETWORKS).flat();
+
+  let numberToCheck = '';
+
   if (cleanPhone.length === 11 && cleanPhone.startsWith('0')) {
-    // Format: 08012345678
-    return /^0[7-9][0-1]\d{8}$/.test(cleanPhone);
+    // Format: 08012345678 → extract 801
+    numberToCheck = cleanPhone.slice(1, 4);
   } else if (cleanPhone.length === 10) {
-    // Format: 8012345678 (without leading 0)
-    return /^[7-9][0-1]\d{8}$/.test(cleanPhone);
+    // Format: 8012345678 → extract 801
+    numberToCheck = cleanPhone.slice(0, 3);
   } else if (cleanPhone.length === 13 && cleanPhone.startsWith('234')) {
-    // Format: 2348012345678
-    return /^234[7-9][0-1]\d{8}$/.test(cleanPhone);
+    // Format: 2348012345678 → extract 801
+    numberToCheck = cleanPhone.slice(3, 6);
+  } else if (cleanPhone.length === 14 && cleanPhone.startsWith('+234')) {
+    // Handle +234 format in case it gets through
+    return false; // This should be cleaned first
+  } else {
+    return false; // Invalid length
   }
 
-  return false;
+  // Check if the prefix is in our known Nigerian networks
+  return allPrefixes.includes(numberToCheck);
 };
 
 /**
- * Validate international phone number
+ * Validate international phone number using libphonenumber-js
  */
 export const validateInternationalPhone = (phone: string): boolean => {
   if (!phone) return false;
 
-  const cleanPhone = phone.replace(/\D/g, '');
-
-  // Basic international validation
-  // Should be 7-15 digits for most international numbers
-  return cleanPhone.length >= 7 && cleanPhone.length <= 15;
+  try {
+    // Use libphonenumber-js for comprehensive international validation
+    return isValidPhoneNumber(phone);
+  } catch (error) {
+    // Fallback to basic validation if parsing fails
+    const cleanPhone = phone.replace(/\D/g, '');
+    return cleanPhone.length >= 7 && cleanPhone.length <= 15;
+  }
 };
 
 /**
@@ -109,14 +125,22 @@ export const formatNigerianPhone = (phone: string): string => {
 };
 
 /**
- * Format international phone number
+ * Format international phone number using libphonenumber-js
  */
 export const formatInternationalPhone = (phone: string): string => {
   if (!phone) return '';
 
-  const cleanPhone = phone.replace(/\D/g, '');
+  try {
+    const phoneNumber = parsePhoneNumber(phone);
+    if (phoneNumber && phoneNumber.isValid()) {
+      return phoneNumber.formatInternational();
+    }
+  } catch (error) {
+    // Fallback to basic formatting
+  }
 
-  // Add + if not present and it's a valid international number
+  // Fallback formatting
+  const cleanPhone = phone.replace(/\D/g, '');
   if (cleanPhone.length >= 7 && !phone.startsWith('+')) {
     return `+${cleanPhone}`;
   }
@@ -220,7 +244,16 @@ export const cleanPhoneForStorage = (phone: string): string => {
     }
   }
 
-  // For international numbers, ensure + prefix
+  // For international numbers, use libphonenumber-js formatting
+  try {
+    const phoneNumber = parsePhoneNumber(phone);
+    if (phoneNumber && phoneNumber.isValid()) {
+      return phoneNumber.format('E.164'); // Standard international format: +1234567890
+    }
+  } catch (error) {
+    // Fallback to validation formatted result
+  }
+
   return validation.formatted || phone;
 };
 

@@ -3,7 +3,7 @@ import SecureTokenStorage from './secureStorage';
 
 // Dynamic API base URL - uses Vite environment variable
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ||
-                    'https://ancerlarins.com/api/v1';
+                    'https://royalhealthconsult.com/api/v1';
 
 // Log API URL only in development
 if (process.env.NODE_ENV === 'development') {

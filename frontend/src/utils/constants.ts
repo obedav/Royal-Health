@@ -39,9 +39,10 @@ export const NIGERIAN_STATES = [
   { value: 'fct', label: 'Federal Capital Territory' },
 ]
 
-// Nigerian phone number validation (covers MTN, Airtel, Glo, 9mobile)
-// Valid formats: +2348012345678, 08012345678, 8012345678
-export const PHONE_REGEX = /^(\+234|234|0)?[7-9][0-1]\d{8}$/
+// Nigerian phone number validation (covers all major networks: MTN, Airtel, Glo, 9mobile, NTEL, Smile)
+// Valid formats: +234 8012345678, +234 801 234 5678, +2348012345678, 08012345678, 8012345678
+// Updated to handle spaces, formatting, and all Nigerian network prefixes
+export const PHONE_REGEX = /^\+?234\s?(7[0-9]{2}|[89][0-9]{2})\s?\d{3}\s?\d{4}$|^0?[789][0-9]{2}\s?\d{3}\s?\d{4}$/
 
 // International phone number validation (more flexible for global numbers)
 export const INTERNATIONAL_PHONE_REGEX = /^[\+]?[1-9][\d]{1,14}$/

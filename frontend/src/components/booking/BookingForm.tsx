@@ -30,7 +30,8 @@ import { z } from 'zod'
 import { useState } from 'react'
 import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaPhone, FaStethoscope } from 'react-icons/fa'
 import { BookingService, BookingFormData, TimeSlot } from '../../types/booking.types'
-import { NIGERIAN_STATES, PHONE_REGEX, ASSESSMENT_PRICE } from '../../utils/constants'
+import { NIGERIAN_STATES, ASSESSMENT_PRICE } from '../../utils/constants'
+import { validatePhone } from '../../utils/phoneValidation'
 import { useBookingStore, useGuestSession } from '../../store/bookingStore'
 import bookingService from '../../services/booking.service'
 
@@ -40,7 +41,10 @@ const assessmentBookingSchema = z.object({
   patientName: z.string().min(2, 'Name must be at least 2 characters'),
   patientAge: z.number().min(1, 'Age is required').max(120, 'Please enter a valid age'),
   patientGender: z.enum(['male', 'female', 'other']),
-  patientPhone: z.string().regex(PHONE_REGEX, 'Please enter a valid Nigerian phone number'),
+  patientPhone: z.string().refine((phone) => {
+    const validation = validatePhone(phone, true); // Allow international numbers
+    return validation.isValid;
+  }, 'Please enter a valid phone number'),
   patientEmail: z.string().email('Please enter a valid email').optional().or(z.literal('')),
   
   // Assessment Appointment Details
@@ -56,7 +60,10 @@ const assessmentBookingSchema = z.object({
   
   // Emergency Contact
   emergencyContactName: z.string().min(2, 'Emergency contact name is required'),
-  emergencyContactPhone: z.string().regex(PHONE_REGEX, 'Please enter a valid phone number'),
+  emergencyContactPhone: z.string().refine((phone) => {
+    const validation = validatePhone(phone, true); // Allow international numbers
+    return validation.isValid;
+  }, 'Please enter a valid phone number'),
   emergencyContactRelationship: z.string().min(1, 'Please specify relationship'),
   
   // Medical Information for Assessment

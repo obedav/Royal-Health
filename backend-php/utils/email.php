@@ -13,7 +13,7 @@ class EmailService {
         'gbengobe@gmail.com',
         'care@royalhealthconsult.com'
     ];
-    private const FROM_EMAIL = 'noreply@ancerlarins.com';
+    private const FROM_EMAIL = 'noreply@royalhealthconsult.com';
     private const FROM_NAME = 'Royal Health Consult';
     private const SUPPORT_EMAIL = 'care@royalhealthconsult.com';
 

@@ -23,13 +23,17 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { FaStethoscope, FaPhone, FaUser, FaMapMarkerAlt, FaCalendarAlt } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
-import { PHONE_REGEX, NIGERIAN_STATES, HEALTHCARE_SERVICES } from '../../utils/constants'
+import { NIGERIAN_STATES, HEALTHCARE_SERVICES } from '../../utils/constants'
+import { validatePhone } from '../../utils/phoneValidation'
 import { useBookingContext } from '../../context/BookingContext'
 import PhoneNumberInput from '../common/PhoneNumberInput'
 
 const consultationSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
-  phone: z.string().regex(PHONE_REGEX, 'Please enter a valid Nigerian phone number'),
+  phone: z.string().refine((phone) => {
+    const validation = validatePhone(phone, true); // Allow international numbers
+    return validation.isValid;
+  }, 'Please enter a valid phone number'),
   email: z.string().email('Please enter a valid email').optional().or(z.literal('')),
   age: z.number().min(1, 'Age is required').max(120, 'Please enter a valid age'),
   gender: z.enum(['male', 'female', 'other']),

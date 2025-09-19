@@ -10,7 +10,7 @@ ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
 // CORS Headers
-header('Access-Control-Allow-Origin: https://ancerlarins.com');
+header('Access-Control-Allow-Origin: https://royalhealthconsult.com');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
 header('Content-Type: application/json');
@@ -92,7 +92,11 @@ try {
         case 'contact':
             require_once 'controllers/contact.php';
             break;
-            
+
+        case 'errors':
+            require_once 'errors.php';
+            break;
+
         default:
             Response::error('Endpoint not found', 404);
             break;

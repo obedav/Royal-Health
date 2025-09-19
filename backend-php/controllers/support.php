@@ -26,7 +26,8 @@ function handleGetFAQs() {
             'id' => 1,
             'category' => 'General',
             'question' => 'What is Royal Health Consult?',
-            'answer' => 'Royal Health Consult is a healthcare platform that connects patients with qualified nurses for home-based care services.'
+            'answer' => 'Royal Health Consult is a healthcare platform that connects patients with qualified nurses for home-based care services.',
+            'isActive' => true
         ],
         [
             'id' => 2,
@@ -71,6 +72,11 @@ function handleGetFAQs() {
             'answer' => 'Pricing varies based on the type of service, duration, and location. You can view pricing details when booking.'
         ]
     ];
-    
+
+    // Add isActive property to all FAQs
+    foreach ($faqs as &$faq) {
+        $faq['isActive'] = true;
+    }
+
     Response::success($faqs, 'FAQs retrieved successfully');
 }

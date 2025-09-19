@@ -8,8 +8,13 @@ $method = $_SERVER['REQUEST_METHOD'];
 global $segments;
 $action = isset($segments[1]) ? $segments[1] : '';
 
-if ($method === 'POST' && $action === 'submit') {
-    handleContactSubmit();
+if ($method === 'POST') {
+    // Handle both /contact and /contact/submit for compatibility
+    if ($action === 'submit' || $action === '') {
+        handleContactSubmit();
+    } else {
+        sendJsonResponse(['success' => false, 'message' => 'Invalid action'], 404);
+    }
 } else {
     sendJsonResponse(['success' => false, 'message' => 'Method not allowed'], 405);
 }
@@ -55,46 +60,37 @@ function handleContactSubmit() {
         $messageId = generateUUID();
         $referenceId = 'RHC-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -6));
         
-        // Save to database
+        // Prepare message data
+        $messageData = [
+            'id' => $messageId,
+            'reference_id' => $referenceId,
+            'first_name' => trim($input['firstName']),
+            'last_name' => trim($input['lastName']),
+            'email' => trim($input['email']),
+            'phone' => trim($input['phone']),
+            'subject' => trim($input['subject']),
+            'inquiry_type' => trim($input['inquiryType']),
+            'message' => trim($input['message']),
+            'status' => 'new',
+            'submitted_at' => date('Y-m-d H:i:s'),
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+
+        // Save to database (optional - continue if fails)
         try {
             $db = Database::getInstance();
-            
-            $messageData = [
-                'id' => $messageId,
-                'reference_id' => $referenceId,
-                'first_name' => trim($input['firstName']),
-                'last_name' => trim($input['lastName']),
-                'email' => trim($input['email']),
-                'phone' => trim($input['phone']),
-                'subject' => trim($input['subject']),
-                'inquiry_type' => trim($input['inquiryType']),
-                'message' => trim($input['message']),
-                'status' => 'new',
-                'submitted_at' => date('Y-m-d H:i:s'),
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
-            ];
-            
             $db->insert('contact_messages', $messageData);
-            
-            // Log successful submission
             error_log("Contact message saved to database: " . $referenceId);
-            
         } catch (Exception $dbError) {
             error_log("Database error saving contact message: " . $dbError->getMessage());
             // Continue execution - we'll still return success even if DB fails
         }
         
-        // Send email notification using new EmailService
+        // Send email notification
         try {
-            require_once '../utils/email.php';
-            $contactData = array_merge($messageData, [
-                'reference_id' => $referenceId,
-                'first_name' => trim($input['firstName']),
-                'last_name' => trim($input['lastName']),
-                'inquiry_type' => trim($input['inquiryType'])
-            ]);
-            EmailService::sendContactNotification($contactData);
+            // Simple email notification instead of EmailService for now
+            sendAdminNotification($input, $referenceId);
         } catch (Exception $emailError) {
             error_log("Email notification failed: " . $emailError->getMessage());
             // Continue execution - we'll still return success even if email fails
@@ -122,7 +118,15 @@ function handleContactSubmit() {
 }
 
 function sendAdminNotification($input, $referenceId) {
-    $adminEmail = 'rcs@royalhealthconsult.com';
+    // Send to all configured admin emails
+    $adminEmails = [
+        'alexanaba22@gmail.com',
+        'lucygodwin83@gmail.com',
+        'gbengobe@gmail.com',
+        'care@royalhealthconsult.com'
+    ];
+
+    $emailsSent = 0;
     $subject = 'New Contact Form Submission - ' . $referenceId;
     
     $emailBody = "
@@ -192,21 +196,35 @@ function sendAdminNotification($input, $referenceId) {
     ";
     
     $headers = [
-        'From: Royal Health Consult <noreply@ancerlarins.com>',
+        'From: Royal Health Consult <noreply@royalhealthconsult.com>',
         'Reply-To: ' . $input['email'],
         'MIME-Version: 1.0',
         'Content-Type: text/html; charset=UTF-8',
         'X-Mailer: PHP/' . phpversion()
     ];
-    
-    // Send email
-    $result = mail($adminEmail, $subject, $emailBody, implode("\r\n", $headers));
-    
-    if (!$result) {
-        throw new Exception("Failed to send admin notification email");
+
+    // Send email to all admin addresses
+    foreach ($adminEmails as $adminEmail) {
+        try {
+            $result = mail($adminEmail, $subject, $emailBody, implode("\r\n", $headers));
+            if ($result) {
+                $emailsSent++;
+                error_log("Contact notification sent to: " . $adminEmail);
+            } else {
+                error_log("Failed to send contact notification to: " . $adminEmail);
+            }
+        } catch (Exception $e) {
+            error_log("Error sending to {$adminEmail}: " . $e->getMessage());
+        }
     }
-    
-    return true;
+
+    // Return true if at least one email was sent
+    if ($emailsSent > 0) {
+        error_log("Contact form notification sent to {$emailsSent} admin emails");
+        return true;
+    } else {
+        throw new Exception("Failed to send admin notification emails to any recipient");
+    }
 }
 
 function generateUUID() {
@@ -234,7 +252,7 @@ function sendJsonResponse($data, $code = 200) {
     
     // Set headers
     header('Content-Type: application/json');
-    header('Access-Control-Allow-Origin: https://ancerlarins.com');
+    header('Access-Control-Allow-Origin: https://royalhealthconsult.com');
     header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, Authorization');
     

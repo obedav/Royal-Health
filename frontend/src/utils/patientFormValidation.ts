@@ -3,6 +3,12 @@
 import { PatientInformation, PatientFormErrors } from '../types/patient.types'
 import { validatePhone, formatNigerianPhone } from './phoneValidation'
 
+export const validatePhoneNumber = (phone: string): boolean => {
+  const validation = validatePhone(phone, true) // Allow international numbers
+  return validation.isValid
+}
+
+// Keep the old function for backward compatibility
 export const validateNigerianPhoneNumber = (phone: string): boolean => {
   const validation = validatePhone(phone, false) // Nigerian only
   return validation.isValid && validation.type === 'nigerian'
@@ -50,8 +56,8 @@ export const validatePatientForm = (formData: PatientInformation): PatientFormEr
 
   if (!formData.phone.trim()) {
     errors.phone = 'Phone number is required'
-  } else if (!validateNigerianPhoneNumber(formData.phone)) {
-    errors.phone = 'Please enter a valid Nigerian phone number'
+  } else if (!validatePhoneNumber(formData.phone)) {
+    errors.phone = 'Please enter a valid phone number'
   }
 
   if (!formData.dateOfBirth) {
@@ -70,8 +76,8 @@ export const validatePatientForm = (formData: PatientInformation): PatientFormEr
 
   if (!formData.emergencyContact.phone.trim()) {
     errors.emergencyContactPhone = 'Emergency contact phone is required'
-  } else if (!validateNigerianPhoneNumber(formData.emergencyContact.phone)) {
-    errors.emergencyContactPhone = 'Please enter a valid Nigerian phone number'
+  } else if (!validatePhoneNumber(formData.emergencyContact.phone)) {
+    errors.emergencyContactPhone = 'Please enter a valid phone number'
   }
 
   if (!formData.emergencyContact.relationship) {

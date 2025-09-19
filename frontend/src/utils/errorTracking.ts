@@ -37,7 +37,7 @@ class ErrorTracking {
   constructor(config: ErrorTrackingConfig = {}) {
     this.sessionId = this.generateSessionId();
     this.config = {
-      apiEndpoint: '/api/v1/errors',
+      apiEndpoint: '/api/v1/errors', // Note: endpoint not implemented yet
       apiKey: '',
       maxErrors: 10,
       enableConsoleCapture: true,
@@ -242,6 +242,13 @@ class ErrorTracking {
       });
 
       if (!response.ok) {
+        // Don't throw for 404 since error endpoint may not be implemented yet
+        if (response.status === 404) {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('Error logging endpoint not available (404) - errors will only be logged locally');
+          }
+          return;
+        }
         throw new Error(`HTTP ${response.status}`);
       }
     } catch (error) {

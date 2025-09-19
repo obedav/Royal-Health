@@ -10,7 +10,7 @@ define('JWT_EXPIRES_IN', 3600); // 1 hour
 
 // Application Configuration
 define('APP_NAME', 'Royal Health Consult');
-define('APP_URL', 'https://ancerlarins.com');
+define('APP_URL', 'https://royalhealthconsult.com');
 define('API_VERSION', 'v1');
 
 // Security Configuration

@@ -6,7 +6,7 @@
 
 // Set proper headers for API
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: https://ancerlarins.com');
+header('Access-Control-Allow-Origin: https://royalhealthconsult.com');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
 

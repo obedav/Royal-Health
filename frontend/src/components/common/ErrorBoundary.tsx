@@ -88,7 +88,8 @@ class ErrorBoundary extends Component<Props, State> {
 
   private sendToErrorEndpoint = async (error: Error, errorInfo: ErrorInfo) => {
     try {
-      await fetch('/api/errors', {
+      // Skip error reporting to backend for now since endpoint is not implemented
+      const response = await fetch('/api/errors', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -100,6 +101,14 @@ class ErrorBoundary extends Component<Props, State> {
           timestamp: new Date().toISOString(),
         }),
       });
+
+      // Don't throw for 404 since error endpoint may not be implemented yet
+      if (!response.ok && response.status === 404) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Error logging endpoint not available (404) - errors will only be logged locally');
+        }
+        return;
+      }
     } catch (reportingError) {
       // Silently fail if error reporting fails
       if (process.env.NODE_ENV === 'development') {
