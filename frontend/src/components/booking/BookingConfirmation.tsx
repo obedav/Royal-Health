@@ -29,7 +29,7 @@ import {
   FaCheckCircle,
   FaCalendarAlt,
   FaClock,
-  FaUserNurse,
+
   FaMapMarkerAlt,
   FaPhone,
   FaEnvelope,
@@ -68,12 +68,6 @@ export interface AssessmentBookingDetails {
   cancellationPolicy: string
   assessmentDuration: number
   followUpInfo: string
-  assignedProfessional: {
-    name: string
-    rating: number
-    experience: number
-    specialization: string
-  }
 }
 
 // Animation keyframes
@@ -140,36 +134,18 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
   const navigate = useNavigate()
   const isMobile = useBreakpointValue({ base: true, md: false })
 
-  // Generate mock healthcare professional data since it's not in ScheduleData
-  const generateMockProfessional = () => {
-    const professionals = [
-      { name: 'Dr. Adaora Okonkwo', rating: 4.9, experience: 8, specialization: 'General Health Assessment' },
-      { name: 'Nurse Joy Abiola', rating: 4.8, experience: 6, specialization: 'Preventive Care' },
-      { name: 'Dr. Emeka Nwosu', rating: 4.9, experience: 12, specialization: 'Chronic Care Management' },
-      { name: 'Nurse Sarah Ibrahim', rating: 4.7, experience: 5, specialization: 'Home Healthcare' },
-      { name: 'Dr. Folake Adebayo', rating: 4.8, experience: 10, specialization: 'Family Medicine' },
-    ]
-    
-    // Use a deterministic selection based on date and service to ensure consistency
-    const index = (new Date(selectedSchedule.date).getDay() + selectedService.name.length) % professionals.length
-    return professionals[index]
-  }
-
-  const mockProfessional = generateMockProfessional()
-
   // Generate assessment booking details
   const assessmentDetails: AssessmentBookingDetails = {
     bookingId: `RHC-${Date.now().toString().slice(-6)}`,
-    confirmationCode: `ASS${mockProfessional.name.split(' ')[1].slice(0, 3).toUpperCase()}${Date.now().toString().slice(-4)}`,
+    confirmationCode: `RHC${Date.now().toString().slice(-6)}`,
     status: paymentResult ? (paymentResult.method === 'cash' ? 'pending' : 'confirmed') : 'pending',
     createdAt: new Date().toISOString(),
     estimatedArrival: calculateEstimatedArrival(),
     assessmentInstructions: generateAssessmentPreparationInstructions(),
-    emergencyContact: '+234 901 234 5678',
+    emergencyContact: '+234 706 332 5184',
     cancellationPolicy: 'Free cancellation up to 4 hours before assessment appointment',
     assessmentDuration: selectedService.duration,
     followUpInfo: 'Assessment report will be provided within 24 hours after completion',
-    assignedProfessional: mockProfessional
   }
 
   function calculateEstimatedArrival(): string {
@@ -290,9 +266,8 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
       time: selectedSchedule.timeSlot.time,
       assessmentFee: ASSESSMENT_PRICE,
       patient: `${patientInfo.firstName} ${patientInfo.lastName}`,
-      healthcareProfessional: assessmentDetails.assignedProfessional.name
     }
-    
+
     const receiptText = `
 ROYAL HEALTH CONSULT - ASSESSMENT RECEIPT
 =========================================
@@ -304,7 +279,6 @@ Date: ${new Date(selectedSchedule.date).toLocaleDateString('en-NG')}
 Time: ${selectedSchedule.timeSlot.time}
 Duration: ${selectedService.duration} minutes
 Patient: ${patientInfo.firstName} ${patientInfo.lastName}
-Healthcare Professional: ${assessmentDetails.assignedProfessional.name}
 
 PAYMENT INFORMATION:
 Assessment Fee: ${formatPrice(ASSESSMENT_PRICE)}
@@ -326,8 +300,8 @@ IMPORTANT NOTES:
 - Emergency contact: ${assessmentDetails.emergencyContact}
 
 Thank you for choosing Royal Health Consult!
-For support: +234 901 234 5678
-Email: support@royalhealthconsult.ng
+For support: +234 706 332 5184
+Email: care@royalhealthconsult.com
     `.trim()
 
     const blob = new Blob([receiptText], { type: 'text/plain' })
@@ -374,7 +348,7 @@ Email: support@royalhealthconsult.ng
       title: `Health Assessment - ${selectedService.name}`,
       start: appointmentDate.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''),
       end: endDate.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''),
-      description: `Health Assessment with ${assessmentDetails.assignedProfessional.name}\\n\\nService: ${selectedService.name}\\nBooking ID: ${assessmentDetails.bookingId}\\nLocation: ${selectedSchedule.address.street}, ${selectedSchedule.address.city}\\n\\nContact: ${assessmentDetails.emergencyContact}`,
+      description: `Health Assessment\\n\\nService: ${selectedService.name}\\nBooking ID: ${assessmentDetails.bookingId}\\nLocation: ${selectedSchedule.address.street}, ${selectedSchedule.address.city}\\n\\nContact: ${assessmentDetails.emergencyContact}`,
       location: `${selectedSchedule.address.street}, ${selectedSchedule.address.city}, ${selectedSchedule.address.state}`
     }
     
@@ -592,24 +566,10 @@ Email: support@royalhealthconsult.ng
                     <Divider />
 
                     <HStack spacing={4} w="full" align="start">
-                      <Icon as={FaUserNurse} color="blue.500" fontSize="lg" mt={1} />
+                      <Icon as={FaPhone} color="blue.500" fontSize="lg" mt={1} />
                       <VStack spacing={1} align="start" flex={1}>
-                        <Text fontWeight="600">Healthcare Professional</Text>
-                        <Text color="gray.600">{assessmentDetails.assignedProfessional.name}</Text>
-                        <HStack spacing={2}>
-                          <Badge colorScheme="green" size="sm">
-                            ⭐ {assessmentDetails.assignedProfessional.rating}
-                          </Badge>
-                          <Badge colorScheme="blue" size="sm">
-                            {assessmentDetails.assignedProfessional.experience}y exp.
-                          </Badge>
-                          <Badge colorScheme="purple" size="sm">
-                            Verified
-                          </Badge>
-                        </HStack>
-                        <Text fontSize="xs" color="gray.500">
-                          {assessmentDetails.assignedProfessional.specialization}
-                        </Text>
+                        <Text fontWeight="600">What Happens Next</Text>
+                        <Text color="gray.600">Our team will contact you to confirm your appointment details.</Text>
                       </VStack>
                     </HStack>
 
@@ -643,7 +603,7 @@ Email: support@royalhealthconsult.ng
                           {assessmentDetails.estimatedArrival} (15 minutes before assessment)
                         </Text>
                         <Text fontSize="sm" color="gray.500">
-                          Healthcare professional will call 30 minutes before arrival
+                          We will contact you to confirm your appointment
                         </Text>
                       </VStack>
                     </HStack>
@@ -934,7 +894,7 @@ Email: support@royalhealthconsult.ng
                       </Box>
                       <VStack spacing={1} align="start" flex={1}>
                         <Text fontWeight="600" fontSize="sm">WhatsApp Support</Text>
-                        <Text fontSize="sm" color="gray.600">+234 901 234 5678</Text>
+                        <Text fontSize="sm" color="gray.600">+234 706 332 5184</Text>
                       </VStack>
                     </HStack>
                     
@@ -952,7 +912,7 @@ Email: support@royalhealthconsult.ng
                       </Box>
                       <VStack spacing={1} align="start" flex={1}>
                         <Text fontWeight="600" fontSize="sm">Email Support</Text>
-                        <Text fontSize="sm" color="gray.600">support@royalhealthconsult.ng</Text>
+                        <Text fontSize="sm" color="gray.600">care@royalhealthconsult.com</Text>
                       </VStack>
                     </HStack>
                   </VStack>
@@ -1023,8 +983,7 @@ Email: support@royalhealthconsult.ng
                 <AlertDescription fontSize="sm">
                   <VStack spacing={2} align="start" mt={3}>
                     <Text>• {assessmentDetails.cancellationPolicy}</Text>
-                    <Text>• SMS reminders will be sent 24h and 2h before assessment</Text>
-                    <Text>• Healthcare professional will call 30 minutes before arrival</Text>
+                    <Text>• We will contact you to confirm your appointment</Text>
                     <Text>• {assessmentDetails.followUpInfo}</Text>
                     {paymentResult && paymentResult.method === 'cash' && (
                       <Text>• Please have exact amount ready: {formatPrice(ASSESSMENT_PRICE)}</Text>
@@ -1212,7 +1171,7 @@ Email: support@royalhealthconsult.ng
               .
               {patientInfo.consentToSMSUpdates && (
                 <Text mt={2}>
-                  📱 You'll receive timely SMS reminders 24 hours and 2 hours before your assessment appointment.
+                  We will contact you to confirm your appointment details.
                 </Text>
               )}
             </AlertDescription>

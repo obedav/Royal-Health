@@ -9,8 +9,19 @@ error_reporting(E_ALL);
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
-// CORS Headers
-header('Access-Control-Allow-Origin: https://royalhealthconsult.com');
+// CORS Headers — add your Vercel deployment URL to this list
+$allowedOrigins = [
+    'https://royalhealthconsult.com',
+    'https://www.royalhealthconsult.com',
+    'https://royal-health.vercel.app',
+];
+
+$origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
+if (in_array($origin, $allowedOrigins)) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+} else {
+    header('Access-Control-Allow-Origin: https://royalhealthconsult.com');
+}
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
 header('Content-Type: application/json');
@@ -91,6 +102,10 @@ try {
             
         case 'contact':
             require_once 'controllers/contact.php';
+            break;
+
+        case 'consultations':
+            require_once 'controllers/consultations.php';
             break;
 
         case 'errors':

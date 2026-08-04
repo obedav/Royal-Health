@@ -80,11 +80,11 @@ const SimpleConsultationForm: React.FC<SimpleConsultationFormProps> = ({
   const onSubmit = async (data: ConsultationFormData) => {
     try {
       // Import API configuration
-      const { buildApiUrl, apiRequest } = await import('../../config/api.config')
+      const { buildApiUrl, apiRequest, API_CONFIG } = await import('../../config/api.config')
 
       // Submit to admin monitoring system with proper error handling
       const response = await apiRequest(
-        buildApiUrl('/api/consultations'),
+        buildApiUrl(API_CONFIG.ENDPOINTS.CONSULTATIONS),
         {
           method: 'POST',
           body: JSON.stringify({

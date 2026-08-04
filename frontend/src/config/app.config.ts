@@ -68,9 +68,11 @@ export const BUSINESS_CONFIG = {
   },
   SOCIAL_MEDIA: {
     WHATSAPP: 'https://wa.me/2347063325184',
-    FACEBOOK: '#',
-    TWITTER: '#',
-    INSTAGRAM: '#',
+    FACEBOOK: 'https://www.facebook.com/theroyalhealthconsult',
+    TWITTER: 'https://www.x.com/theroyalhealthc',
+    INSTAGRAM: 'https://www.instagram.com/theroyalhealthconsult',
+    LINKEDIN: 'https://www.linkedin.com/company/theroyalhealthconsult',
+    TIKTOK: 'https://www.tiktok.com/@theroyalhealthconsult',
   },
 } as const
 

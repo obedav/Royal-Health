@@ -3,13 +3,13 @@ export const API_CONFIG = {
   // Base URL for API endpoints
   BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001',
 
-  // API Endpoints
+  // API Endpoints (without /api prefix since BASE_URL includes it)
   ENDPOINTS: {
-    CONSULTATIONS: '/api/consultations',
-    BOOKINGS: '/api/bookings',
-    SERVICES: '/api/services',
-    CONTACT: '/api/contact',
-    HEALTH_CHECK: '/api/health'
+    CONSULTATIONS: '/consultations',
+    BOOKINGS: '/bookings',
+    SERVICES: '/services',
+    CONTACT: '/contact',
+    HEALTH_CHECK: '/health'
   },
 
   // Request timeout in milliseconds

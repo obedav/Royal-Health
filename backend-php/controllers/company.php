@@ -56,11 +56,12 @@ function handleGetContactInfo() {
             'Selected areas in Southwest Nigeria'
         ],
         'socialMedia' => [
-            'facebook' => 'https://facebook.com/royalhealthconsult',
-            'twitter' => 'https://twitter.com/royalhealthng',
-            'instagram' => 'https://instagram.com/royalhealthconsult',
-            'linkedin' => 'https://linkedin.com/company/royal-health-consult',
-            'whatsapp' => 'https://wa.me/2349012345678'
+            'facebook' => 'https://www.facebook.com/theroyalhealthconsult',
+            'twitter' => 'https://www.x.com/theroyalhealthc',
+            'instagram' => 'https://www.instagram.com/theroyalhealthconsult',
+            'linkedin' => 'https://www.linkedin.com/company/theroyalhealthconsult',
+            'whatsapp' => 'https://wa.me/2347063325184',
+            'tiktok' => 'https://www.tiktok.com/@theroyalhealthconsult'
         ]
     ];
     

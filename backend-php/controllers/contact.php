@@ -4,8 +4,10 @@
  * Handles contact form submissions and saves to database
  */
 
-$method = $_SERVER['REQUEST_METHOD'];
+// Get segments from global scope (set in index.php)
 global $segments;
+
+$method = $_SERVER['REQUEST_METHOD'];
 $action = isset($segments[1]) ? $segments[1] : '';
 
 if ($method === 'POST') {
@@ -13,53 +15,53 @@ if ($method === 'POST') {
     if ($action === 'submit' || $action === '') {
         handleContactSubmit();
     } else {
-        sendJsonResponse(['success' => false, 'message' => 'Invalid action'], 404);
+        Response::error('Invalid action', 404);
     }
 } else {
-    sendJsonResponse(['success' => false, 'message' => 'Method not allowed'], 405);
+    Response::error('Method not allowed', 405);
 }
 
 function handleContactSubmit() {
     try {
         // Get JSON input
         $input = json_decode(file_get_contents('php://input'), true);
-        
+
         if (!$input) {
-            sendJsonResponse(['success' => false, 'message' => 'Invalid JSON input'], 400);
+            Response::error('Invalid JSON input', 400);
             return;
         }
-        
+
         // Validate required fields
         $required = ['firstName', 'lastName', 'email', 'phone', 'subject', 'inquiryType', 'message'];
         foreach ($required as $field) {
             if (!isset($input[$field]) || empty(trim($input[$field]))) {
-                sendJsonResponse(['success' => false, 'message' => ucfirst($field) . ' is required'], 400);
+                Response::error(ucfirst($field) . ' is required', 400);
                 return;
             }
         }
-        
+
         // Validate email format
         if (!filter_var($input['email'], FILTER_VALIDATE_EMAIL)) {
-            sendJsonResponse(['success' => false, 'message' => 'Invalid email format'], 400);
+            Response::error('Invalid email format', 400);
             return;
         }
-        
+
         // Validate phone number (basic check)
         if (strlen(trim($input['phone'])) < 10) {
-            sendJsonResponse(['success' => false, 'message' => 'Please enter a valid phone number'], 400);
+            Response::error('Please enter a valid phone number', 400);
             return;
         }
-        
+
         // Validate message length
         if (strlen(trim($input['message'])) < 10) {
-            sendJsonResponse(['success' => false, 'message' => 'Message must be at least 10 characters long'], 400);
+            Response::error('Message must be at least 10 characters long', 400);
             return;
         }
-        
+
         // Generate IDs
-        $messageId = generateUUID();
+        $messageId = generateContactUUID();
         $referenceId = 'RHC-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -6));
-        
+
         // Prepare message data
         $messageData = [
             'id' => $messageId,
@@ -86,38 +88,32 @@ function handleContactSubmit() {
             error_log("Database error saving contact message: " . $dbError->getMessage());
             // Continue execution - we'll still return success even if DB fails
         }
-        
+
         // Send email notification
         try {
-            // Simple email notification instead of EmailService for now
-            sendAdminNotification($input, $referenceId);
+            sendContactAdminNotification($input, $referenceId);
         } catch (Exception $emailError) {
             error_log("Email notification failed: " . $emailError->getMessage());
             // Continue execution - we'll still return success even if email fails
         }
-        
+
         // Success response
-        $response = [
-            'success' => true,
-            'message' => 'Contact form submitted successfully',
-            'id' => $referenceId,
-            'data' => [
-                'referenceId' => $referenceId,
-                'submittedAt' => date('Y-m-d H:i:s'),
-                'status' => 'received',
-                'estimatedResponse' => '24 hours'
-            ]
+        $responseData = [
+            'referenceId' => $referenceId,
+            'submittedAt' => date('Y-m-d H:i:s'),
+            'status' => 'received',
+            'estimatedResponse' => '24 hours'
         ];
-        
-        sendJsonResponse($response, 200);
-        
+
+        Response::success($responseData, 'Contact form submitted successfully');
+
     } catch (Exception $e) {
         error_log("Contact form error: " . $e->getMessage());
-        sendJsonResponse(['success' => false, 'message' => 'Failed to submit contact form'], 500);
+        Response::error('Failed to submit contact form', 500);
     }
 }
 
-function sendAdminNotification($input, $referenceId) {
+function sendContactAdminNotification($input, $referenceId) {
     // Send to all configured admin emails
     $adminEmails = [
         'alexanaba22@gmail.com',
@@ -128,10 +124,25 @@ function sendAdminNotification($input, $referenceId) {
 
     $emailsSent = 0;
     $subject = 'New Contact Form Submission - ' . $referenceId;
-    
-    $emailBody = "
+
+    // Generate WhatsApp reply link
+    $customerPhone = preg_replace('/[^0-9]/', '', $input['phone']);
+    // Ensure phone has country code (Nigeria +234)
+    if (strlen($customerPhone) === 10) {
+        $customerPhone = '234' . $customerPhone;
+    } elseif (strlen($customerPhone) === 11 && $customerPhone[0] === '0') {
+        $customerPhone = '234' . substr($customerPhone, 1);
+    }
+
+    $whatsappMessage = urlencode("Hello " . $input['firstName'] . ", thank you for contacting Royal Health Consult regarding \"" . $input['subject'] . "\". How can we assist you today?");
+    $whatsappLink = "https://wa.me/" . $customerPhone . "?text=" . $whatsappMessage;
+
+    $emailSubjectEncoded = urlencode("Re: " . $input['subject'] . " - " . $referenceId);
+
+    $emailBody = '
     <html>
     <head>
+        <meta charset="UTF-8">
         <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .header { background: #C2185B; color: white; padding: 20px; text-align: center; }
@@ -140,73 +151,111 @@ function sendAdminNotification($input, $referenceId) {
             .label { font-weight: bold; color: #C2185B; }
             .value { margin-left: 10px; }
             .footer { background: #f8f9fa; padding: 15px; text-align: center; font-size: 12px; color: #666; }
+            .whatsapp-btn {
+                display: inline-block;
+                background: #25D366;
+                color: white !important;
+                padding: 12px 24px;
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: bold;
+                margin: 10px 5px;
+            }
+            .email-btn {
+                display: inline-block;
+                background: #C2185B;
+                color: white !important;
+                padding: 12px 24px;
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: bold;
+                margin: 10px 5px;
+            }
+            .phone-btn {
+                display: inline-block;
+                background: #2196F3;
+                color: white !important;
+                padding: 12px 24px;
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: bold;
+                margin: 10px 5px;
+            }
+            .quick-actions { text-align: center; padding: 20px; background: #f0f0f0; border-radius: 10px; margin: 20px 0; }
         </style>
     </head>
     <body>
-        <div class='header'>
+        <div class="header">
             <h2>New Contact Form Submission</h2>
-            <p>Reference ID: {$referenceId}</p>
+            <p>Reference ID: ' . htmlspecialchars($referenceId) . '</p>
         </div>
-        
-        <div class='content'>
-            <div class='field'>
-                <span class='label'>Name:</span>
-                <span class='value'>{$input['firstName']} {$input['lastName']}</span>
+
+        <div class="content">
+            <div class="quick-actions">
+                <h3 style="margin-top: 0; color: #333;">Quick Response Options</h3>
+                <a href="' . $whatsappLink . '" class="whatsapp-btn">Reply via WhatsApp</a>
+                <a href="mailto:' . htmlspecialchars($input['email']) . '?subject=' . $emailSubjectEncoded . '" class="email-btn">Reply via Email</a>
+                <a href="tel:' . htmlspecialchars($input['phone']) . '" class="phone-btn">Call Customer</a>
             </div>
-            
-            <div class='field'>
-                <span class='label'>Email:</span>
-                <span class='value'>{$input['email']}</span>
+
+            <div class="field">
+                <span class="label">Name:</span>
+                <span class="value">' . htmlspecialchars($input['firstName']) . ' ' . htmlspecialchars($input['lastName']) . '</span>
             </div>
-            
-            <div class='field'>
-                <span class='label'>Phone:</span>
-                <span class='value'>{$input['phone']}</span>
+
+            <div class="field">
+                <span class="label">Email:</span>
+                <span class="value"><a href="mailto:' . htmlspecialchars($input['email']) . '">' . htmlspecialchars($input['email']) . '</a></span>
             </div>
-            
-            <div class='field'>
-                <span class='label'>Subject:</span>
-                <span class='value'>{$input['subject']}</span>
+
+            <div class="field">
+                <span class="label">Phone:</span>
+                <span class="value"><a href="tel:' . htmlspecialchars($input['phone']) . '">' . htmlspecialchars($input['phone']) . '</a></span>
             </div>
-            
-            <div class='field'>
-                <span class='label'>Inquiry Type:</span>
-                <span class='value'>{$input['inquiryType']}</span>
+
+            <div class="field">
+                <span class="label">Subject:</span>
+                <span class="value">' . htmlspecialchars($input['subject']) . '</span>
             </div>
-            
-            <div class='field'>
-                <span class='label'>Message:</span>
-                <div class='value' style='background: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 5px;'>
-                    " . nl2br(htmlspecialchars($input['message'])) . "
+
+            <div class="field">
+                <span class="label">Inquiry Type:</span>
+                <span class="value">' . htmlspecialchars($input['inquiryType']) . '</span>
+            </div>
+
+            <div class="field">
+                <span class="label">Message:</span>
+                <div class="value" style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 5px;">
+                    ' . nl2br(htmlspecialchars($input['message'])) . '
                 </div>
             </div>
-            
-            <div class='field'>
-                <span class='label'>Submitted:</span>
-                <span class='value'>" . date('Y-m-d H:i:s') . "</span>
+
+            <div class="field">
+                <span class="label">Submitted:</span>
+                <span class="value">' . date('Y-m-d H:i:s') . '</span>
             </div>
         </div>
-        
-        <div class='footer'>
+
+        <div class="footer">
             <p>This message was sent from the Royal Health Consult contact form.</p>
             <p>Please respond within 24 hours for the best customer experience.</p>
         </div>
     </body>
     </html>
-    ";
-    
-    $headers = [
+    ';
+
+    $headers = implode("\r\n", [
         'From: Royal Health Consult <noreply@royalhealthconsult.com>',
         'Reply-To: ' . $input['email'],
         'MIME-Version: 1.0',
         'Content-Type: text/html; charset=UTF-8',
         'X-Mailer: PHP/' . phpversion()
-    ];
+    ]);
 
     // Send email to all admin addresses
     foreach ($adminEmails as $adminEmail) {
         try {
-            $result = mail($adminEmail, $subject, $emailBody, implode("\r\n", $headers));
+            $result = @mail($adminEmail, $subject, $emailBody, $headers);
             if ($result) {
                 $emailsSent++;
                 error_log("Contact notification sent to: " . $adminEmail);
@@ -214,20 +263,21 @@ function sendAdminNotification($input, $referenceId) {
                 error_log("Failed to send contact notification to: " . $adminEmail);
             }
         } catch (Exception $e) {
-            error_log("Error sending to {$adminEmail}: " . $e->getMessage());
+            error_log("Error sending to " . $adminEmail . ": " . $e->getMessage());
         }
     }
 
-    // Return true if at least one email was sent
+    // Log result
     if ($emailsSent > 0) {
-        error_log("Contact form notification sent to {$emailsSent} admin emails");
+        error_log("Contact form notification sent to " . $emailsSent . " admin emails");
         return true;
     } else {
-        throw new Exception("Failed to send admin notification emails to any recipient");
+        error_log("Warning: No admin notification emails were sent successfully");
+        return false;
     }
 }
 
-function generateUUID() {
+function generateContactUUID() {
     return sprintf(
         '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
         mt_rand(0, 0xffff),
@@ -240,24 +290,3 @@ function generateUUID() {
         mt_rand(0, 0xffff)
     );
 }
-
-function sendJsonResponse($data, $code = 200) {
-    // Clear any output buffers
-    if (ob_get_level()) {
-        ob_clean();
-    }
-    
-    // Set HTTP response code
-    http_response_code($code);
-    
-    // Set headers
-    header('Content-Type: application/json');
-    header('Access-Control-Allow-Origin: https://royalhealthconsult.com');
-    header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type, Authorization');
-    
-    // Send JSON response
-    echo json_encode($data);
-    exit;
-}
-?>

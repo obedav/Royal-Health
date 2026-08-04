@@ -39,16 +39,17 @@ import {
   FaMapMarkerAlt,
   FaClock,
   FaWhatsapp,
-  FaTwitter,
   FaFacebook,
   FaInstagram,
   FaLinkedin,
+  FaTiktok,
   FaPaperPlane,
   FaHeadset,
   FaAmbulance,
   FaQuestionCircle,
   FaUserTie,
 } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 
 // Types for real data
 interface ContactInfo {
@@ -73,6 +74,7 @@ interface ContactInfo {
     instagram?: string;
     linkedin?: string;
     whatsapp?: string;
+    tiktok?: string;
   };
 }
 
@@ -138,11 +140,12 @@ const Contact: React.FC = () => {
       emergency: "24/7 Emergency Available",
     },
     socialMedia: {
-      facebook: "https://facebook.com/royalhealthconsult",
-      twitter: "https://twitter.com/royalhealthng",
-      instagram: "https://instagram.com/royalhealthconsult",
-      linkedin: "https://linkedin.com/company/royal-health-consult",
-      whatsapp: "https://wa.me/2349012345678",
+      facebook: "https://www.facebook.com/theroyalhealthconsult",
+      twitter: "https://www.x.com/theroyalhealthc",
+      instagram: "https://www.instagram.com/theroyalhealthconsult",
+      linkedin: "https://www.linkedin.com/company/theroyalhealthconsult",
+      whatsapp: "https://wa.me/2347063325184",
+      tiktok: "https://www.tiktok.com/@theroyalhealthconsult",
     },
   });
 
@@ -303,9 +306,9 @@ const Contact: React.FC = () => {
       color: "facebook",
     },
     {
-      icon: FaTwitter,
+      icon: FaXTwitter,
       url: contactInfo?.socialMedia.twitter,
-      color: "twitter",
+      color: "gray",
     },
     {
       icon: FaInstagram,
@@ -316,6 +319,11 @@ const Contact: React.FC = () => {
       icon: FaLinkedin,
       url: contactInfo?.socialMedia.linkedin,
       color: "linkedin",
+    },
+    {
+      icon: FaTiktok,
+      url: contactInfo?.socialMedia.tiktok,
+      color: "gray",
     },
     {
       icon: FaWhatsapp,
@@ -419,8 +427,18 @@ const Contact: React.FC = () => {
           message: "",
         });
       } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to send message");
+        // Try to parse error response, but handle empty/invalid JSON
+        let errorMessage = "Failed to send message";
+        try {
+          const text = await response.text();
+          if (text) {
+            const errorData = JSON.parse(text);
+            errorMessage = errorData.message || errorMessage;
+          }
+        } catch {
+          // Response wasn't valid JSON, use default message
+        }
+        throw new Error(errorMessage);
       }
     } catch (error) {
       console.error("❌ Contact form submission error:", error);

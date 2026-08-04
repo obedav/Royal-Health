@@ -17,11 +17,12 @@ import {
 } from "@chakra-ui/react";
 import {
   FaFacebook,
-  FaTwitter,
   FaInstagram,
   FaLinkedin,
   FaWhatsapp,
+  FaTiktok,
 } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 import { Link as RouterLink } from "react-router-dom";
 
 const Footer: React.FC = () => {
@@ -106,7 +107,7 @@ const Footer: React.FC = () => {
               Follow Us
             </Heading>
             <HStack spacing={4}>
-              <Link href="https://www.facebook.com/profile.php?id=61579018860340" isExternal>
+              <Link href="https://www.facebook.com/theroyalhealthconsult" isExternal>
                 <Icon
                   as={FaFacebook}
                   boxSize={6}
@@ -114,9 +115,9 @@ const Footer: React.FC = () => {
                   _hover={{ color: "purple.200" }}
                 />
               </Link>
-              <Link href="https://twitter.com" isExternal>
+              <Link href="https://www.x.com/theroyalhealthc" isExternal>
                 <Icon
-                  as={FaTwitter}
+                  as={FaXTwitter}
                   boxSize={6}
                   color="white"
                   _hover={{ color: "purple.200" }}
@@ -130,7 +131,7 @@ const Footer: React.FC = () => {
                   _hover={{ color: "purple.200" }}
                 />
               </Link>
-              <Link href="https://linkedin.com" isExternal>
+              <Link href="https://www.linkedin.com/company/theroyalhealthconsult" isExternal>
                 <Icon
                   as={FaLinkedin}
                   boxSize={6}
@@ -138,7 +139,15 @@ const Footer: React.FC = () => {
                   _hover={{ color: "purple.200" }}
                 />
               </Link>
-              <Link href="https://whatsapp.com" isExternal>
+              <Link href="https://www.tiktok.com/@theroyalhealthconsult" isExternal>
+                <Icon
+                  as={FaTiktok}
+                  boxSize={6}
+                  color="white"
+                  _hover={{ color: "purple.200" }}
+                />
+              </Link>
+              <Link href="https://wa.me/2347063325184" isExternal>
                 <Icon
                   as={FaWhatsapp}
                   boxSize={6}
