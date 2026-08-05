@@ -379,7 +379,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ service, onSubmit, onBack, al
                       borderRadius="full"
                       fontWeight="600"
                     >
-                      {formatPrice(ASSESSMENT_PRICE)}
+                      Pricing on request
                     </Badge>
                     {service.category === 'emergency' && (
                       <Badge 
@@ -419,7 +419,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ service, onSubmit, onBack, al
             <AlertTitle>About Your Assessment</AlertTitle>
             <AlertDescription>
               Our qualified healthcare professionals will conduct a comprehensive assessment in the comfort of your home. 
-              All assessments are priced at {formatPrice(ASSESSMENT_PRICE)} regardless of the type or duration.
+              Our qualified healthcare professionals will conduct a comprehensive assessment in the comfort of your home. Pricing will be confirmed by our team when we contact you.
             </AlertDescription>
           </Box>
         </Alert>
@@ -981,7 +981,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ service, onSubmit, onBack, al
                     py={3}
                     borderRadius="full"
                   >
-                    {formatPrice(ASSESSMENT_PRICE)}
+                    Pricing on request
                   </Badge>
                 </HStack>
               </CardBody>
@@ -1036,7 +1036,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ service, onSubmit, onBack, al
                 }}
                 transition="all 0.2s ease-in-out"
               >
-                Book Assessment - {formatPrice(ASSESSMENT_PRICE)}
+                Book Assessment
               </Button>
             </HStack>
 
@@ -1050,7 +1050,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ service, onSubmit, onBack, al
                 {' '}and{' '}
                 <Text as="span" color="primary.500" textDecoration="underline" cursor="pointer">
                   Privacy Policy
-                </Text>. Assessment fee is {formatPrice(ASSESSMENT_PRICE)} for all services.
+                </Text>. Pricing will be confirmed by our team upon contact.
               </Text>
             </Box>
           </VStack>

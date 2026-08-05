@@ -53,7 +53,7 @@ import { useState, useEffect } from 'react'
 import type { BookingService } from '../../types/booking.types'
 import type { ScheduleData } from './AppointmentScheduling'
 import type { PatientInformation } from './PatientInformationForm'
-import { ASSESSMENT_PRICE } from '../../constants/assessments'
+const ASSESSMENT_PRICE = 0 // Pricing determined by Royal Health upon contact
 
 interface PaymentIntegrationProps {
   selectedService: BookingService
@@ -621,7 +621,7 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
 
                             <HStack justify="space-between" w="full">
                               <Text fontWeight="600" color="gray.700">Amount:</Text>
-                              <Text fontWeight="700" fontSize="lg" color="green.600">{formatPrice(ASSESSMENT_PRICE)}</Text>
+                              <Text fontWeight="700" fontSize="lg" color="purple.600">Confirmed upon booking</Text>
                             </HStack>
                           </VStack>
 
@@ -631,7 +631,7 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
                               <AlertTitle fontSize="sm">Payment Instructions</AlertTitle>
                               <AlertDescription>
                                 <VStack spacing={1} align="start" mt={2}>
-                                  <Text>• Transfer exactly {formatPrice(ASSESSMENT_PRICE)} to the account above</Text>
+                                  <Text>• Our team will confirm the amount when we contact you</Text>
                                   <Text>• Use your full name as reference</Text>
                                   <Text>• Take a screenshot of your transfer receipt</Text>
                                   <Text>• Keep your receipt for confirmation</Text>
@@ -650,8 +650,8 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
                     <Box>
                       <AlertTitle fontSize="sm">Other Payment Methods Coming Soon</AlertTitle>
                       <AlertDescription fontSize="sm">
-                        We're working on adding more payment options including card payments, mobile money, and USSD. 
-                        All health assessments have a fixed price of {formatPrice(ASSESSMENT_PRICE)}.
+                        We're working on adding more payment options including card payments, mobile money, and USSD.
+                        Our team will confirm pricing when we contact you to arrange your appointment.
                       </AlertDescription>
                     </Box>
                   </Alert>
@@ -945,7 +945,7 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
                   <Box>
                     <AlertTitle>Ready to Proceed</AlertTitle>
                     <AlertDescription>
-                      Your health assessment appointment will be confirmed once you complete the bank transfer of {formatPrice(ASSESSMENT_PRICE)}.
+                      Our team will contact you to confirm your appointment and discuss payment details.
                     </AlertDescription>
                   </Box>
                 </Alert>
@@ -965,7 +965,7 @@ const PaymentIntegration: React.FC<PaymentIntegrationProps> = ({
                       </HStack>
                       <HStack justify="space-between" w="full">
                         <Text fontSize="sm" color="gray.600">Amount:</Text>
-                        <Text fontSize="sm" fontWeight="700" color="green.600">{formatPrice(ASSESSMENT_PRICE)}</Text>
+                        <Text fontSize="sm" fontWeight="700" color="purple.600">To be confirmed</Text>
                       </HStack>
                     </VStack>
                   </CardBody>

@@ -48,7 +48,6 @@ import { BookingService } from '../../types/booking.types'
 import { ScheduleData } from './AppointmentScheduling'
 import { PatientInformation } from './PatientInformationForm'
 import { PaymentResult } from './PaymentIntegration'
-import { ASSESSMENT_PRICE } from '../../constants/assessments'
 
 interface BookingConfirmationProps {
   selectedService: BookingService
@@ -264,7 +263,7 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
       assessmentType: selectedService.name,
       date: selectedSchedule.date,
       time: selectedSchedule.timeSlot.time,
-      assessmentFee: ASSESSMENT_PRICE,
+      assessmentFee: 'To be confirmed',
       patient: `${patientInfo.firstName} ${patientInfo.lastName}`,
     }
 
@@ -281,7 +280,7 @@ Duration: ${selectedService.duration} minutes
 Patient: ${patientInfo.firstName} ${patientInfo.lastName}
 
 PAYMENT INFORMATION:
-Assessment Fee: ${formatPrice(ASSESSMENT_PRICE)}
+Assessment Fee: To be confirmed by Royal Health
 ${paymentResult ?
   `Payment Method: ${paymentResult.method.toUpperCase()}
 Transaction ID: ${paymentResult.transactionId}
@@ -659,7 +658,7 @@ Email: care@royalhealthconsult.com
                     
                     <HStack justify="space-between" w="full">
                       <Text>Assessment Fee</Text>
-                      <Text fontWeight="600">{formatPrice(ASSESSMENT_PRICE)}</Text>
+                      <Text fontWeight="600" color="purple.600">To be confirmed</Text>
                     </HStack>
                     
                     {paymentResult ? (
@@ -702,9 +701,9 @@ Email: care@royalhealthconsult.com
                     <Alert status="info" size="sm">
                       <AlertIcon />
                       <Box fontSize="sm">
-                        <AlertTitle>Fixed Assessment Fee!</AlertTitle>
+                        <AlertTitle>Assessment Fee</AlertTitle>
                         <AlertDescription>
-                          All health assessments are priced at {formatPrice(ASSESSMENT_PRICE)} regardless of type or duration.
+                          Pricing will be confirmed by our team when we contact you to arrange your appointment.
                         </AlertDescription>
                       </Box>
                     </Alert>
@@ -986,7 +985,7 @@ Email: care@royalhealthconsult.com
                     <Text>• We will contact you to confirm your appointment</Text>
                     <Text>• {assessmentDetails.followUpInfo}</Text>
                     {paymentResult && paymentResult.method === 'cash' && (
-                      <Text>• Please have exact amount ready: {formatPrice(ASSESSMENT_PRICE)}</Text>
+                      <Text>• Our team will confirm the exact amount when we contact you</Text>
                     )}
                     {!paymentResult && (
                       <Text>• Payment will be discussed and arranged during your consultation</Text>

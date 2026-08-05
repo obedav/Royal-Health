@@ -8,18 +8,16 @@ $method = $_SERVER['REQUEST_METHOD'];
 if ($method === 'GET') {
     try {
         $db = Database::getInstance();
-        
+
         // Test database connection
-        $result = $db->fetch("SELECT NOW() as current_time, VERSION() as db_version");
-        $userCount = $db->fetch("SELECT COUNT(*) as count FROM users")['count'];
-        
+        $result = $db->fetch("SELECT NOW() as server_time, VERSION() as db_version");
+
         Response::success([
             'status' => 'healthy',
-            'timestamp' => $result['current_time'],
+            'timestamp' => $result['server_time'],
             'database' => [
                 'status' => 'connected',
                 'version' => $result['db_version'],
-                'userCount' => (int)$userCount
             ],
             'api_version' => API_VERSION,
             'app_name' => APP_NAME

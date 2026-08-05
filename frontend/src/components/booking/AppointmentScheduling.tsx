@@ -35,7 +35,6 @@ import {
 } from 'react-icons/fa'
 import { useState, useEffect } from 'react'
 import { BookingService } from '../../types/booking.types'
-import { ASSESSMENT_PRICE } from '../../constants/assessments'
 
 interface SchedulingProps {
   selectedService: BookingService
@@ -148,7 +147,7 @@ const AppointmentScheduling: React.FC<SchedulingProps> = ({
       time: slot.label,
       duration: selectedService.duration,
       available: Math.random() > 0.2, // 80% availability for assessments
-      price: ASSESSMENT_PRICE, // Fixed ₦5,000 for all assessments
+      price: 0,
       isEmergency: selectedService.category === 'emergency' && (parseInt(slot.time.split(':')[0]) < 8 || parseInt(slot.time.split(':')[0]) > 18)
     }))
   }
@@ -283,16 +282,16 @@ const AppointmentScheduling: React.FC<SchedulingProps> = ({
                   >
                     {selectedService.duration} minutes
                   </Badge>
-                  <Badge 
-                    bg="green.500"
+                  <Badge
+                    bg="purple.500"
                     color="white"
-                    fontSize="md" 
-                    px={4} 
+                    fontSize="sm"
+                    px={4}
                     py={1}
                     borderRadius="full"
                     fontWeight="600"
                   >
-                    {formatPrice(ASSESSMENT_PRICE)}
+                    Pricing on request
                   </Badge>
                   {selectedService.category === 'emergency' && (
                     <Badge 
@@ -667,8 +666,8 @@ const AppointmentScheduling: React.FC<SchedulingProps> = ({
                   <Text fontSize="sm">
                     <strong>Healthcare Professional:</strong> Will be assigned based on your location and assessment type
                   </Text>
-                  <Text fontSize="sm" color="green.600" fontWeight="600">
-                    <strong>Assessment Fee:</strong> {formatPrice(ASSESSMENT_PRICE)}
+                  <Text fontSize="sm" color="purple.600" fontWeight="600">
+                    <strong>Assessment Fee:</strong> Pricing confirmed by Royal Health upon contact
                   </Text>
                 </VStack>
               </AlertDescription>

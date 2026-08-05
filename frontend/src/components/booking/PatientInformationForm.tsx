@@ -43,7 +43,6 @@ import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { BookingService } from "../../types/booking.types";
 import { ScheduleData } from "./AppointmentScheduling";
-import { ASSESSMENT_PRICE } from "../../constants/assessments";
 import type { PatientInformation } from "../../types/patient.types";
 import {
   validatePatientForm,
@@ -431,16 +430,16 @@ const PatientInformationForm: React.FC<PatientFormProps> = ({
                       {selectedSchedule.address.state}
                     </Text>
                   </VStack>
-                  <Badge 
-                    bg="green.500"
+                  <Badge
+                    bg="purple.500"
                     color="white"
-                    fontSize="md" 
-                    px={4} 
+                    fontSize="sm"
+                    px={4}
                     py={1}
                     borderRadius="full"
                     fontWeight="600"
                   >
-                    {formatPrice(ASSESSMENT_PRICE)}
+                    Pricing on request
                   </Badge>
                 </VStack>
               </HStack>
