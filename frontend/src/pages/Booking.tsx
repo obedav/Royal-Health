@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Box,
   Container,
@@ -40,6 +40,7 @@ import {
   FaCreditCard,
 } from "react-icons/fa";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { buildApiUrl } from "../config/api.config";
 import ServiceSelection from "../components/booking/ServiceSelection";
 import AppointmentScheduling from "../components/booking/AppointmentScheduling";
 import type { ScheduleData } from "../components/booking/AppointmentScheduling";
@@ -65,6 +66,7 @@ const Booking: React.FC = () => {
   const [paymentResult, setPaymentResult] = useState<
     PaymentResult | undefined
   >();
+  const sessionId = useRef(`session-${Date.now()}`);
 
   // Enhanced booking steps with payment removed
   const steps = [
@@ -121,8 +123,34 @@ const Booking: React.FC = () => {
     setSelectedSchedule(scheduleData);
   };
 
-  const handlePatientInfoSubmit = (patientData: PatientInformation) => {
+  const handlePatientInfoSubmit = async (patientData: PatientInformation) => {
     setPatientInfo(patientData);
+
+    if (!selectedService || !selectedSchedule) return;
+
+    try {
+      const payload = {
+        sessionId: sessionId.current,
+        serviceId: selectedService.id,
+        patientInfo: {
+          name: `${patientData.firstName} ${patientData.lastName}`,
+          email: patientData.email || null,
+          phone: patientData.phone,
+          address: `${selectedSchedule.address.street}, ${selectedSchedule.address.city}, ${selectedSchedule.address.state}`,
+        },
+        scheduledDate: selectedSchedule.date,
+        scheduledTime: selectedSchedule.timeSlot.time,
+        totalAmount: 0,
+      };
+
+      await fetch(buildApiUrl('/bookings/guest'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    } catch (error) {
+      console.error('Booking submission failed:', error);
+    }
   };
 
   const handlePaymentSuccess = (payment: PaymentResult) => {

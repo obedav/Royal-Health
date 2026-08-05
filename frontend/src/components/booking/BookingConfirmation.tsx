@@ -481,6 +481,74 @@ Email: care@royalhealthconsult.com
             </Box>
           </Fade>
 
+          {/* Booking Reference Banner */}
+          <Fade in={true} transition={{ enter: { duration: 0.6, delay: 1.2 } }}>
+            <Box
+              bg="linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)"
+              borderRadius="2xl"
+              p={{ base: 5, md: 8 }}
+              textAlign="center"
+              boxShadow="0 10px 30px rgba(0, 0, 0, 0.3)"
+            >
+              <VStack spacing={3}>
+                <Badge colorScheme="green" px={4} py={1} borderRadius="full" fontSize="xs" letterSpacing="wider">
+                  BOOKING CONFIRMED
+                </Badge>
+                <Text color="rgba(255,255,255,0.7)" fontSize="sm" fontWeight="600" letterSpacing="wider" textTransform="uppercase">
+                  Your Booking Reference
+                </Text>
+                <Text
+                  color="white"
+                  fontSize={{ base: "3xl", md: "5xl" }}
+                  fontWeight="900"
+                  letterSpacing={{ base: "wide", md: "wider" }}
+                  fontFamily="mono"
+                >
+                  {assessmentDetails.confirmationCode}
+                </Text>
+                <Text color="rgba(255,255,255,0.6)" fontSize="sm">
+                  Save this code — our team will ask for it when confirming your appointment
+                </Text>
+              </VStack>
+            </Box>
+          </Fade>
+
+          {/* Confirmation Notice */}
+          <Fade in={true} transition={{ enter: { duration: 0.6, delay: 1.5 } }}>
+            <Alert
+              status="success"
+              bg="rgba(34, 197, 94, 0.08)"
+              borderColor="rgba(34, 197, 94, 0.3)"
+              borderWidth="2px"
+              borderRadius="2xl"
+              backdropFilter="blur(15px)"
+              boxShadow="0 4px 15px rgba(34, 197, 94, 0.1)"
+              p={{ base: 4, md: 6 }}
+            >
+              <AlertIcon color="green.600" fontSize={{ base: "xl", md: "2xl" }} />
+              <Box>
+                <AlertTitle fontWeight="700" fontSize={{ base: "md", md: "lg" }}>
+                  Booking Request Received!
+                </AlertTitle>
+                <AlertDescription fontSize={{ base: "sm", md: "md" }} lineHeight="1.6">
+                  Your details have been captured. Our team will call{" "}
+                  <Text as="span" fontWeight="600" color="green.700">
+                    {patientInfo.phone}
+                  </Text>
+                  {patientInfo.email && (
+                    <>
+                      {" "}and email{" "}
+                      <Text as="span" fontWeight="600" color="green.700">
+                        {patientInfo.email}
+                      </Text>
+                    </>
+                  )}
+                  {" "}within 2 hours to confirm your appointment.
+                </AlertDescription>
+              </Box>
+            </Alert>
+          </Fade>
+
       {/* Enhanced Content Grid with Staggered Animations */}
       <SimpleGrid columns={{ base: 1, xl: 2 }} spacing={{ base: 6, md: 10 }} w="full">
         {/* Left Column - Assessment Details */}
@@ -566,9 +634,67 @@ Email: care@royalhealthconsult.com
 
                     <HStack spacing={4} w="full" align="start">
                       <Icon as={FaPhone} color="blue.500" fontSize="lg" mt={1} />
-                      <VStack spacing={1} align="start" flex={1}>
+                      <VStack spacing={2} align="start" flex={1}>
                         <Text fontWeight="600">What Happens Next</Text>
-                        <Text color="gray.600">Our team will contact you to confirm your appointment details.</Text>
+                        <VStack spacing={3} align="start" w="full">
+                          <HStack align="start" spacing={3}>
+                            <Box
+                              minW="22px"
+                              h="22px"
+                              bgGradient="linear(45deg, blue.500, purple.500)"
+                              borderRadius="full"
+                              display="flex"
+                              alignItems="center"
+                              justifyContent="center"
+                              mt={0.5}
+                              flexShrink={0}
+                            >
+                              <Text color="white" fontSize="xs" fontWeight="800">1</Text>
+                            </Box>
+                            <VStack spacing={0} align="start">
+                              <Text fontSize="sm" fontWeight="700" color="gray.700">Within 2 hours</Text>
+                              <Text fontSize="sm" color="gray.600">Our team calls to confirm your appointment and discuss pricing</Text>
+                            </VStack>
+                          </HStack>
+                          <HStack align="start" spacing={3}>
+                            <Box
+                              minW="22px"
+                              h="22px"
+                              bgGradient="linear(45deg, blue.500, purple.500)"
+                              borderRadius="full"
+                              display="flex"
+                              alignItems="center"
+                              justifyContent="center"
+                              mt={0.5}
+                              flexShrink={0}
+                            >
+                              <Text color="white" fontSize="xs" fontWeight="800">2</Text>
+                            </Box>
+                            <VStack spacing={0} align="start">
+                              <Text fontSize="sm" fontWeight="700" color="gray.700">Day before</Text>
+                              <Text fontSize="sm" color="gray.600">Reminder call and confirmation of arrival time</Text>
+                            </VStack>
+                          </HStack>
+                          <HStack align="start" spacing={3}>
+                            <Box
+                              minW="22px"
+                              h="22px"
+                              bgGradient="linear(45deg, blue.500, purple.500)"
+                              borderRadius="full"
+                              display="flex"
+                              alignItems="center"
+                              justifyContent="center"
+                              mt={0.5}
+                              flexShrink={0}
+                            >
+                              <Text color="white" fontSize="xs" fontWeight="800">3</Text>
+                            </Box>
+                            <VStack spacing={0} align="start">
+                              <Text fontSize="sm" fontWeight="700" color="gray.700">Day of assessment</Text>
+                              <Text fontSize="sm" color="gray.600">Healthcare professional arrives at your home</Text>
+                            </VStack>
+                          </HStack>
+                        </VStack>
                       </VStack>
                     </HStack>
 
@@ -696,17 +822,6 @@ Email: care@royalhealthconsult.com
                       </VStack>
                     )}
 
-                    <Divider />
-
-                    <Alert status="info" size="sm">
-                      <AlertIcon />
-                      <Box fontSize="sm">
-                        <AlertTitle>Assessment Fee</AlertTitle>
-                        <AlertDescription>
-                          Pricing will be confirmed by our team when we contact you to arrange your appointment.
-                        </AlertDescription>
-                      </Box>
-                    </Alert>
                   </VStack>
 
                   <HStack spacing={3} w="full">
@@ -1126,57 +1241,6 @@ Email: care@royalhealthconsult.com
         </Box>
       </SimpleGrid>
 
-      {/* Enhanced Final Confirmation Notice */}
-      <Fade in={true} transition={{ enter: { duration: 0.6, delay: 2.5 } }}>
-        <Alert
-          status="success"
-          bg="rgba(34, 197, 94, 0.08)"
-          borderColor="rgba(34, 197, 94, 0.3)"
-          borderWidth="2px"
-          borderRadius="2xl"
-          backdropFilter="blur(15px)"
-          boxShadow="0 8px 25px rgba(34, 197, 94, 0.12), 0 3px 10px rgba(0, 0, 0, 0.05)"
-          p={{ base: 4, md: 6 }}
-          _hover={{
-            transform: "translateY(-2px)",
-            boxShadow: "0 12px 35px rgba(34, 197, 94, 0.18), 0 5px 15px rgba(0, 0, 0, 0.08)",
-          }}
-          transition="all 0.3s ease-in-out"
-        >
-          <AlertIcon color="green.600" fontSize={{ base: "xl", md: "2xl" }} />
-          <Box>
-            <AlertTitle
-              bgGradient="linear(45deg, green.600, emerald.600)"
-              bgClip="text"
-              sx={{
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-              fontWeight="700"
-              fontSize={{ base: "md", md: "lg" }}
-            >
-              Confirmation Sent!
-            </AlertTitle>
-            <AlertDescription fontSize={{ base: "sm", md: "md" }} lineHeight="1.6">
-              We've sent comprehensive assessment appointment details to{" "}
-              <Text as="span" fontWeight="600" color="green.700">
-                {patientInfo.email}
-              </Text>{" "}
-              and{" "}
-              <Text as="span" fontWeight="600" color="green.700">
-                {patientInfo.phone}
-              </Text>
-              .
-              {patientInfo.consentToSMSUpdates && (
-                <Text mt={2}>
-                  We will contact you to confirm your appointment details.
-                </Text>
-              )}
-            </AlertDescription>
-          </Box>
-        </Alert>
-      </Fade>
     </VStack>
   </Container>
 </Box>

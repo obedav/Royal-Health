@@ -217,7 +217,7 @@ class EmailService {
 
                         <div class='detail-row'>
                             <span class='label'>Amount:</span>
-                            <span class='value'>₦" . number_format($booking['total_amount']) . "</span>
+                            <span class='value'>To be confirmed by Royal Health</span>
                         </div>
 
                         <div class='detail-row'>
@@ -297,7 +297,7 @@ class EmailService {
                         <p><strong>Service:</strong> {$serviceName}</p>
                         <p><strong>Date:</strong> {$bookingDate}</p>
                         <p><strong>Time:</strong> {$bookingTime}</p>
-                        <p><strong>Amount:</strong> ₦" . number_format($booking['total_amount']) . "</p>
+                        <p><strong>Amount:</strong> To be confirmed by our team</p>
                         <p><strong>Location:</strong> {$booking['patient_address']}</p>
                     </div>
 
