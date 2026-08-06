@@ -17,9 +17,10 @@ import {
 } from '@chakra-ui/react'
 import { FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'
 import axios from 'axios'
+import { API_CONFIG } from '../../config/api.config'
 
 const ADMIN_AUTH_KEY = 'rh_admin_auth'
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+const API_BASE = API_CONFIG.BASE_URL
 const SESSION_DURATION_MS = 60 * 60 * 1000 // 1 hour
 
 interface AdminAuth {
