@@ -1,257 +1,326 @@
 import {
-  Box,
-  Container,
-  Heading,
-  Text,
-  VStack,
-  HStack,
-  Card,
-  CardBody,
-  Badge,
-  Icon,
-  SimpleGrid,
-  Button,
-  useColorModeValue,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  TableContainer,
-  Flex,
-  Input,
-  Select,
+  Box, Container, Heading, Text, VStack, HStack, Flex, Spacer,
+  Card, CardBody, Badge, Icon, SimpleGrid, Button, IconButton,
+  Input, InputGroup, InputLeftElement, Select, Spinner, Center,
+  Table, Thead, Tbody, Tr, Th, Td, TableContainer,
+  AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader,
+  AlertDialogContent, AlertDialogOverlay, useDisclosure,
+  useToast, Tooltip, Avatar, Tag, Skeleton, SkeletonText,
+  Divider, useColorModeValue,
 } from '@chakra-ui/react'
-import { FaStethoscope, FaUser, FaPhone, FaMapMarkerAlt, FaCalendarAlt, FaEye, FaCheck, FaClock } from 'react-icons/fa'
-import { useState, useEffect } from 'react'
-import { HEALTHCARE_SERVICES } from '../utils/constants'
+import {
+  FaStethoscope, FaSearch, FaClock, FaPhone, FaCalendarAlt,
+  FaCheckCircle, FaTimesCircle, FaTrash, FaSync, FaSignOutAlt,
+  FaUser, FaMapMarkerAlt, FaEnvelope, FaHeartbeat,
+} from 'react-icons/fa'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { API_CONFIG } from '../config/api.config'
 
-interface ConsultationRequest {
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+interface Consultation {
   id: string
+  reference_id: string
   name: string
   phone: string
   email?: string
   age: number
-  gender: 'male' | 'female' | 'other'
-  serviceType: string
+  gender: string
+  service_type: string
+  selected_service?: string
   state: string
   city: string
   address: string
-  healthConcerns?: string
-  preferredDate: string
-  preferredTime: 'morning' | 'afternoon' | 'evening'
-  submittedAt: string
+  health_concerns?: string
+  preferred_date: string
+  preferred_time: string
   status: 'pending' | 'contacted' | 'scheduled' | 'completed' | 'cancelled'
+  submitted_at: string
 }
 
+interface Summary {
+  total: number
+  pending: number
+  contacted: number
+  scheduled: number
+  completed: number
+  cancelled: number
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+const ADMIN_AUTH_KEY = 'rh_admin_auth'
+
+function getAdminToken(): string | null {
+  try {
+    const raw = sessionStorage.getItem(ADMIN_AUTH_KEY)
+    if (!raw) return null
+    const auth = JSON.parse(raw)
+    if (Date.now() >= auth.expiresAt) { sessionStorage.removeItem(ADMIN_AUTH_KEY); return null }
+    return auth.token
+  } catch { return null }
+}
+
+function signOut() {
+  sessionStorage.removeItem(ADMIN_AUTH_KEY)
+  window.location.reload()
+}
+
+const STATUS_CONFIG = {
+  pending:   { color: 'orange', icon: FaClock,       label: 'Pending' },
+  contacted: { color: 'blue',   icon: FaPhone,        label: 'Contacted' },
+  scheduled: { color: 'purple', icon: FaCalendarAlt,  label: 'Scheduled' },
+  completed: { color: 'green',  icon: FaCheckCircle,  label: 'Completed' },
+  cancelled: { color: 'red',    icon: FaTimesCircle,  label: 'Cancelled' },
+} as const
+
+const TIME_LABELS: Record<string, string> = {
+  morning: '8AM – 12PM', afternoon: '12PM – 5PM', evening: '5PM – 8PM',
+}
+
+function formatDate(dateStr: string) {
+  if (!dateStr) return '—'
+  return new Date(dateStr).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
+// ─── Stat Card ───────────────────────────────────────────────────────────────
+
+const StatCard: React.FC<{
+  label: string; value: number; icon: React.ElementType
+  gradient: string; loading: boolean
+}> = ({ label, value, icon, gradient, loading }) => (
+  <Card borderRadius="xl" overflow="hidden" boxShadow="sm" border="1px solid" borderColor="gray.100">
+    <CardBody p={0}>
+      <Box bgGradient={gradient} p={4} pb={3}>
+        <HStack justify="space-between" align="start">
+          <Box>
+            {loading ? (
+              <Skeleton h="32px" w="48px" mb={1} startColor="whiteAlpha.400" endColor="whiteAlpha.700" />
+            ) : (
+              <Text fontSize="3xl" fontWeight="800" color="white" lineHeight="1">{value}</Text>
+            )}
+            <Text fontSize="xs" color="whiteAlpha.800" fontWeight="600" mt={1}>{label}</Text>
+          </Box>
+          <Box bg="whiteAlpha.200" p={2} borderRadius="lg">
+            <Icon as={icon} color="white" fontSize="lg" />
+          </Box>
+        </HStack>
+      </Box>
+    </CardBody>
+  </Card>
+)
+
+// ─── Row Skeleton ─────────────────────────────────────────────────────────────
+
+const RowSkeleton = () => (
+  <Tr>
+    {[180, 130, 120, 100, 90, 80].map((w, i) => (
+      <Td key={i}><Skeleton h="16px" w={`${w}px`} borderRadius="md" /></Td>
+    ))}
+    <Td><Skeleton h="28px" w="60px" borderRadius="md" /></Td>
+    <Td><Skeleton h="28px" w="28px" borderRadius="md" /></Td>
+  </Tr>
+)
+
+// ─── Main Component ───────────────────────────────────────────────────────────
+
 const AdminConsultations: React.FC = () => {
-  const [requests, setRequests] = useState<ConsultationRequest[]>([])
-  const [filteredRequests, setFilteredRequests] = useState<ConsultationRequest[]>([])
-  const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [searchTerm, setSearchTerm] = useState('')
-  const cardBg = useColorModeValue('white', 'gray.800')
-  const borderColor = useColorModeValue('gray.200', 'gray.600')
+  const [consultations, setConsultations] = useState<Consultation[]>([])
+  const [summary, setSummary] = useState<Summary>({ total: 0, pending: 0, contacted: 0, scheduled: 0, completed: 0, cancelled: 0 })
+  const [loading, setLoading] = useState(true)
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [search, setSearch] = useState('')
+  const [deleteTarget, setDeleteTarget] = useState<Consultation | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const [updatingId, setUpdatingId] = useState<string | null>(null)
 
-  // Mock data - In real app, this would come from API/backend
-  useEffect(() => {
-    // Simulate loading consultation requests
-    const mockRequests: ConsultationRequest[] = [
-      {
-        id: '1',
-        name: 'John Doe',
-        phone: '+2348012345678',
-        email: 'john@example.com',
-        age: 45,
-        gender: 'male',
-        serviceType: 'general-health-assessment',
-        state: 'lagos',
-        city: 'Lagos',
-        address: '123 Victoria Island, Lagos',
-        healthConcerns: 'High blood pressure concerns',
-        preferredDate: '2024-01-15',
-        preferredTime: 'morning',
-        submittedAt: '2024-01-10T10:30:00Z',
-        status: 'pending'
-      },
-      {
-        id: '2',
-        name: 'Mary Johnson',
-        phone: '+2348087654321',
-        age: 60,
-        gender: 'female',
-        serviceType: 'elderly-care-assessment',
-        state: 'ogun',
-        city: 'Abeokuta',
-        address: '456 Oke Mosan, Abeokuta',
-        preferredDate: '2024-01-16',
-        preferredTime: 'afternoon',
-        submittedAt: '2024-01-11T14:15:00Z',
-        status: 'contacted'
-      },
-      {
-        id: '3',
-        name: 'Ahmad Hassan',
-        phone: '+2347012345678',
-        email: 'ahmad@example.com',
-        age: 35,
-        gender: 'male',
-        serviceType: 'mental-health-screening',
-        state: 'fct',
-        city: 'Abuja',
-        address: '789 Garki Area, Abuja',
-        healthConcerns: 'Stress and anxiety management',
-        preferredDate: '2024-01-17',
-        preferredTime: 'evening',
-        submittedAt: '2024-01-12T09:45:00Z',
-        status: 'scheduled'
-      }
-    ]
-    setRequests(mockRequests)
-    setFilteredRequests(mockRequests)
-  }, [])
+  const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure()
+  const cancelRef = useRef<HTMLButtonElement>(null)
+  const toast = useToast()
 
-  // Filter and search logic
-  useEffect(() => {
-    let filtered = requests
+  const cardBg  = useColorModeValue('white', 'gray.800')
+  const tableBg = useColorModeValue('gray.50', 'gray.700')
 
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(req => req.status === statusFilter)
+  // ── Fetch ──────────────────────────────────────────────────────────────────
+
+  const fetchConsultations = useCallback(async (showSpinner = true) => {
+    const token = getAdminToken()
+    if (!token) { signOut(); return }
+    if (showSpinner) setLoading(true)
+    try {
+      const params = new URLSearchParams({ limit: '100' })
+      if (statusFilter !== 'all') params.set('status', statusFilter)
+      if (search.trim()) params.set('search', search.trim())
+
+      const res = await fetch(`${API_CONFIG.BASE_URL}/consultations/list?${params}`, {
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.message || 'Failed to load')
+      setConsultations(json.data?.consultations ?? [])
+      if (json.data?.summary) setSummary(json.data.summary)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Could not load consultations'
+      toast({ title: 'Load error', description: msg, status: 'error', duration: 4000, isClosable: true })
+    } finally {
+      setLoading(false)
     }
+  }, [statusFilter, search, toast])
 
-    if (searchTerm) {
-      filtered = filtered.filter(req =>
-        req.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        req.phone.includes(searchTerm) ||
-        req.city.toLowerCase().includes(searchTerm.toLowerCase())
+  useEffect(() => { fetchConsultations() }, [fetchConsultations])
+
+  // ── Status update ──────────────────────────────────────────────────────────
+
+  const handleStatusChange = async (consultation: Consultation, newStatus: string) => {
+    const token = getAdminToken()
+    if (!token) { signOut(); return }
+    setUpdatingId(consultation.id)
+    try {
+      const res = await fetch(`${API_CONFIG.BASE_URL}/consultations/${consultation.id}/status`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.message || 'Update failed')
+      setConsultations(prev =>
+        prev.map(c => c.id === consultation.id ? { ...c, status: newStatus as Consultation['status'] } : c)
       )
+      setSummary(prev => {
+        const next = { ...prev }
+        if (consultation.status in next) (next as any)[consultation.status]--
+        if (newStatus in next) (next as any)[newStatus]++
+        return next
+      })
+      toast({ title: 'Status updated', status: 'success', duration: 2000 })
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Update failed'
+      toast({ title: 'Update failed', description: msg, status: 'error', duration: 3000 })
+    } finally {
+      setUpdatingId(null)
     }
+  }
 
-    setFilteredRequests(filtered)
-  }, [requests, statusFilter, searchTerm])
+  // ── Delete ─────────────────────────────────────────────────────────────────
 
-  const getStatusColor = (status: string) => {
-    const colors = {
-      pending: 'yellow',
-      contacted: 'blue',
-      scheduled: 'green',
-      completed: 'gray',
-      cancelled: 'red'
+  const confirmDelete = (c: Consultation) => { setDeleteTarget(c); onDeleteOpen() }
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return
+    const token = getAdminToken()
+    if (!token) { signOut(); return }
+    setDeleting(true)
+    try {
+      const res = await fetch(`${API_CONFIG.BASE_URL}/consultations/${deleteTarget.id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.message || 'Delete failed')
+      setConsultations(prev => prev.filter(c => c.id !== deleteTarget.id))
+      setSummary(prev => {
+        const next = { ...prev, total: prev.total - 1 }
+        if (deleteTarget.status in next) (next as any)[deleteTarget.status]--
+        return next
+      })
+      toast({ title: 'Lead deleted', status: 'success', duration: 2000 })
+      onDeleteClose()
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Delete failed'
+      toast({ title: 'Delete failed', description: msg, status: 'error', duration: 3000 })
+    } finally {
+      setDeleting(false)
+      setDeleteTarget(null)
     }
-    return colors[status as keyof typeof colors] || 'gray'
   }
 
-  const getStatusIcon = (status: string) => {
-    const icons = {
-      pending: FaClock,
-      contacted: FaPhone,
-      scheduled: FaCalendarAlt,
-      completed: FaCheck,
-      cancelled: FaClock
-    }
-    return icons[status as keyof typeof icons] || FaClock
-  }
+  // ── Render ─────────────────────────────────────────────────────────────────
 
-  const updateRequestStatus = (id: string, newStatus: string) => {
-    setRequests(prev => prev.map(req =>
-      req.id === id ? { ...req, status: newStatus as ConsultationRequest['status'] } : req
-    ))
-  }
-
-  const getServiceName = (serviceId: string) => {
-    const service = HEALTHCARE_SERVICES.find(s => s.id === serviceId)
-    return service?.name || serviceId
-  }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    })
-  }
-
-  const formatTime = (time: string) => {
-    const timeMap = {
-      morning: '8AM - 12PM',
-      afternoon: '12PM - 5PM',
-      evening: '5PM - 8PM'
-    }
-    return timeMap[time as keyof typeof timeMap] || time
-  }
+  const stats = [
+    { label: 'Total Leads',  value: summary.total,     icon: FaHeartbeat,   gradient: 'linear(135deg, #C2185B, #7B1FA2)' },
+    { label: 'Pending',      value: summary.pending,    icon: FaClock,        gradient: 'linear(135deg, #E65100, #FF8F00)' },
+    { label: 'Contacted',    value: summary.contacted,  icon: FaPhone,        gradient: 'linear(135deg, #1565C0, #1976D2)' },
+    { label: 'Scheduled',    value: summary.scheduled,  icon: FaCalendarAlt,  gradient: 'linear(135deg, #6A1B9A, #8E24AA)' },
+    { label: 'Completed',    value: summary.completed,  icon: FaCheckCircle,  gradient: 'linear(135deg, #2E7D32, #43A047)' },
+  ]
 
   return (
     <Box minH="100vh" bg="gray.50">
-      <Container maxW="7xl" py={8}>
-        <VStack spacing={8} align="stretch">
-          {/* Header */}
-          <Box textAlign="center">
-            <Icon as={FaStethoscope} fontSize="4xl" color="brand.500" mb={4} />
-            <Heading
-              size="xl"
-              mb={4}
-              bgGradient="linear(45deg, brand.600, purple.600)"
-              bgClip="text"
-              sx={{
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              Consultation Requests - Admin Panel
-            </Heading>
-            <Text color="gray.600" fontSize="lg">
-              Monitor and manage health consultation requests
-            </Text>
-          </Box>
 
-          {/* Stats Cards */}
-          <SimpleGrid columns={{ base: 1, md: 4 }} spacing={6}>
-            {[
-              { label: 'Total Requests', value: requests.length, color: 'blue', icon: FaUser },
-              { label: 'Pending', value: requests.filter(r => r.status === 'pending').length, color: 'yellow', icon: FaClock },
-              { label: 'Contacted', value: requests.filter(r => r.status === 'contacted').length, color: 'blue', icon: FaPhone },
-              { label: 'Scheduled', value: requests.filter(r => r.status === 'scheduled').length, color: 'green', icon: FaCalendarAlt },
-            ].map((stat, index) => (
-              <Card key={index} bg={cardBg} borderColor={borderColor} borderWidth="2px">
-                <CardBody p={6} textAlign="center">
-                  <VStack spacing={3}>
-                    <Box
-                      w={12}
-                      h={12}
-                      bgGradient={`linear(45deg, ${stat.color}.100, ${stat.color}.200)`}
-                      borderRadius="full"
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                    >
-                      <Icon as={stat.icon} color={`${stat.color}.600`} fontSize="xl" />
-                    </Box>
-                    <Text fontSize="2xl" fontWeight="bold" color="gray.800">
-                      {stat.value}
-                    </Text>
-                    <Text fontSize="sm" color="gray.600" fontWeight="500">
-                      {stat.label}
-                    </Text>
-                  </VStack>
-                </CardBody>
-              </Card>
+      {/* Header */}
+      <Box bg="white" borderBottom="1px solid" borderColor="gray.200" px={6} py={4} position="sticky" top={0} zIndex={10}>
+        <Flex align="center" maxW="7xl" mx="auto">
+          <HStack spacing={3}>
+            <Box bg="brand.500" p={2} borderRadius="lg">
+              <Icon as={FaStethoscope} color="white" fontSize="lg" />
+            </Box>
+            <Box>
+              <Heading size="sm" color="gray.800">Royal Health Admin</Heading>
+              <Text fontSize="xs" color="gray.500">Consultation Management</Text>
+            </Box>
+          </HStack>
+          <Spacer />
+          <HStack spacing={2}>
+            <Tooltip label="Refresh data">
+              <IconButton
+                aria-label="Refresh"
+                icon={<Icon as={FaSync} />}
+                size="sm"
+                variant="ghost"
+                colorScheme="gray"
+                isLoading={loading}
+                onClick={() => fetchConsultations(false)}
+              />
+            </Tooltip>
+            <Button
+              leftIcon={<Icon as={FaSignOutAlt} />}
+              size="sm"
+              variant="ghost"
+              colorScheme="red"
+              onClick={signOut}
+            >
+              Sign Out
+            </Button>
+          </HStack>
+        </Flex>
+      </Box>
+
+      <Container maxW="7xl" py={8}>
+        <VStack spacing={6} align="stretch">
+
+          {/* Stats */}
+          <SimpleGrid columns={{ base: 2, md: 3, lg: 5 }} spacing={4}>
+            {stats.map(s => (
+              <StatCard key={s.label} {...s} loading={loading} />
             ))}
           </SimpleGrid>
 
-          {/* Filters */}
-          <Card bg={cardBg} borderColor={borderColor} borderWidth="2px">
-            <CardBody p={6}>
-              <Flex gap={4} flexWrap="wrap">
-                <Input
-                  placeholder="Search by name, phone, or city..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  maxW="300px"
-                />
+          {/* Table Card */}
+          <Card bg={cardBg} borderRadius="xl" boxShadow="sm" border="1px solid" borderColor="gray.100">
+            <CardBody p={0}>
+
+              {/* Toolbar */}
+              <Flex p={4} gap={3} flexWrap="wrap" borderBottom="1px solid" borderColor="gray.100" align="center">
+                <InputGroup maxW="300px">
+                  <InputLeftElement pointerEvents="none">
+                    <Icon as={FaSearch} color="gray.400" fontSize="sm" />
+                  </InputLeftElement>
+                  <Input
+                    placeholder="Search name, phone, city…"
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    size="sm"
+                    borderRadius="lg"
+                    focusBorderColor="brand.500"
+                  />
+                </InputGroup>
                 <Select
                   value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  maxW="200px"
+                  onChange={e => setStatusFilter(e.target.value)}
+                  maxW="160px"
+                  size="sm"
+                  borderRadius="lg"
+                  focusBorderColor="brand.500"
                 >
                   <option value="all">All Status</option>
                   <option value="pending">Pending</option>
@@ -260,142 +329,206 @@ const AdminConsultations: React.FC = () => {
                   <option value="completed">Completed</option>
                   <option value="cancelled">Cancelled</option>
                 </Select>
+                <Spacer />
+                <Text fontSize="xs" color="gray.400" alignSelf="center">
+                  {loading ? '…' : `${consultations.length} record${consultations.length !== 1 ? 's' : ''}`}
+                </Text>
               </Flex>
-            </CardBody>
-          </Card>
 
-          {/* Requests Table */}
-          <Card bg={cardBg} borderColor={borderColor} borderWidth="2px">
-            <CardBody p={0}>
+              {/* Table */}
               <TableContainer>
-                <Table variant="simple">
-                  <Thead bg="gray.50">
+                <Table variant="simple" size="sm">
+                  <Thead bg={tableBg}>
                     <Tr>
-                      <Th>Patient Info</Th>
-                      <Th>Service Type</Th>
-                      <Th>Location</Th>
-                      <Th>Preferred Schedule</Th>
-                      <Th>Status</Th>
-                      <Th>Submitted</Th>
-                      <Th>Actions</Th>
+                      <Th py={3} fontSize="xs">Patient</Th>
+                      <Th py={3} fontSize="xs">Service</Th>
+                      <Th py={3} fontSize="xs">Location</Th>
+                      <Th py={3} fontSize="xs">Schedule</Th>
+                      <Th py={3} fontSize="xs">Ref ID</Th>
+                      <Th py={3} fontSize="xs">Submitted</Th>
+                      <Th py={3} fontSize="xs">Status</Th>
+                      <Th py={3} fontSize="xs" w="40px"></Th>
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {filteredRequests.map((request) => (
-                      <Tr key={request.id} _hover={{ bg: 'gray.50' }}>
-                        <Td>
-                          <VStack align="start" spacing={1}>
-                            <Text fontWeight="bold" fontSize="sm">
-                              {request.name}
-                            </Text>
-                            <Text fontSize="xs" color="gray.600">
-                              {request.phone}
-                            </Text>
-                            <Text fontSize="xs" color="gray.500">
-                              Age: {request.age}, {request.gender}
-                            </Text>
-                          </VStack>
-                        </Td>
-                        <Td>
-                          <Text fontSize="sm" fontWeight="500">
-                            {getServiceName(request.serviceType)}
-                          </Text>
-                        </Td>
-                        <Td>
-                          <VStack align="start" spacing={1}>
-                            <Text fontSize="sm" fontWeight="500">
-                              {request.city}, {request.state}
-                            </Text>
-                            <Text fontSize="xs" color="gray.600" noOfLines={1} maxW="200px">
-                              {request.address}
-                            </Text>
-                          </VStack>
-                        </Td>
-                        <Td>
-                          <VStack align="start" spacing={1}>
-                            <Text fontSize="sm" fontWeight="500">
-                              {formatDate(request.preferredDate)}
-                            </Text>
-                            <Text fontSize="xs" color="gray.600">
-                              {formatTime(request.preferredTime)}
-                            </Text>
-                          </VStack>
-                        </Td>
-                        <Td>
-                          <Badge
-                            colorScheme={getStatusColor(request.status)}
-                            variant="subtle"
-                            px={2}
-                            py={1}
-                            borderRadius="md"
-                          >
-                            {request.status}
-                          </Badge>
-                        </Td>
-                        <Td>
-                          <Text fontSize="xs" color="gray.600">
-                            {formatDate(request.submittedAt)}
-                          </Text>
-                        </Td>
-                        <Td>
-                          <HStack spacing={2}>
-                            <Select
-                              size="sm"
-                              value={request.status}
-                              onChange={(e) => updateRequestStatus(request.id, e.target.value)}
-                              minW="120px"
-                            >
-                              <option value="pending">Pending</option>
-                              <option value="contacted">Contacted</option>
-                              <option value="scheduled">Scheduled</option>
-                              <option value="completed">Completed</option>
-                              <option value="cancelled">Cancelled</option>
-                            </Select>
-                          </HStack>
+                    {loading ? (
+                      Array.from({ length: 5 }).map((_, i) => <RowSkeleton key={i} />)
+                    ) : consultations.length === 0 ? (
+                      <Tr>
+                        <Td colSpan={8}>
+                          <Center py={16}>
+                            <VStack spacing={3}>
+                              <Box p={5} bg="gray.100" borderRadius="full">
+                                <Icon as={FaStethoscope} fontSize="3xl" color="gray.400" />
+                              </Box>
+                              <Text fontWeight="600" color="gray.500">No consultations found</Text>
+                              <Text fontSize="sm" color="gray.400">
+                                {search || statusFilter !== 'all' ? 'Try adjusting your filters' : 'New leads will appear here'}
+                              </Text>
+                            </VStack>
+                          </Center>
                         </Td>
                       </Tr>
-                    ))}
+                    ) : (
+                      consultations.map(c => {
+                        const cfg = STATUS_CONFIG[c.status] ?? STATUS_CONFIG.pending
+                        return (
+                          <Tr key={c.id} _hover={{ bg: 'gray.50' }} transition="background 0.15s">
+                            {/* Patient */}
+                            <Td py={3}>
+                              <HStack spacing={2}>
+                                <Avatar size="xs" name={c.name} bg="brand.100" color="brand.700" />
+                                <VStack align="start" spacing={0}>
+                                  <Text fontWeight="600" fontSize="sm" noOfLines={1}>{c.name}</Text>
+                                  <HStack spacing={1}>
+                                    <Icon as={FaPhone} fontSize="9px" color="gray.400" />
+                                    <Text fontSize="xs" color="gray.500">{c.phone}</Text>
+                                  </HStack>
+                                  {c.email && (
+                                    <HStack spacing={1}>
+                                      <Icon as={FaEnvelope} fontSize="9px" color="gray.400" />
+                                      <Text fontSize="xs" color="gray.500" noOfLines={1}>{c.email}</Text>
+                                    </HStack>
+                                  )}
+                                  <Text fontSize="xs" color="gray.400">{c.age}y · {c.gender}</Text>
+                                </VStack>
+                              </HStack>
+                            </Td>
+
+                            {/* Service */}
+                            <Td py={3}>
+                              <Text fontSize="sm" fontWeight="500" noOfLines={2} maxW="160px">
+                                {c.selected_service || c.service_type}
+                              </Text>
+                            </Td>
+
+                            {/* Location */}
+                            <Td py={3}>
+                              <HStack spacing={1} align="start">
+                                <Icon as={FaMapMarkerAlt} fontSize="10px" color="gray.400" mt="3px" />
+                                <VStack align="start" spacing={0}>
+                                  <Text fontSize="sm" fontWeight="500">{c.city}, {c.state}</Text>
+                                  <Text fontSize="xs" color="gray.500" noOfLines={1} maxW="140px">{c.address}</Text>
+                                </VStack>
+                              </HStack>
+                            </Td>
+
+                            {/* Schedule */}
+                            <Td py={3}>
+                              <VStack align="start" spacing={0}>
+                                <Text fontSize="sm" fontWeight="500">{formatDate(c.preferred_date)}</Text>
+                                <Text fontSize="xs" color="gray.500">{TIME_LABELS[c.preferred_time] ?? c.preferred_time}</Text>
+                              </VStack>
+                            </Td>
+
+                            {/* Ref ID */}
+                            <Td py={3}>
+                              <Tag size="sm" colorScheme="gray" fontFamily="mono" fontSize="10px">
+                                {c.reference_id ?? '—'}
+                              </Tag>
+                            </Td>
+
+                            {/* Submitted */}
+                            <Td py={3}>
+                              <Text fontSize="xs" color="gray.500">{formatDate(c.submitted_at)}</Text>
+                            </Td>
+
+                            {/* Status */}
+                            <Td py={3}>
+                              <Select
+                                size="xs"
+                                value={c.status}
+                                onChange={e => handleStatusChange(c, e.target.value)}
+                                borderRadius="md"
+                                focusBorderColor="brand.500"
+                                isDisabled={updatingId === c.id}
+                                minW="110px"
+                              >
+                                {Object.entries(STATUS_CONFIG).map(([val, cfg]) => (
+                                  <option key={val} value={val}>{cfg.label}</option>
+                                ))}
+                              </Select>
+                            </Td>
+
+                            {/* Delete */}
+                            <Td py={3}>
+                              <Tooltip label="Delete lead" placement="left">
+                                <IconButton
+                                  aria-label="Delete"
+                                  icon={<Icon as={FaTrash} />}
+                                  size="xs"
+                                  variant="ghost"
+                                  colorScheme="red"
+                                  onClick={() => confirmDelete(c)}
+                                />
+                              </Tooltip>
+                            </Td>
+                          </Tr>
+                        )
+                      })
+                    )}
                   </Tbody>
                 </Table>
               </TableContainer>
-
-              {filteredRequests.length === 0 && (
-                <Box textAlign="center" py={12}>
-                  <Text color="gray.500" fontSize="lg">
-                    No consultation requests found
-                  </Text>
-                  <Text color="gray.400" fontSize="sm" mt={2}>
-                    Try adjusting your search or filter criteria
-                  </Text>
-                </Box>
-              )}
             </CardBody>
           </Card>
 
-          {/* Instructions */}
-          <Card bg="blue.50" borderColor="blue.200" borderWidth="2px">
-            <CardBody p={6}>
-              <VStack spacing={3} align="start">
-                <Heading size="md" color="blue.800">
-                  Admin Instructions
-                </Heading>
-                <Text color="blue.700" fontSize="sm">
-                  1. Monitor incoming consultation requests in real-time
-                </Text>
-                <Text color="blue.700" fontSize="sm">
-                  2. Update status as you contact and schedule patients
-                </Text>
-                <Text color="blue.700" fontSize="sm">
-                  3. Use search and filters to manage large volumes of requests
-                </Text>
-                <Text color="blue.700" fontSize="sm">
-                  4. Contact patients within 24 hours of their submission
-                </Text>
-              </VStack>
-            </CardBody>
-          </Card>
+          {/* Footer info */}
+          <HStack justify="center" spacing={2}>
+            <Icon as={FaHeartbeat} color="brand.400" fontSize="sm" />
+            <Text fontSize="xs" color="gray.400">
+              Royal Health Admin · Data refreshes on page load and after each action
+            </Text>
+          </HStack>
+
         </VStack>
       </Container>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog isOpen={isDeleteOpen} leastDestructiveRef={cancelRef} onClose={onDeleteClose} isCentered>
+        <AlertDialogOverlay>
+          <AlertDialogContent borderRadius="2xl" mx={4}>
+            <AlertDialogHeader pb={0}>
+              <HStack spacing={3}>
+                <Box bg="red.100" p={2} borderRadius="lg">
+                  <Icon as={FaTrash} color="red.500" />
+                </Box>
+                <Text fontWeight="700" fontSize="lg">Delete Lead</Text>
+              </HStack>
+            </AlertDialogHeader>
+            <AlertDialogBody py={4}>
+              <Text color="gray.600">
+                Permanently delete the consultation from{' '}
+                <Text as="span" fontWeight="700">{deleteTarget?.name}</Text>?
+              </Text>
+              {deleteTarget?.reference_id && (
+                <Tag mt={2} size="sm" colorScheme="gray" fontFamily="mono">
+                  {deleteTarget.reference_id}
+                </Tag>
+              )}
+              <Text fontSize="sm" color="red.500" mt={3} fontWeight="500">
+                This action cannot be undone.
+              </Text>
+            </AlertDialogBody>
+            <Divider />
+            <AlertDialogFooter gap={2}>
+              <Button ref={cancelRef} onClick={onDeleteClose} variant="ghost" size="sm">
+                Cancel
+              </Button>
+              <Button
+                colorScheme="red"
+                size="sm"
+                onClick={handleDelete}
+                isLoading={deleting}
+                loadingText="Deleting…"
+                borderRadius="lg"
+              >
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Box>
   )
 }

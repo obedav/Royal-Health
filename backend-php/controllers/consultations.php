@@ -9,6 +9,7 @@ global $segments;
 
 $method = $_SERVER['REQUEST_METHOD'];
 $action = isset($segments[1]) ? $segments[1] : '';
+$subAction = isset($segments[2]) ? $segments[2] : '';
 
 if ($method === 'POST') {
     if ($action === '' || $action === 'submit') {
@@ -22,8 +23,39 @@ if ($method === 'POST') {
     } else {
         Response::error('Invalid action', 404);
     }
+} elseif ($method === 'PUT') {
+    if ($action && $subAction === 'status') {
+        updateConsultationStatus($action);
+    } else {
+        Response::error('Invalid action', 404);
+    }
+} elseif ($method === 'DELETE') {
+    if ($action) {
+        deleteConsultation($action);
+    } else {
+        Response::error('Consultation ID required', 400);
+    }
 } else {
     Response::error('Method not allowed', 405);
+}
+
+function requireConsultationAdminAuth(): void {
+    $headers = getallheaders();
+    $authHeader = $headers['Authorization'] ?? '';
+    if (strpos($authHeader, 'Bearer ') !== 0) {
+        Response::error('Authentication required', 401);
+        exit;
+    }
+    try {
+        $decoded = JWT::decode(substr($authHeader, 7));
+        if (($decoded['role'] ?? '') !== 'admin') {
+            Response::error('Admin access required', 403);
+            exit;
+        }
+    } catch (Exception $e) {
+        Response::error('Invalid or expired token', 401);
+        exit;
+    }
 }
 
 function handleConsultationSubmit() {
@@ -133,9 +165,117 @@ function handleConsultationSubmit() {
 }
 
 function handleGetConsultations() {
-    // This would typically require authentication
-    // For now, return empty array or implement auth check
-    Response::error('Authentication required', 401);
+    requireConsultationAdminAuth();
+    try {
+        $db     = Database::getInstance();
+        $status = $_GET['status'] ?? '';
+        $search = $_GET['search'] ?? '';
+        $page   = max(1, (int)($_GET['page'] ?? 1));
+        $limit  = min(100, max(10, (int)($_GET['limit'] ?? 50)));
+        $offset = ($page - 1) * $limit;
+
+        $where  = [];
+        $params = [];
+
+        if ($status && $status !== 'all') {
+            $where[]  = "status = ?";
+            $params[] = $status;
+        }
+        if ($search) {
+            $where[]  = "(name LIKE ? OR phone LIKE ? OR city LIKE ?)";
+            $term     = "%{$search}%";
+            $params[] = $term;
+            $params[] = $term;
+            $params[] = $term;
+        }
+
+        $whereClause = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+
+        $total = $db->fetch("SELECT COUNT(*) as count FROM consultations {$whereClause}", $params)['count'];
+        $rows  = $db->fetchAll(
+            "SELECT id, reference_id, name, phone, email, age, gender,
+                    service_type, selected_service, state, city, address,
+                    health_concerns, preferred_date, preferred_time,
+                    status, submitted_at, created_at
+             FROM consultations {$whereClause}
+             ORDER BY submitted_at DESC
+             LIMIT ? OFFSET ?",
+            array_merge($params, [$limit, $offset])
+        );
+
+        // Summary counts
+        $counts = $db->fetchAll(
+            "SELECT status, COUNT(*) as count FROM consultations GROUP BY status"
+        );
+        $summary = ['total' => (int)$total, 'pending' => 0, 'contacted' => 0,
+                    'scheduled' => 0, 'completed' => 0, 'cancelled' => 0];
+        foreach ($counts as $c) {
+            if (isset($summary[$c['status']])) {
+                $summary[$c['status']] = (int)$c['count'];
+            }
+        }
+
+        Response::success([
+            'consultations' => $rows,
+            'summary'       => $summary,
+            'pagination'    => [
+                'page'  => $page,
+                'limit' => $limit,
+                'total' => (int)$total,
+                'pages' => (int)ceil($total / $limit),
+            ],
+        ], 'Consultations retrieved');
+
+    } catch (Exception $e) {
+        error_log("Get consultations failed: " . $e->getMessage());
+        Response::error('Failed to fetch consultations', 500);
+    }
+}
+
+function updateConsultationStatus($id) {
+    requireConsultationAdminAuth();
+    try {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $allowed = ['pending', 'contacted', 'scheduled', 'completed', 'cancelled'];
+        $status  = $input['status'] ?? '';
+
+        if (!in_array($status, $allowed)) {
+            Response::error('Invalid status value', 400);
+            return;
+        }
+
+        $db      = Database::getInstance();
+        $affected = $db->execute(
+            "UPDATE consultations SET status = ?, updated_at = ? WHERE id = ?",
+            [$status, date('Y-m-d H:i:s'), $id]
+        );
+
+        if ($affected > 0) {
+            Response::success(['id' => $id, 'status' => $status], 'Status updated');
+        } else {
+            Response::error('Consultation not found', 404);
+        }
+    } catch (Exception $e) {
+        error_log("Update consultation status failed: " . $e->getMessage());
+        Response::error('Failed to update status', 500);
+    }
+}
+
+function deleteConsultation($id) {
+    requireConsultationAdminAuth();
+    try {
+        $db      = Database::getInstance();
+        $affected = $db->execute("DELETE FROM consultations WHERE id = ?", [$id]);
+
+        if ($affected > 0) {
+            Response::success(['id' => $id], 'Consultation deleted');
+        } else {
+            Response::error('Consultation not found', 404);
+        }
+    } catch (Exception $e) {
+        error_log("Delete consultation failed: " . $e->getMessage());
+        Response::error('Failed to delete consultation', 500);
+    }
 }
 
 function sendConsultationAdminNotification($input, $referenceId) {
