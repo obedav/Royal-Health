@@ -73,7 +73,7 @@ const ProtectedAdminRoute: React.FC<Props> = ({ children }) => {
         return
       }
 
-      if (data.role !== 'admin') {
+      if (data.user?.role !== 'admin') {
         setError('Access denied. Admin credentials required.')
         return
       }
