@@ -15,6 +15,8 @@ import {
 } from 'react-icons/fa'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { API_CONFIG } from '../config/api.config'
+import AdminLayout from '../components/admin/AdminLayout'
+import { getAdminToken, signOut } from '../utils/adminAuth'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -48,23 +50,6 @@ interface Summary {
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-
-const ADMIN_AUTH_KEY = 'rh_admin_auth'
-
-function getAdminToken(): string | null {
-  try {
-    const raw = sessionStorage.getItem(ADMIN_AUTH_KEY)
-    if (!raw) return null
-    const auth = JSON.parse(raw)
-    if (Date.now() >= auth.expiresAt) { sessionStorage.removeItem(ADMIN_AUTH_KEY); return null }
-    return auth.token
-  } catch { return null }
-}
-
-function signOut() {
-  sessionStorage.removeItem(ADMIN_AUTH_KEY)
-  window.location.reload()
-}
 
 const STATUS_CONFIG = {
   pending:   { color: 'orange', icon: FaClock,       label: 'Pending' },
@@ -245,22 +230,22 @@ const AdminConsultations: React.FC = () => {
   ]
 
   return (
-    <Box minH="100vh" bg="gray.50">
+    <AdminLayout>
+      <Container maxW="7xl" py={8}>
+        <VStack spacing={6} align="stretch">
 
-      {/* Header */}
-      <Box bg="white" borderBottom="1px solid" borderColor="gray.200" px={6} py={4} position="sticky" top={0} zIndex={10}>
-        <Flex align="center" maxW="7xl" mx="auto">
-          <HStack spacing={3}>
-            <Box bg="brand.500" p={2} borderRadius="lg">
-              <Icon as={FaStethoscope} color="white" fontSize="lg" />
-            </Box>
-            <Box>
-              <Heading size="sm" color="gray.800">Royal Health Admin</Heading>
-              <Text fontSize="xs" color="gray.500">Consultation Management</Text>
-            </Box>
-          </HStack>
-          <Spacer />
-          <HStack spacing={2}>
+          {/* Page title */}
+          <Flex align="center">
+            <HStack spacing={3}>
+              <Box bg="brand.500" p={2} borderRadius="lg" display="flex" alignItems="center" justifyContent="center">
+                <Icon as={FaStethoscope} color="white" fontSize="md" />
+              </Box>
+              <Box>
+                <Heading size="lg" color="gray.800">Consultations</Heading>
+                <Text fontSize="xs" color="gray.500">Manage all patient consultation requests</Text>
+              </Box>
+            </HStack>
+            <Spacer />
             <Tooltip label="Refresh data">
               <IconButton
                 aria-label="Refresh"
@@ -272,21 +257,7 @@ const AdminConsultations: React.FC = () => {
                 onClick={() => fetchConsultations(false)}
               />
             </Tooltip>
-            <Button
-              leftIcon={<Icon as={FaSignOutAlt} />}
-              size="sm"
-              variant="ghost"
-              colorScheme="red"
-              onClick={signOut}
-            >
-              Sign Out
-            </Button>
-          </HStack>
-        </Flex>
-      </Box>
-
-      <Container maxW="7xl" py={8}>
-        <VStack spacing={6} align="stretch">
+          </Flex>
 
           {/* Stats */}
           <SimpleGrid columns={{ base: 2, md: 3, lg: 5 }} spacing={4}>
@@ -529,7 +500,7 @@ const AdminConsultations: React.FC = () => {
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
-    </Box>
+    </AdminLayout>
   )
 }
 

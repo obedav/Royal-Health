@@ -109,6 +109,10 @@ try {
             require_once 'controllers/consultations.php';
             break;
 
+        case 'admin':
+            require_once 'controllers/admin.php';
+            break;
+
         case 'errors':
             require_once 'errors.php';
             break;

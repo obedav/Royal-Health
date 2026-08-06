@@ -14,7 +14,10 @@ const Booking = React.lazy(() => import('../pages/Booking'))
 const About = React.lazy(() => import('../pages/About'))
 const Contact = React.lazy(() => import('../pages/Contact'))
 const Consultation = React.lazy(() => import('../pages/Consultation'))
+const AdminDashboard     = React.lazy(() => import('../pages/AdminDashboard'))
 const AdminConsultations = React.lazy(() => import('../pages/AdminConsultations'))
+const AdminBookings      = React.lazy(() => import('../pages/AdminBookings'))
+const AdminContacts      = React.lazy(() => import('../pages/AdminContacts'))
 
 // Loading component for lazy-loaded routes
 const RouteLoader: React.FC = () => (
@@ -159,11 +162,49 @@ const AppRouter: React.FC = () => {
 
       {/* Admin Routes — requires admin credentials */}
       <Route
+        path={ROUTES.ADMIN.BASE}
+        element={<Navigate to={ROUTES.ADMIN.DASHBOARD} replace />}
+      />
+
+      <Route
+        path={ROUTES.ADMIN.DASHBOARD}
+        element={
+          <ProtectedAdminRoute>
+            <RouteWrapper>
+              <AdminDashboard />
+            </RouteWrapper>
+          </ProtectedAdminRoute>
+        }
+      />
+
+      <Route
         path={ROUTES.ADMIN.CONSULTATIONS}
         element={
           <ProtectedAdminRoute>
             <RouteWrapper>
               <AdminConsultations />
+            </RouteWrapper>
+          </ProtectedAdminRoute>
+        }
+      />
+
+      <Route
+        path={ROUTES.ADMIN.BOOKINGS}
+        element={
+          <ProtectedAdminRoute>
+            <RouteWrapper>
+              <AdminBookings />
+            </RouteWrapper>
+          </ProtectedAdminRoute>
+        }
+      />
+
+      <Route
+        path={ROUTES.ADMIN.CONTACTS}
+        element={
+          <ProtectedAdminRoute>
+            <RouteWrapper>
+              <AdminContacts />
             </RouteWrapper>
           </ProtectedAdminRoute>
         }

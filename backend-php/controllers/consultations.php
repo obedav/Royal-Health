@@ -40,14 +40,13 @@ if ($method === 'POST') {
 }
 
 function requireConsultationAdminAuth(): void {
-    $headers = getallheaders();
-    $authHeader = $headers['Authorization'] ?? '';
-    if (strpos($authHeader, 'Bearer ') !== 0) {
+    $token = JWT::getTokenFromHeader();
+    if (!$token) {
         Response::error('Authentication required', 401);
         exit;
     }
     try {
-        $decoded = JWT::decode(substr($authHeader, 7));
+        $decoded = JWT::decode($token);
         if (($decoded['role'] ?? '') !== 'admin') {
             Response::error('Admin access required', 403);
             exit;

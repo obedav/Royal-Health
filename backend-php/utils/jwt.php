@@ -58,17 +58,21 @@ class JWT {
     }
     
     public static function getTokenFromHeader() {
-        $headers = getallheaders();
-        $authorization = $headers['Authorization'] ?? $headers['authorization'] ?? '';
-        
-        if (!$authorization) {
-            return null;
+        // On Apache with PHP-CGI/FastCGI, getallheaders() may drop the
+        // Authorization header. Check $_SERVER as a reliable fallback.
+        $authorization = $_SERVER['HTTP_AUTHORIZATION']
+            ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION']
+            ?? '';
+
+        if (!$authorization && function_exists('getallheaders')) {
+            $headers = getallheaders();
+            $authorization = $headers['Authorization'] ?? $headers['authorization'] ?? '';
         }
-        
-        if (strpos($authorization, 'Bearer ') === 0) {
+
+        if ($authorization && strpos($authorization, 'Bearer ') === 0) {
             return substr($authorization, 7);
         }
-        
+
         return null;
     }
     

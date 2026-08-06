@@ -130,9 +130,10 @@ export const ROUTES = {
   CONTACT: '/contact',
   ADMIN: {
     BASE: '/admin',
+    DASHBOARD: '/admin/dashboard',
     CONSULTATIONS: '/admin/consultations',
     BOOKINGS: '/admin/bookings',
-    DASHBOARD: '/admin/dashboard',
+    CONTACTS: '/admin/contacts',
   },
 } as const
 
