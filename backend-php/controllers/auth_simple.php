@@ -1,65 +1,71 @@
 <?php
 /**
- * Simple Authentication Controller
+ * Authentication Controller
  */
 
-$db = Database::getInstance();
+$db     = Database::getInstance();
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Get path segments from global scope
 global $segments;
 $action = isset($segments[1]) ? $segments[1] : '';
 
 if ($method === 'POST' && $action === 'login') {
     handleSimpleLogin($db);
 } else {
-    Response::error('Endpoint not found: ' . $method . ' ' . $action, 404);
+    Response::error('Endpoint not found', 404);
 }
 
 function handleSimpleLogin($db) {
     try {
-        // Get JSON input
+        // Rate limit: 10 attempts per IP per 15 minutes
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        if (!checkRateLimit('login_' . $ip, 10, 900)) {
+            Response::error('Too many login attempts. Please try again later.', 429);
+            return;
+        }
+
         $input = json_decode(file_get_contents('php://input'), true);
-        
+
         if (!$input) {
             Response::error('Invalid JSON input', 400);
             return;
         }
-        
-        if (!isset($input['email']) || !isset($input['password'])) {
+
+        if (empty($input['email']) || empty($input['password'])) {
             Response::error('Email and password required', 400);
             return;
         }
-        
-        // Find user
+
         $user = $db->fetch("SELECT * FROM users WHERE email = ?", [$input['email']]);
-        
-        if (!$user) {
-            Response::error('User not found', 401);
+
+        // Single generic message prevents email enumeration (H-5)
+        if (!$user || !password_verify($input['password'], $user['password_hash'])) {
+            Response::error('Invalid credentials', 401);
             return;
         }
-        
-        // Verify password
-        if (!password_verify($input['password'], $user['password_hash'])) {
-            Response::error('Invalid password', 401);
-            return;
-        }
-        
-        // Success response
+
+        // Issue a properly signed JWT (C-2 — replaces the broken base64 token)
+        $tokenPayload = [
+            'userId' => $user['id'],
+            'email'  => $user['email'],
+            'role'   => $user['role'],
+            'exp'    => time() + 3600,
+        ];
+
         Response::success([
-            'accessToken' => base64_encode($user['id'] . ':' . time()),
+            'accessToken' => JWT::encode($tokenPayload),
             'user' => [
-                'id' => $user['id'],
-                'email' => $user['email'],
+                'id'        => $user['id'],
+                'email'     => $user['email'],
                 'firstName' => $user['first_name'],
-                'lastName' => $user['last_name'],
-                'role' => $user['role']
+                'lastName'  => $user['last_name'],
+                'role'      => $user['role'],
             ],
-            'expiresIn' => 3600
+            'expiresIn' => 3600,
         ], 'Login successful');
-        
+
     } catch (Exception $e) {
-        Response::error('Login failed: ' . $e->getMessage(), 500);
+        error_log("Login error: " . $e->getMessage());
+        Response::error('Login failed', 500);
     }
 }
-?>

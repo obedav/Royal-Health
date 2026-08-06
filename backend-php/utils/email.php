@@ -6,6 +6,10 @@
 
 class EmailService {
 
+    private static function sanitizeHeader(string $value): string {
+        return str_replace(["\r", "\n", "\0"], '', $value);
+    }
+
     // Email configuration
     private const ADMIN_EMAILS = [
         'alexanaba22@gmail.com',
@@ -47,11 +51,11 @@ class EmailService {
 
         $headers = [
             'From: ' . self::FROM_NAME . ' <' . self::FROM_EMAIL . '>',
-            'Reply-To: ' . ($booking['patient_email'] ?? self::SUPPORT_EMAIL),
+            'Reply-To: ' . self::sanitizeHeader($booking['patient_email'] ?? self::SUPPORT_EMAIL),
             'MIME-Version: 1.0',
             'Content-Type: text/html; charset=UTF-8',
-            'X-Mailer: Royal Health PHP/' . phpversion(),
-            'X-Priority: 2' // High priority for bookings
+            'X-Mailer: Royal Health Mailer',
+            'X-Priority: 2'
         ];
 
         $success = true;
@@ -79,7 +83,7 @@ class EmailService {
             'Reply-To: ' . self::SUPPORT_EMAIL,
             'MIME-Version: 1.0',
             'Content-Type: text/html; charset=UTF-8',
-            'X-Mailer: Royal Health PHP/' . phpversion()
+            'X-Mailer: Royal Health Mailer'
         ];
 
         return mail($booking['patient_email'], $subject, $emailBody, implode("\r\n", $headers));
@@ -99,7 +103,7 @@ class EmailService {
                 'Reply-To: ' . $contactData['email'],
                 'MIME-Version: 1.0',
                 'Content-Type: text/html; charset=UTF-8',
-                'X-Mailer: Royal Health PHP/' . phpversion()
+                'X-Mailer: Royal Health Mailer'
             ];
 
             // Send to all admin emails
@@ -135,7 +139,7 @@ class EmailService {
             'Reply-To: ' . self::SUPPORT_EMAIL,
             'MIME-Version: 1.0',
             'Content-Type: text/html; charset=UTF-8',
-            'X-Mailer: Royal Health PHP/' . phpversion()
+            'X-Mailer: Royal Health Mailer'
         ];
 
         return mail($contactData['email'], $subject, $emailBody, implode("\r\n", $headers));

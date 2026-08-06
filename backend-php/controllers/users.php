@@ -299,7 +299,7 @@ function registerUser() {
             'first_name' => trim($input['firstName'] ?? ''),
             'last_name' => trim($input['lastName'] ?? ''),
             'phone' => trim($input['phone'] ?? ''),
-            'role' => $input['role'] ?? 'patient',
+            'role' => 'patient',
             'status' => 'active',
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s')
@@ -364,17 +364,10 @@ function camelToSnake($input) {
     return strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $input));
 }
 
-function generateUUID() {
-    return sprintf(
-        '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-        mt_rand(0, 0xffff),
-        mt_rand(0, 0xffff),
-        mt_rand(0, 0xffff),
-        mt_rand(0, 0x0fff) | 0x4000,
-        mt_rand(0, 0x3fff) | 0x8000,
-        mt_rand(0, 0xffff),
-        mt_rand(0, 0xffff),
-        mt_rand(0, 0xffff)
-    );
+function generateUUID(): string {
+    $bytes = random_bytes(16);
+    $bytes[6] = chr((ord($bytes[6]) & 0x0f) | 0x40);
+    $bytes[8] = chr((ord($bytes[8]) & 0x3f) | 0x80);
+    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($bytes), 4));
 }
 ?>

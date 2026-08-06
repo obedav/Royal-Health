@@ -52,9 +52,17 @@ function handleContactSubmit() {
             return;
         }
 
-        // Validate message length
+        // Validate field lengths (M-8)
         if (strlen(trim($input['message'])) < 10) {
             Response::error('Message must be at least 10 characters long', 400);
+            return;
+        }
+        if (strlen(trim($input['message'])) > 5000) {
+            Response::error('Message must not exceed 5000 characters', 400);
+            return;
+        }
+        if (strlen(trim($input['subject'])) > 200) {
+            Response::error('Subject must not exceed 200 characters', 400);
             return;
         }
 
@@ -246,10 +254,10 @@ function sendContactAdminNotification($input, $referenceId) {
 
     $headers = implode("\r\n", [
         'From: Royal Health Consult <noreply@royalhealthconsult.com>',
-        'Reply-To: ' . $input['email'],
+        'Reply-To: ' . sanitizeEmailHeader($input['email']),
         'MIME-Version: 1.0',
         'Content-Type: text/html; charset=UTF-8',
-        'X-Mailer: PHP/' . phpversion()
+        'X-Mailer: Royal Health Mailer'
     ]);
 
     // Send email to all admin addresses
@@ -277,16 +285,13 @@ function sendContactAdminNotification($input, $referenceId) {
     }
 }
 
-function generateContactUUID() {
-    return sprintf(
-        '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-        mt_rand(0, 0xffff),
-        mt_rand(0, 0xffff),
-        mt_rand(0, 0xffff),
-        mt_rand(0, 0x0fff) | 0x4000,
-        mt_rand(0, 0x3fff) | 0x8000,
-        mt_rand(0, 0xffff),
-        mt_rand(0, 0xffff),
-        mt_rand(0, 0xffff)
-    );
+function sanitizeEmailHeader(string $value): string {
+    return str_replace(["\r", "\n", "\0"], '', $value);
+}
+
+function generateContactUUID(): string {
+    $bytes = random_bytes(16);
+    $bytes[6] = chr((ord($bytes[6]) & 0x0f) | 0x40);
+    $bytes[8] = chr((ord($bytes[8]) & 0x3f) | 0x80);
+    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($bytes), 4));
 }

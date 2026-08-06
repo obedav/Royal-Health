@@ -39,9 +39,9 @@ interface BookingState {
   resetBooking: () => void
 }
 
-// Generate guest session ID
+// Generate guest session ID using cryptographically secure PRNG (L-5)
 const generateSessionId = (): string => {
-  return `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  return `guest_${crypto.randomUUID()}`
 }
 
 // Session storage helpers

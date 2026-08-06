@@ -113,7 +113,8 @@ function getServices() {
         Response::success($services, 'Services retrieved successfully');
 
     } catch (Exception $e) {
-        Response::error('Failed to fetch services: ' . $e->getMessage(), 500);
+        error_log("Get services failed: " . $e->getMessage());
+        Response::error('Failed to fetch services', 500);
     }
 }
 
@@ -181,7 +182,8 @@ function createGuestBooking() {
         Response::success($response, 'Guest booking created successfully');
 
     } catch (Exception $e) {
-        Response::error('Failed to create booking: ' . $e->getMessage(), 500);
+        error_log("Create guest booking failed: " . $e->getMessage());
+        Response::error('Failed to create booking', 500);
     }
 }
 
@@ -252,13 +254,20 @@ function createUserBooking() {
         Response::success($response, 'User booking created successfully');
 
     } catch (Exception $e) {
-        Response::error('Failed to create booking: ' . $e->getMessage(), 500);
+        error_log("Create user booking failed: " . $e->getMessage());
+        Response::error('Failed to create booking', 500);
     }
 }
 
 function getBookingConfirmation($bookingId) {
     try {
         $sessionId = $_GET['sessionId'] ?? null;
+        $userId = getCurrentUserId();
+
+        if (!$sessionId && !$userId) {
+            Response::error('Authentication required to view booking', 401);
+            return;
+        }
 
         $db = Database::getInstance();
 
@@ -268,6 +277,9 @@ function getBookingConfirmation($bookingId) {
         if ($sessionId) {
             $query .= " AND session_id = ?";
             $params[] = $sessionId;
+        } else {
+            $query .= " AND user_id = ?";
+            $params[] = $userId;
         }
 
         $booking = $db->fetch($query, $params);
@@ -294,13 +306,20 @@ function getBookingConfirmation($bookingId) {
         Response::success($confirmation, 'Booking confirmation retrieved');
 
     } catch (Exception $e) {
-        Response::error('Failed to fetch booking confirmation: ' . $e->getMessage(), 500);
+        error_log("Get booking confirmation failed: " . $e->getMessage());
+        Response::error('Failed to fetch booking confirmation', 500);
     }
 }
 
 function getBookingStatus($bookingId) {
     try {
         $sessionId = $_GET['sessionId'] ?? null;
+        $userId = getCurrentUserId();
+
+        if (!$sessionId && !$userId) {
+            Response::error('Authentication required to view booking status', 401);
+            return;
+        }
 
         $db = Database::getInstance();
 
@@ -310,6 +329,9 @@ function getBookingStatus($bookingId) {
         if ($sessionId) {
             $query .= " AND session_id = ?";
             $params[] = $sessionId;
+        } else {
+            $query .= " AND user_id = ?";
+            $params[] = $userId;
         }
 
         $booking = $db->fetch($query, $params);
@@ -327,13 +349,20 @@ function getBookingStatus($bookingId) {
         ], 'Booking status retrieved');
 
     } catch (Exception $e) {
-        Response::error('Failed to check booking status: ' . $e->getMessage(), 500);
+        error_log("Get booking status failed: " . $e->getMessage());
+        Response::error('Failed to check booking status', 500);
     }
 }
 
 function cancelBooking($bookingId) {
     try {
         $sessionId = $_GET['sessionId'] ?? null;
+        $userId = getCurrentUserId();
+
+        if (!$sessionId && !$userId) {
+            Response::error('Authentication required to cancel a booking', 401);
+            return;
+        }
 
         $db = Database::getInstance();
 
@@ -343,18 +372,22 @@ function cancelBooking($bookingId) {
         if ($sessionId) {
             $query .= " AND session_id = ?";
             $params[] = $sessionId;
+        } else {
+            $query .= " AND user_id = ?";
+            $params[] = $userId;
         }
 
-        $result = $db->execute($query, $params);
+        $affected = $db->execute($query, $params);
 
-        if ($result) {
+        if ($affected > 0) {
             Response::success(['success' => true, 'message' => 'Booking cancelled successfully']);
         } else {
-            Response::error('Booking not found or already cancelled', 404);
+            Response::error('Booking not found or access denied', 404);
         }
 
     } catch (Exception $e) {
-        Response::error('Failed to cancel booking: ' . $e->getMessage(), 500);
+        error_log("Cancel booking failed: " . $e->getMessage());
+        Response::error('Failed to cancel booking', 500);
     }
 }
 
@@ -366,7 +399,8 @@ function getGuestBookings($sessionId) {
         Response::success($bookings, 'Guest bookings retrieved');
 
     } catch (Exception $e) {
-        Response::error('Failed to fetch guest bookings: ' . $e->getMessage(), 500);
+        error_log("Get guest bookings failed: " . $e->getMessage());
+        Response::error('Failed to fetch guest bookings', 500);
     }
 }
 
@@ -384,7 +418,8 @@ function getMyBookings() {
         Response::success($bookings, 'User bookings retrieved');
 
     } catch (Exception $e) {
-        Response::error('Failed to fetch user bookings: ' . $e->getMessage(), 500);
+        error_log("Get user bookings failed: " . $e->getMessage());
+        Response::error('Failed to fetch user bookings', 500);
     }
 }
 
@@ -423,7 +458,8 @@ function convertGuestToUser() {
         Response::success(['success' => true, 'userId' => $userId], 'Account created and bookings converted');
 
     } catch (Exception $e) {
-        Response::error('Failed to convert guest to user: ' . $e->getMessage(), 500);
+        error_log("Convert guest to user failed: " . $e->getMessage());
+        Response::error('Failed to convert guest to user', 500);
     }
 }
 
@@ -457,17 +493,10 @@ function getCurrentUserId() {
     return null;
 }
 
-function generateUUID() {
-    return sprintf(
-        '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-        mt_rand(0, 0xffff),
-        mt_rand(0, 0xffff),
-        mt_rand(0, 0xffff),
-        mt_rand(0, 0x0fff) | 0x4000,
-        mt_rand(0, 0x3fff) | 0x8000,
-        mt_rand(0, 0xffff),
-        mt_rand(0, 0xffff),
-        mt_rand(0, 0xffff)
-    );
+function generateUUID(): string {
+    $bytes = random_bytes(16);
+    $bytes[6] = chr((ord($bytes[6]) & 0x0f) | 0x40);
+    $bytes[8] = chr((ord($bytes[8]) & 0x3f) | 0x80);
+    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($bytes), 4));
 }
 ?>

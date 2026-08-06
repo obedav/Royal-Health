@@ -156,23 +156,8 @@ const SimpleConsultationForm: React.FC<SimpleConsultationFormProps> = ({
           isClosable: true,
         })
 
-        // Still save data locally for potential retry
+        // Preserve form context in memory for in-session retry only (M-2: no PII to localStorage)
         setConsultationData(data)
-
-        // Log for admin monitoring (local storage as fallback)
-        try {
-          const existingRequests = JSON.parse(localStorage.getItem('pendingConsultations') || '[]')
-          existingRequests.push({
-            ...data,
-            submittedAt: new Date().toISOString(),
-            status: 'pending_offline',
-            selectedService: selectedService?.name || 'Not specified',
-            error: error instanceof Error ? error.message : 'Network error'
-          })
-          localStorage.setItem('pendingConsultations', JSON.stringify(existingRequests))
-        } catch (storageError) {
-          console.warn('Could not save to local storage:', storageError)
-        }
       } else {
         // Server error
         toast({

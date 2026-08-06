@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { Box, Center, VStack, Spinner, Text } from '@chakra-ui/react'
 import ErrorBoundary from '../components/common/ErrorBoundary'
 import PageLoader from '../components/common/PageLoader'
+import ProtectedAdminRoute from '../components/common/ProtectedAdminRoute'
 import { ROUTES } from '../config/app.config'
 
 // Lazy load pages for better performance
@@ -156,13 +157,15 @@ const AppRouter: React.FC = () => {
         }
       />
 
-      {/* Admin Routes */}
+      {/* Admin Routes — requires admin credentials */}
       <Route
         path={ROUTES.ADMIN.CONSULTATIONS}
         element={
-          <RouteWrapper>
-            <AdminConsultations />
-          </RouteWrapper>
+          <ProtectedAdminRoute>
+            <RouteWrapper>
+              <AdminConsultations />
+            </RouteWrapper>
+          </ProtectedAdminRoute>
         }
       />
 

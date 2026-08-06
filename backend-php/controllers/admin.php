@@ -14,7 +14,27 @@ if ($method === 'GET' && $action === 'contact-messages') {
     sendJsonResponse(['success' => false, 'message' => 'Admin endpoint not found'], 404);
 }
 
+function requireAdminAuth(): void {
+    $headers = getallheaders();
+    $authHeader = $headers['Authorization'] ?? '';
+    if (strpos($authHeader, 'Bearer ') !== 0) {
+        Response::error('Authentication required', 401);
+        exit;
+    }
+    try {
+        $decoded = JWT::decode(substr($authHeader, 7));
+        if (($decoded['role'] ?? '') !== 'admin') {
+            Response::error('Admin access required', 403);
+            exit;
+        }
+    } catch (Exception $e) {
+        Response::error('Invalid or expired token', 401);
+        exit;
+    }
+}
+
 function handleGetContactMessages($filter = '') {
+    requireAdminAuth();
     try {
         $db = Database::getInstance();
         
@@ -61,6 +81,7 @@ function handleGetContactMessages($filter = '') {
 }
 
 function handleUpdateContactMessage($messageId) {
+    requireAdminAuth();
     try {
         $input = json_decode(file_get_contents('php://input'), true);
         
@@ -106,13 +127,10 @@ function handleUpdateContactMessage($messageId) {
 }
 
 function sendJsonResponse($data, $code = 200) {
-    if (ob_get_level()) ob_clean();
-    http_response_code($code);
-    header('Content-Type: application/json');
-    header('Access-Control-Allow-Origin: https://ancerlarins.com');
-    header('Access-Control-Allow-Methods: GET, PUT, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type, Authorization');
-    echo json_encode($data);
-    exit;
+    if ($code >= 200 && $code < 300) {
+        Response::success($data);
+    } else {
+        Response::error($data['message'] ?? 'Error', $code);
+    }
 }
 ?>

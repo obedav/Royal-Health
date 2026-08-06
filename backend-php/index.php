@@ -38,6 +38,7 @@ require_once 'config/config.php';
 require_once 'utils/response.php';
 require_once 'utils/jwt.php';
 require_once 'utils/validation.php';
+require_once 'utils/ratelimit.php';
 
 // Simple router
 $request_uri = $_SERVER['REQUEST_URI'];

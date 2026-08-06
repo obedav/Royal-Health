@@ -45,10 +45,24 @@ function handleConsultationSubmit() {
             }
         }
 
-        // Validate phone number (basic check)
+        // Validate phone number
         $phone = is_string($input['phone']) ? trim($input['phone']) : '';
         if (strlen($phone) < 10) {
             Response::error('Please enter a valid phone number', 400);
+            return;
+        }
+
+        // Field length limits (M-8)
+        if (isset($input['name']) && strlen(trim($input['name'])) > 100) {
+            Response::error('Name must not exceed 100 characters', 400);
+            return;
+        }
+        if (isset($input['address']) && strlen(trim($input['address'])) > 500) {
+            Response::error('Address must not exceed 500 characters', 400);
+            return;
+        }
+        if (isset($input['healthConcerns']) && strlen(trim($input['healthConcerns'])) > 2000) {
+            Response::error('Health concerns must not exceed 2000 characters', 400);
             return;
         }
 
@@ -293,10 +307,10 @@ function sendConsultationAdminNotification($input, $referenceId) {
 
     $headers = implode("\r\n", [
         'From: Royal Health Consult <noreply@royalhealthconsult.com>',
-        'Reply-To: ' . ($customerEmail ? $customerEmail : 'care@royalhealthconsult.com'),
+        'Reply-To: ' . sanitizeConsultationEmailHeader($customerEmail ?: 'care@royalhealthconsult.com'),
         'MIME-Version: 1.0',
         'Content-Type: text/html; charset=UTF-8',
-        'X-Mailer: PHP/' . phpversion()
+        'X-Mailer: Royal Health Mailer',
     ]);
 
     // Send email to all admin addresses
@@ -406,7 +420,7 @@ function sendConsultationCustomerConfirmation($input, $referenceId) {
         'Reply-To: care@royalhealthconsult.com',
         'MIME-Version: 1.0',
         'Content-Type: text/html; charset=UTF-8',
-        'X-Mailer: PHP/' . phpversion()
+        'X-Mailer: Royal Health Mailer',
     ]);
 
     $result = mail($customerEmail, $subject, $emailBody, $headers);
@@ -418,16 +432,13 @@ function sendConsultationCustomerConfirmation($input, $referenceId) {
     return $result;
 }
 
-function generateConsultationUUID() {
-    return sprintf(
-        '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-        mt_rand(0, 0xffff),
-        mt_rand(0, 0xffff),
-        mt_rand(0, 0xffff),
-        mt_rand(0, 0x0fff) | 0x4000,
-        mt_rand(0, 0x3fff) | 0x8000,
-        mt_rand(0, 0xffff),
-        mt_rand(0, 0xffff),
-        mt_rand(0, 0xffff)
-    );
+function sanitizeConsultationEmailHeader(string $value): string {
+    return str_replace(["\r", "\n", "\0"], '', $value);
+}
+
+function generateConsultationUUID(): string {
+    $bytes = random_bytes(16);
+    $bytes[6] = chr((ord($bytes[6]) & 0x0f) | 0x40);
+    $bytes[8] = chr((ord($bytes[8]) & 0x3f) | 0x80);
+    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($bytes), 4));
 }
